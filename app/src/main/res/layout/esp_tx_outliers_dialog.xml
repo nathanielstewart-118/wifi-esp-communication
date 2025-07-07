@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView  xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <LinearLayout
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:padding="16dp"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:layout_height="wrap_content"
+        >
+        <TableLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:stretchColumns="*"
+            android:minHeight="200dp"
+            android:id="@+id/esp_tx_outliers_edit_tb"
+            android:gravity="top"
+            >
+            <TableRow
+                android:background="@color/bs_primary">
+                <TextView
+                    android:padding="16dp"
+                    android:textStyle="bold"
+                    android:textColor="@color/white"
+                    android:text="Order">
+                </TextView>
+                <TextView
+                    android:padding="16dp"
+                    android:textStyle="bold"
+                    android:textColor="@color/white"
+                    android:text="Outlier">
+                </TextView>
+                <TextView
+                    android:padding="16dp"
+                    android:textStyle="bold"
+                    android:textColor="@color/white"
+                    android:text="Comparison">
+                </TextView>
+                <TextView
+                    android:padding="16dp"
+                    android:textStyle="bold"
+                    android:textColor="@color/white"
+                    android:text="Activate">
+                </TextView>
+
+            </TableRow>
+        </TableLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            >
+            <Button
+                android:id="@+id/esp_tx_save_outliers_btn"
+                android:layout_width="150dp"
+                android:backgroundTint="@color/bs_success"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:text="Save"
+                android:padding="8dp" />
+            <Button
+                android:id="@+id/esp_tx_close_outliers_modal_btn"
+                android:layout_width="150dp"
+                android:backgroundTint="@color/bs_secondary"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:text="Cancel"
+                android:padding="8dp" />
+
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

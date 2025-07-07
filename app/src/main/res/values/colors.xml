@@ -7,4 +7,25 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="nav_item_normal">#444444</color>
+    <color name="nav_item_checked">#FF5722</color>
+    <color name="bs_primary">#0d6efd</color>
+    <color name="bs_secondary">#6c757d</color>
+    <color name="bs_success">#198754</color>
+    <color name="bs_danger">#dc3545</color>
+    <color name="bs_warning">#ffc107</color>
+    <color name="bs_info">#0dcaf0</color>
+    <color name="bs_light">#f8f9fa</color>
+    <color name="bs_dark">#212529</color>
+    <color name="tr_light">#f8f9fa</color> <!-- Bootstrap's table-light -->
+
+    <!-- Selected Row Backgrounds -->
+    <color name="tr_primary">#0d6efd</color> <!-- Bootstrap's primary -->
+    <color name="tr_success">#198754</color> <!-- Bootstrap's success -->
+    <color name="tr_info">#0dcaf0</color>    <!-- Bootstrap's info -->
+    <color name="tr_warning">#ffc107</color> <!-- Bootstrap's warning -->
+    <color name="tr_danger">#dc3545</color>  <!-- Bootstrap's danger -->
+
+    <!-- Optional: Active row (light gray-blue shade) -->
+    <color name="tr_active">#e9ecef</color>  <!-- Similar to Bootstrap's active row -->
 </resources>

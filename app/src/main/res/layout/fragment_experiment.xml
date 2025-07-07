@@ -1,0 +1,352 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/scrollView"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:id="@+id/rootLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Save & Load Buttons -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_gravity="center_horizontal"
+            android:weightSum="2">
+
+            <Button
+                android:id="@+id/btnSave"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_weight="1"
+                android:layout_margin="16dp"
+                android:backgroundTint="@color/bs_success"
+                android:text="Save" />
+
+            <Button
+                android:id="@+id/btnLoad"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_margin="16dp"
+                android:backgroundTint="@color/bs_primary"
+                android:layout_weight="1"
+                android:text="load" />
+        </LinearLayout>
+
+        <!-- Spacer -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="16dp" />
+
+        <!-- Experiment Set Buttons -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_gravity="center_horizontal"
+            android:weightSum="4"
+            android:padding="8dp">
+
+            <Button
+                android:id="@+id/btnSet1"
+                android:layout_width="90dp"
+                android:layout_height="50dp"
+                android:text="SET1"
+                android:textStyle="bold"
+                android:textSize="18sp"
+                android:layout_margin="4dp"
+                android:backgroundTint="@color/bs_info" />
+
+            <Button
+                android:id="@+id/btnSet2"
+                android:layout_width="90dp"
+                android:layout_height="50dp"
+                android:text="SET2"
+                android:textStyle="bold"
+                android:textSize="18sp"
+                android:layout_margin="4dp"
+                android:backgroundTint="@color/bs_info" />
+
+            <Button
+                android:id="@+id/btnSet3"
+                android:layout_width="90dp"
+                android:layout_height="50dp"
+                android:text="SET3"
+                android:textStyle="bold"
+                android:textSize="18sp"
+                android:layout_margin="4dp"
+                android:backgroundTint="@color/bs_info" />
+
+            <Button
+                android:id="@+id/btnSet4"
+                android:layout_width="90dp"
+                android:layout_height="50dp"
+                android:text="SET4"
+                android:textStyle="bold"
+                android:textSize="18sp"
+                android:layout_margin="4dp"
+                android:backgroundTint="@color/bs_info" />
+        </LinearLayout>
+
+        <!-- Divider -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#B0B0B0"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp" />
+
+        <!-- Command Selection Layout -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="50dp"
+            android:weightSum="5">
+
+            <!-- Left Labels -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Command selection"
+                    android:textSize="12sp"
+                    android:paddingBottom="8dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="N Trials"
+                    android:textSize="18sp"
+                    android:paddingVertical="6dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Command"
+                    android:textSize="18sp"
+                    android:paddingVertical="6dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Rest"
+                    android:textSize="18sp"
+                    android:paddingVertical="6dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Rest-Random"
+                    android:textSize="18sp"
+                    android:paddingVertical="6dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Pre-Run"
+                    android:textSize="18sp"
+                    android:paddingVertical="6dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Post-Run"
+                    android:textSize="18sp"
+                    android:paddingVertical="6dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Run-Time"
+                    android:textSize="18sp"
+                    android:paddingTop="12dp"
+                    android:paddingBottom="4dp" />
+            </LinearLayout>
+
+            <!-- Middle Buttons/Inputs -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_weight="2"
+                android:orientation="vertical"
+                android:layout_height="wrap_content"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp">
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/dropdown_menu"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Choose an option">
+
+                    <AutoCompleteTextView
+                        android:id="@+id/auto_complete_textview"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="none" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <EditText
+                    android:id="@+id/experiment_n_trials_input"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:hint="Enter the total number of commands"
+                    android:inputType="number" />
+
+                <EditText
+                    android:id="@+id/experiment_command_input"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:hint="Enter time (in 0.1 degree increments)"
+                    android:inputType="numberDecimal" />
+
+                <EditText
+                    android:id="@+id/experiment_rest_random_input"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:hint="Enter time (in 0.1 degree increments)"
+                    android:inputType="numberDecimal" />
+
+                <EditText
+                    android:id="@+id/experiment_pre_run_input"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:hint="Enter time (in 0.1 degree increments)"
+                    android:inputType="numberDecimal" />
+
+                <EditText
+                    android:id="@+id/experiment_post_run_input"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:hint="Enter time (in 0.1 degree increments)"
+                    android:inputType="numberDecimal" />
+
+                <EditText
+                    android:id="@+id/experiment_run_time_input"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:hint="Enter time (in 0.1 degree increments)"
+                    android:inputType="numberDecimal" />
+
+                <View
+                    android:layout_height="40dp"
+                    android:layout_width="match_parent" />
+            </LinearLayout>
+
+            <!-- Right Display Texts -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_weight="2"
+                android:orientation="vertical"
+                android:layout_height="wrap_content"
+                android:paddingStart="8dp">
+
+                <TextView
+                    android:id="@+id/tvCurrentSetting1"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:text=""
+                    android:gravity="center"
+                    android:padding="4dp" />
+
+                <TextView
+                    android:id="@+id/tvCurrentSetting2"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:text="0"
+                    android:gravity="center"
+                    android:padding="4dp" />
+
+                <TextView
+                    android:id="@+id/tvCurrentSetting3"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:text="0"
+                    android:gravity="center"
+                    android:padding="4dp" />
+
+                <TextView
+                    android:id="@+id/tvCurrentSetting4"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:text="0"
+                    android:gravity="center"
+                    android:padding="4dp" />
+
+                <TextView
+                    android:id="@+id/tvCurrentSetting5"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:text="0"
+                    android:gravity="center"
+                    android:padding="4dp" />
+
+                <TextView
+                    android:id="@+id/tvCurrentSetting6"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:text="0"
+                    android:gravity="center"
+                    android:padding="4dp" />
+
+                <TextView
+                    android:id="@+id/tvRunTimeDisplay"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:text="About 1 Run\nDisplay of required time"
+                    android:gravity="center"
+                    android:padding="8dp"
+                    android:textAlignment="center"
+                    android:textSize="16sp" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- Bottom Buttons -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="50dp"
+            android:weightSum="5">
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:visibility="invisible"
+                />
+            <Button
+                android:id="@+id/experiment_reload_btn"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_weight="2"
+                android:text="Reload"
+                android:textStyle="bold"
+                android:textSize="18sp"
+                android:layout_marginEnd="16dp"
+                android:backgroundTint="@color/bs_info" />
+
+            <Button
+                android:id="@+id/experiment_update_btn"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_weight="2"
+                android:text="Update"
+                android:textStyle="bold"
+                android:textSize="18sp"
+                android:backgroundTint="@color/bs_success" />
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView>

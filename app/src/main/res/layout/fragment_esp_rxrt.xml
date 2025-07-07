@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView  xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <LinearLayout
+        android:orientation="vertical"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <LinearLayout
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal">
+            <TextView
+                android:id="@+id/esp_rxrt_header"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="ESP RXRT Basic Settings"
+                android:textSize="24sp"
+                android:textColor="@android:color/black"
+                android:gravity="center"
+                android:padding="16dp"
+                android:textStyle="bold"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="16dp"
+                android:text="Protocol" />
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="3dp"
+                android:background="@drawable/rounded_background"
+                android:gravity="center_vertical">
+
+                <!-- Your description text -->
+                <Button
+                    android:id="@+id/esp_rxrt_tcp_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="TCP"
+                    android:textStyle="bold"
+                    android:minHeight="36dp"
+                    android:background="@drawable/rounded_button"
+                    android:textColor="@android:color/black" />
+
+                <Button
+                    android:id="@+id/esp_rxrt_udp_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="UDP"
+                    android:textStyle="bold"
+                    android:minHeight="36dp"
+                    android:background="@android:color/transparent"
+                    android:textColor="@android:color/black" />
+
+
+                <!-- Material 3 switch -->
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <TableLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:id="@+id/esp_rxrt_list_tb"
+                    android:stretchColumns="*"
+                    android:gravity="center"
+                    android:padding="16dp">
+                    <TableRow>
+
+                        <TextView
+                            android:text="@string/sensor_th_order"
+                            android:textColor="@android:color/white"
+                            android:padding="8dp"
+                            android:background="?attr/colorPrimary"
+                            android:textStyle="bold"/>
+
+                        <TextView
+                            android:text="@string/sensor_th_variable_name"
+                            android:textColor="@android:color/white"
+                            android:padding="8dp"
+                            android:background="?attr/colorPrimary"
+                            android:textStyle="bold"/>
+
+                        <TextView
+                            android:text="@string/sensor_th_data_type"
+                            android:textColor="@android:color/white"
+                            android:background="?attr/colorPrimary"
+                            android:padding="8dp"
+                            android:textStyle="bold"/>
+
+                        <TextView
+                            android:text="Channel Count"
+                            android:textColor="@android:color/white"
+                            android:background="?attr/colorPrimary"
+                            android:padding="8dp"
+                            android:textStyle="bold"/>
+
+                        <TextView
+                            android:text="Number of bytes"
+                            android:textColor="@android:color/white"
+                            android:background="?attr/colorPrimary"
+                            android:padding="8dp"
+                            android:textStyle="bold"/>
+
+                        <TextView
+                            android:text="Threshold"
+                            android:textColor="@android:color/white"
+                            android:background="?attr/colorPrimary"
+                            android:padding="8dp"
+                            android:textStyle="bold"/>
+                        <TextView
+                            android:text=""
+                            android:textColor="@android:color/white"
+                            android:padding="8dp"
+                            android:textStyle="bold"/>
+
+                        <TextView
+                            android:text=""
+                            android:textColor="@android:color/white"
+                            android:padding="8dp"
+                            android:textStyle="bold"/>
+
+                        <TextView
+                            android:text=""
+                            android:textColor="@android:color/white"
+                            android:padding="8dp"
+                            android:textStyle="bold"/>
+                    </TableRow>
+
+                </TableLayout>
+            </ScrollView>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal">
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/bs_primary"
+                android:id="@+id/esp_rxrt_add_custom_btn"
+                android:layout_margin="16dp"
+                android:text="Add custom" />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/bs_success"
+                android:id="@+id/esp_rxrt_load_sensors_btn"
+                android:layout_margin="16dp"
+                android:text="Load Sensors" />
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/bs_info"
+                android:id="@+id/esp_rxrt_load_actuators_btn"
+                android:layout_margin="16dp"
+                android:text="Load Actuators" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView>

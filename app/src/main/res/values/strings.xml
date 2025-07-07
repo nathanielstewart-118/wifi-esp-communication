@@ -1,3 +1,34 @@
 <resources>
     <string name="app_name">My Application</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="drawer_open">Open drawer</string>
+    <string name="drawer_close">Close drawer</string>
+    <string name="wifi"> WIFI </string>
+    <string name="sensor"> Sensor </string>
+    <string name="actuator"> Actuator </string>
+    <string name="command"> Command </string>
+    <string name="experiment"> Experiment </string>
+    <string name="visualization"> Visualization </string>
+    <string name="monitoring"> Monitoring </string>
+    <string name="reproduction"> Reproduction </string>
+    <string name="wifi_th_network_name">Network Name</string>
+    <string name="wifi_th_signal_strength">Signal Strength</string>
+    <string name="wifi_th_link_speed">Link Speed</string>
+    <string name="wifi_th_security">Security</string>
+    <string name="wifi_th_select">Select</string>
+    <string name="sensor_th_variable_name">Variable Name</string>
+    <string name="sensor_th_data_type">Data Type</string>
+    <string name="sensor_th_number_of_channels">Number of channels</string>
+    <string name="sensor_th_monitoring_esp_tx">Monitoring(ESP TX)</string>
+    <string name="sensor_th_real_time_control_esp_rx_rt">Real-time control(ESP RX RT)</string>
+    <string name="sensor_settings_title">Sensor Settings</string>
+    <string name="sensor_th_order">Order</string>
+    <string name="actuator_settings_title">Actuator Settings</string>
+    <string name="command_code_hex">Command Code (Hex)</string>
+    <string name="command_time_1_float">Time 1(Float)</string>
+    <string name="command_time_2_float">Time 2 (Float)</string>
+    <string name="command_setting_threshold">Setting Threshold</string>
+    <string name="command_settings_title">Command Settings</string>
+
 </resources>

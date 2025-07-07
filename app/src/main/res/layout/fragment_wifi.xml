@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:weightSum="10"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal">
+        <TextView
+            android:id="@+id/headerText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="WIFI Access and Connection"
+            android:textSize="24sp"
+            android:textColor="@android:color/black"
+            android:gravity="center"
+            android:padding="16dp"
+            android:textStyle="bold"/>
+    </LinearLayout>
+
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/bs_primary"
+            android:id="@+id/wifi_search_btn"
+            android:layout_margin="16dp"
+            android:text="Search" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/bs_success"
+            android:id="@+id/wifi_connect_btn"
+            android:layout_margin="16dp"
+            android:text="Connect" />
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/bs_info"
+            android:id="@+id/wifi_auto_connect_btn"
+            android:layout_margin="16dp"
+            android:text="Auto Connect" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_weight="9"
+        android:layout_height="0dp"
+        android:orientation="horizontal">
+
+        <TableLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:stretchColumns="*"
+            android:id="@+id/wifi_list_tb"
+            android:padding="16dp">
+
+            <!-- Table Header -->
+            <TableRow android:background="?attr/colorPrimary">
+                <TextView
+                    android:text="@string/wifi_th_network_name"
+                    android:textColor="@android:color/white"
+                    android:padding="8dp"
+                    android:textStyle="bold"/>
+
+                <TextView
+                    android:text="@string/wifi_th_signal_strength"
+                    android:textColor="@android:color/white"
+                    android:padding="8dp"
+                    android:textStyle="bold"/>
+
+                <TextView
+                    android:text="@string/wifi_th_link_speed"
+                    android:textColor="@android:color/white"
+                    android:padding="8dp"
+                    android:textStyle="bold"/>
+
+                <TextView
+                    android:text="@string/wifi_th_security"
+                    android:textColor="@android:color/white"
+                    android:padding="8dp"
+                    android:textStyle="bold"/>
+                <TextView
+                    android:text="@string/wifi_th_select"
+                    android:textColor="@android:color/white"
+                    android:padding="8dp"
+                    android:textStyle="bold"/>
+            </TableRow>
+
+            <!-- Table Row -->
+
+            <!-- Add more rows as needed -->
+
+        </TableLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

@@ -26,10 +26,13 @@ android {
         sourceCompatibility JavaVersion.VERSION_11
         targetCompatibility JavaVersion.VERSION_11
     }
+    lintOptions {
+        warningsAsErrors false
+    }
 }
 
 dependencies {
-
+    implementation libs.core
     implementation libs.appcompat
     implementation libs.material
     testImplementation libs.junit
@@ -38,6 +41,6 @@ dependencies {
 //    implementation libs.appcompat.v161
     implementation libs.lifecycle.runtime
     implementation libs.drawerlayout
-    implementation libs.material
-
+    implementation libs.room.runtime
+    annotationProcessor libs.room.compiler
 }

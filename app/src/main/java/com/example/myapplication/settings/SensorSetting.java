@@ -1,10 +1,12 @@
 package com.example.myapplication.settings;
 
+import static com.example.myapplication.utils.CommonUtils.getNumberOfBytesFromDataTypeString;
+import static com.example.myapplication.utils.UIUtils.setupOperationalButtons;
+
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
-import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
@@ -44,7 +46,6 @@ public class SensorSetting extends Fragment {
     private final List<SensorActuator> sensors = new ArrayList<>();
     private int selectedSetting = -1;
     private SensorActuatorViewModel sensorActuatorViewModel;
-
     private AppDatabase db;
 
     public SensorSetting() {
@@ -57,8 +58,7 @@ public class SensorSetting extends Fragment {
         sensorActuatorViewModel = new ViewModelProvider(
                 requireActivity()
         ).get(SensorActuatorViewModel.class);
-        Log.d("oncreateview", "This is before calling displayTable");
-        sensorActuatorViewModel.getAllSensorActuators().observe(getViewLifecycleOwner(), data -> {
+        sensorActuatorViewModel.getAllSensors().observe(getViewLifecycleOwner(), data -> {
             this.displayTable(data);
             sensors.addAll(data);
         });
@@ -78,7 +78,7 @@ public class SensorSetting extends Fragment {
                 Integer monitoring = monitoringCheckbox.isChecked() ? 1 : 0;
                 Integer realTimeControl = realTimeControlCheckbox.isChecked() ? 1 : 0;
 
-                SensorActuator sensor = new SensorActuator(variableName, dataType, Integer.parseInt(numberOfChannels), monitoring, realTimeControl);
+                SensorActuator sensor = new SensorActuator(variableName, 0, dataType, Integer.parseInt(numberOfChannels), monitoring, realTimeControl);
                 if (selectedSetting == -1) {
                     sensorActuatorViewModel.insert(sensor);
                     sensorActuatorViewModel.getInsertResult().observe(getViewLifecycleOwner(), id -> {
@@ -98,9 +98,10 @@ public class SensorSetting extends Fragment {
                         if(res != null && res != 0) {
                             Toast.makeText(getContext(), "Update success!", Toast.LENGTH_SHORT).show();
                         }
+                        else {
+                            Toast.makeText(getContext(), "Update Failed", Toast.LENGTH_SHORT).show();
+                        }
                     });
-//                    int affectedRows = db.sensorActuatorDao().update(sensor);
-//                    sensorListTable.removeViewAt(selectedSetting + 1);
                 }
                 SensorSetting.this.initEditControls();
                 selectedSetting = -1;
@@ -118,7 +119,6 @@ public class SensorSetting extends Fragment {
     }
 
     public void addTableRow(SensorActuator data, int index) {
-        Log.d("data","This is inside addTableRow function: " + data.getVariableName());
         TableRow tableRow = new TableRow(requireContext());
         tableRow.setVerticalGravity(Gravity.CENTER);
         TextView orderText = new TextView(requireContext());
@@ -130,6 +130,11 @@ public class SensorSetting extends Fragment {
         TextView numberOfChannelsText = new TextView(requireContext());
         numberOfChannelsText.setText(String.valueOf(data.getNumberOfChannels()));
         numberOfChannelsText.setGravity(Gravity.CENTER);
+
+        TextView numberOfBytesText = new TextView(requireContext());
+        numberOfBytesText.setText(String.valueOf(getNumberOfBytesFromDataTypeString(data.getDataType()) * data.getNumberOfChannels()));
+        numberOfBytesText.setGravity(Gravity.CENTER);
+
         TextView dataTypeText = new TextView(requireContext());
         dataTypeText.setText(data.getDataType());
         dataTypeText.setGravity(Gravity.CENTER);
@@ -140,28 +145,17 @@ public class SensorSetting extends Fragment {
         realTimeControlText.setText(data.getRealTimeControl() == 1 ? "Yes" : "No");
         realTimeControlText.setGravity(Gravity.CENTER);
 
-
         tableRow.addView(orderText);
         tableRow.addView(nameText);
         tableRow.addView(dataTypeText);
         tableRow.addView(numberOfChannelsText);
+        tableRow.addView(numberOfBytesText);
         tableRow.addView(monitoringText);
         tableRow.addView(realTimeControlText);
 
-        ImageButton iconButton = new ImageButton(requireContext());
-        iconButton.setImageResource(R.drawable.baseline_edit_24); // your drawable icon
-        iconButton.setBackgroundColor(Color.TRANSPARENT); // optional styling
+        List<ImageButton> operationalButtons = setupOperationalButtons(data.getId(), requireContext());
 
-        TableRow.LayoutParams params = new TableRow.LayoutParams(
-                100,
-                80
-        );
-        ImageButton changeValueBtn = new ImageButton(requireContext());
-        changeValueBtn.setImageResource(R.drawable.baseline_edit_24);
-        changeValueBtn.setBackgroundColor(Color.TRANSPARENT);
-        changeValueBtn.setColorFilter(Color.parseColor("#198754"));
-        changeValueBtn.setLayoutParams(params);
-        changeValueBtn.setTag(data.getId());
+        ImageButton changeValueBtn = operationalButtons.get(0);
         changeValueBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -183,21 +177,16 @@ public class SensorSetting extends Fragment {
                 realTimeControlCheckbox.setChecked(selectedSensors.get(0).getRealTimeControl() == 1);
             }
         });
-        LinearLayout btnLayout = new LinearLayout(requireContext());
-        btnLayout.setGravity(Gravity.CENTER);
-        btnLayout.addView(changeValueBtn);
 
-        ImageButton changeOrderBtn = new ImageButton(requireContext());
-        changeOrderBtn.setImageResource(R.drawable.baseline_bar_chart_24);
-        changeOrderBtn.setBackgroundColor(Color.TRANSPARENT);
-        changeOrderBtn.setColorFilter(Color.parseColor("#0dcaf0"));
-        btnLayout.addView(changeOrderBtn);
+        ImageButton changeOrderBtn = operationalButtons.get(1);
+        changeOrderBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
 
-        ImageButton deleteBtn = new ImageButton(requireContext());
-        deleteBtn.setImageResource(R.drawable.baseline_delete_24);
-        deleteBtn.setBackgroundColor(Color.TRANSPARENT);
-        deleteBtn.setColorFilter(Color.parseColor("#dc3545"));
-        deleteBtn.setTag(data.getId());
+            }
+        });
+
+        ImageButton deleteBtn = operationalButtons.get(2);
         deleteBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -230,7 +219,13 @@ public class SensorSetting extends Fragment {
                         .show();
             }
         });
+
+        LinearLayout btnLayout = new LinearLayout(requireContext());
+        btnLayout.setGravity(Gravity.CENTER);
+        btnLayout.addView(changeValueBtn);
+        btnLayout.addView(changeOrderBtn);
         btnLayout.addView(deleteBtn);
+
         tableRow.addView(btnLayout);
         sensorListTable.addView(tableRow);
     }

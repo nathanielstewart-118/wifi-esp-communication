@@ -1,6 +1,6 @@
 package com.example.myapplication.utils;
 
-public class commonUtils {
+public class CommonUtils {
 
     public static int getNumberOfBytesFromDataTypeString(String type) {
         switch(type) {

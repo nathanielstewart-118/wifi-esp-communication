@@ -70,6 +70,12 @@
                 <!-- Material 3 switch -->
 
             </LinearLayout>
+            <Switch
+                android:id="@+id/esp_tx_crc_toggle"
+                android:layout_width="wrap_content"
+                android:layout_marginHorizontal="30dp"
+                android:layout_height="wrap_content"
+                android:text=" CRC " />
 
         </LinearLayout>
 

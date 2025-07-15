@@ -1,7 +1,8 @@
 package com.example.myapplication.settings;
 
-import static com.example.myapplication.utils.commonUtils.getNumberOfBytesFromDataTypeString;
+import static com.example.myapplication.utils.CommonUtils.getNumberOfBytesFromDataTypeString;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -9,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Switch;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -19,7 +21,6 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.myapplication.R;
-import com.example.myapplication.db.entity.SensorActuator;
 import com.example.myapplication.db.entity.SensorActuator;
 
 import java.util.ArrayList;
@@ -35,6 +36,10 @@ public class ESPRXRTSetting extends Fragment {
     private Button addCustomBtn;
     private Button loadSensorsBtn;
     private Button loadActuatorsBtn;
+    private Button tcpBtn;
+    private Button udpBtn;
+
+    private Switch crcSwitch;
 
     public ESPRXRTSetting() {
 
@@ -47,11 +52,42 @@ public class ESPRXRTSetting extends Fragment {
         addCustomBtn = (Button) view.findViewById(R.id.esp_rxrt_add_custom_btn);
         loadActuatorsBtn = (Button) view.findViewById(R.id.esp_rxrt_load_actuators_btn);
         loadSensorsBtn = (Button) view.findViewById(R.id.esp_rxrt_load_sensors_btn);
+        tcpBtn = (Button) view.findViewById(R.id.esp_rxrt_tcp_btn);
+        udpBtn = (Button) view.findViewById(R.id.esp_rxrt_udp_btn);
+        tcpBtn.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.tr_active));
+
+        tcpBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                tcpBtn.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.tr_active));
+                tcpBtn.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.rounded_button));
+                udpBtn.setBackgroundColor(Color.TRANSPARENT);
+                udpBtn.setBackgroundTintList(null);
+                udpBtn.setBackgroundColor(Color.TRANSPARENT);
+
+            }
+        });
+
+        udpBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                udpBtn.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.tr_active));
+                udpBtn.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.rounded_button));
+                tcpBtn.setBackgroundColor(Color.TRANSPARENT);
+                tcpBtn.setBackgroundTintList(null);
+                tcpBtn.setBackgroundColor(Color.TRANSPARENT);
+
+            }
+        });
 
         List<SensorActuator> actuators = new ArrayList<>();
         this.loadActuators(actuators);
         this.loadSensors(new ArrayList<>());
         return view;
+
+
+
+
     }
 
     public void loadSensors(List<SensorActuator> dtos) {

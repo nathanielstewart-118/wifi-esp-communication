@@ -8,45 +8,38 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.myapplication.db.AppDatabase;
-import com.example.myapplication.db.entity.SensorActuator;
-import com.example.myapplication.db.dao.SensorActuatorDao;
+import com.example.myapplication.db.dao.ESPTXDao;
+import com.example.myapplication.db.entity.Command;
+import com.example.myapplication.db.entity.ESPTX;
 
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class SensorActuatorViewModel extends AndroidViewModel {
-    private final SensorActuatorDao sensorActuatorDao;
+public class ESPTXViewModel extends AndroidViewModel {
+
+    private final ESPTXDao espTXDao;
     private final ExecutorService executorService;
 
     private final MutableLiveData<Long> insertResult = new MutableLiveData<>();
     private final MutableLiveData<Integer> updateResult = new MutableLiveData<>();
     private final MutableLiveData<Integer> deleteResult = new MutableLiveData<>();
 
-    public SensorActuatorViewModel(@NonNull Application application) {
+    public ESPTXViewModel(@NonNull Application application) {
         super(application);
         AppDatabase db = AppDatabase.getInstance(application);
-        this.sensorActuatorDao = db.sensorActuatorDao();
+        this.espTXDao = db.espTXDao();
         this.executorService = Executors.newSingleThreadExecutor();
     }
 
-    public LiveData<List<SensorActuator>> getAllSensorActuators() {
-        return sensorActuatorDao.getAllSensorsAndActuators();
+    public LiveData<List<ESPTX>> getAllESPTXes() {
+        return espTXDao.getAllESPTXes();
     }
-
-    public LiveData<List<SensorActuator>> getAllSensors() {
-        return sensorActuatorDao.getAllSensors();
-    }
-
-    public LiveData<List<SensorActuator>> getAllActuators() {
-        return sensorActuatorDao.getAllActuators();
-    }
-
 
     // --- INSERT ---
-    public void insert(SensorActuator sensorActuator) {
+    public void insert(ESPTX esptx) {
         executorService.execute(() -> {
-            long result = sensorActuatorDao.insert(sensorActuator);
+            long result = espTXDao.insert(esptx);
             insertResult.postValue(result);
         });
     }
@@ -56,9 +49,9 @@ public class SensorActuatorViewModel extends AndroidViewModel {
     }
 
     // --- UPDATE ---
-    public void update(SensorActuator sensorActuator) {
+    public void update(ESPTX esptx) {
         executorService.execute(() -> {
-            int result = sensorActuatorDao.update(sensorActuator);
+            int result = espTXDao.update(esptx);
             updateResult.postValue(result);
         });
     }
@@ -68,9 +61,9 @@ public class SensorActuatorViewModel extends AndroidViewModel {
     }
 
     // --- DELETE ---
-    public void delete(SensorActuator sensorActuator) {
+    public void delete(ESPTX esptx) {
         executorService.execute(() -> {
-            int result = sensorActuatorDao.delete(sensorActuator);
+            int result = espTXDao.delete(esptx);
             deleteResult.postValue(result);
         });
     }
@@ -78,5 +71,4 @@ public class SensorActuatorViewModel extends AndroidViewModel {
     public LiveData<Integer> getDeleteResult() {
         return deleteResult;
     }
-
 }

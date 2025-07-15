@@ -8,45 +8,38 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.myapplication.db.AppDatabase;
+import com.example.myapplication.db.dao.CommandDao;
+import com.example.myapplication.db.entity.Command;
 import com.example.myapplication.db.entity.SensorActuator;
-import com.example.myapplication.db.dao.SensorActuatorDao;
 
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class SensorActuatorViewModel extends AndroidViewModel {
-    private final SensorActuatorDao sensorActuatorDao;
+public class CommandViewModel extends AndroidViewModel {
+
+    private final CommandDao commandDao;
     private final ExecutorService executorService;
 
     private final MutableLiveData<Long> insertResult = new MutableLiveData<>();
     private final MutableLiveData<Integer> updateResult = new MutableLiveData<>();
     private final MutableLiveData<Integer> deleteResult = new MutableLiveData<>();
-
-    public SensorActuatorViewModel(@NonNull Application application) {
+    
+    public CommandViewModel(@NonNull Application application) {
         super(application);
         AppDatabase db = AppDatabase.getInstance(application);
-        this.sensorActuatorDao = db.sensorActuatorDao();
+        this.commandDao = db.commandDao();
         this.executorService = Executors.newSingleThreadExecutor();
     }
 
-    public LiveData<List<SensorActuator>> getAllSensorActuators() {
-        return sensorActuatorDao.getAllSensorsAndActuators();
+    public LiveData<List<Command>> getAllCommands() {
+        return commandDao.getAllCommands();
     }
-
-    public LiveData<List<SensorActuator>> getAllSensors() {
-        return sensorActuatorDao.getAllSensors();
-    }
-
-    public LiveData<List<SensorActuator>> getAllActuators() {
-        return sensorActuatorDao.getAllActuators();
-    }
-
 
     // --- INSERT ---
-    public void insert(SensorActuator sensorActuator) {
+    public void insert(Command command) {
         executorService.execute(() -> {
-            long result = sensorActuatorDao.insert(sensorActuator);
+            long result = commandDao.insert(command);
             insertResult.postValue(result);
         });
     }
@@ -56,9 +49,9 @@ public class SensorActuatorViewModel extends AndroidViewModel {
     }
 
     // --- UPDATE ---
-    public void update(SensorActuator sensorActuator) {
+    public void update(Command command) {
         executorService.execute(() -> {
-            int result = sensorActuatorDao.update(sensorActuator);
+            int result = commandDao.update(command);
             updateResult.postValue(result);
         });
     }
@@ -68,9 +61,9 @@ public class SensorActuatorViewModel extends AndroidViewModel {
     }
 
     // --- DELETE ---
-    public void delete(SensorActuator sensorActuator) {
+    public void delete(Command command) {
         executorService.execute(() -> {
-            int result = sensorActuatorDao.delete(sensorActuator);
+            int result = commandDao.delete(command);
             deleteResult.postValue(result);
         });
     }
@@ -78,5 +71,5 @@ public class SensorActuatorViewModel extends AndroidViewModel {
     public LiveData<Integer> getDeleteResult() {
         return deleteResult;
     }
-
+    
 }

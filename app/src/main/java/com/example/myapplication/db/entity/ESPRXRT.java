@@ -3,13 +3,23 @@ package com.example.myapplication.db.entity;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
+import androidx.room.TypeConverters;
 
+import com.example.myapplication.db.converters.ESPRXRTThresholdConverter;
+import com.example.myapplication.db.converters.ESPTXOutlierConverter;
 
-@Entity(tableName = "sensors_and_actuators")
-public class SensorActuator {
+import java.util.List;
 
+@Entity(tableName="esp_rxrt")
+public class ESPRXRT {
     @PrimaryKey(autoGenerate = true)
     private Long id;
+
+    @ColumnInfo(name = "sensor_actuator_id")
+    private Integer sensorActuatorId;
+
+    @ColumnInfo(name = "sensor_or_actuator")
+    private Integer sensorOrActuator;
 
     @ColumnInfo(name = "variable_name")
     private String variableName;
@@ -17,25 +27,18 @@ public class SensorActuator {
     @ColumnInfo(name = "data_type")
     private String dataType;
 
-    @ColumnInfo(name = "sensor_or_actuator")
-    private Integer sensorOrActuator;
-
     @ColumnInfo(name = "number_of_channels")
     private Integer numberOfChannels;
 
-    @ColumnInfo(name = "monitoring")
-    private Integer monitoring;
+    @ColumnInfo(name = "thresholds")
+    @TypeConverters(ESPRXRTThresholdConverter.class)
+    private List<ESPRXRTThreshold> thresholds;
 
-    @ColumnInfo(name = "real_time_control")
-    private Integer realTimeControl;
-
-    public SensorActuator(String variableName, Integer sensorOrActuator, String dataType, Integer numberOfChannels, Integer monitoring, Integer realTimeControl) {
+    public ESPRXRT(String variableName, String dataType, Integer numberOfChannels, List<ESPRXRTThreshold> thresholds) {
         this.variableName = variableName;
         this.dataType = dataType;
         this.numberOfChannels = numberOfChannels;
-        this.monitoring = monitoring;
-        this.realTimeControl = realTimeControl;
-        this.sensorOrActuator = sensorOrActuator;
+        this.thresholds = thresholds;
     }
 
     public Long getId() {
@@ -44,6 +47,14 @@ public class SensorActuator {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Integer getSensorActuatorId() {
+        return sensorActuatorId;
+    }
+
+    public void setSensorActuatorId(Integer sensorActuatorId) {
+        this.sensorActuatorId = sensorActuatorId;
     }
 
     public Integer getSensorOrActuator() {
@@ -74,23 +85,15 @@ public class SensorActuator {
         return numberOfChannels;
     }
 
-    public void setNumberOfChannels(Integer numberOfChannels) {
-        this.numberOfChannels = numberOfChannels;
+    public void setChannelCount(Integer channelCount) {
+        this.numberOfChannels = channelCount;
     }
 
-    public Integer getMonitoring() {
-        return monitoring;
+    public List<ESPRXRTThreshold> getThresholds() {
+        return thresholds;
     }
 
-    public void setMonitoring(Integer monitoring) {
-        this.monitoring = monitoring;
-    }
-
-    public Integer getRealTimeControl() {
-        return realTimeControl;
-    }
-
-    public void setRealTimeControl(Integer realTimeControl) {
-        this.realTimeControl = realTimeControl;
+    public void setThresholds(List<ESPRXRTThreshold> thresholds) {
+        this.thresholds = thresholds;
     }
 }

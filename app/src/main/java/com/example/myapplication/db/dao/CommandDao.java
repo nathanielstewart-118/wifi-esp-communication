@@ -1,5 +1,6 @@
 package com.example.myapplication.db.dao;
 
+import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
@@ -23,7 +24,7 @@ public interface CommandDao {
     int delete(Command command);
 
     @Query("SELECT * FROM commands")
-    List<Command> getAllCommands();
+    LiveData<List<Command>> getAllCommands();
 
     @Query("SELECT * FROM commands WHERE id = :id")
     Command getCommandById(int id);

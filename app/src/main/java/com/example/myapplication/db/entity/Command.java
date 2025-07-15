@@ -3,6 +3,11 @@ package com.example.myapplication.db.entity;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 import androidx.room.ColumnInfo;
+import androidx.room.TypeConverters;
+
+import com.example.myapplication.db.converters.CommandThresholdConverter;
+
+import java.util.List;
 
 @Entity(tableName="commands")
 public class Command {
@@ -20,7 +25,8 @@ public class Command {
     private Float time2;
 
     @ColumnInfo(name = "thresholds")
-    private String thresholds;
+    @TypeConverters(CommandThresholdConverter.class)
+    private List<CommandThreshold> thresholds;
 
     public Long getId() {
         return id;
@@ -30,7 +36,7 @@ public class Command {
         this.id = id;
     }
 
-    public Command(String commandCode, float time1, float time2, String thresholds) {
+    public Command(String commandCode, float time1, float time2, List<CommandThreshold> thresholds) {
         this.commandCode = commandCode;
         this.time1 = time1;
         this.time2 = time2;
@@ -61,11 +67,11 @@ public class Command {
         this.time2 = time2;
     }
 
-    public String getThresholds() {
+    public List<CommandThreshold> getThresholds() {
         return thresholds;
     }
 
-    public void setThresholds(String thresholds) {
+    public void setThresholds(List<CommandThreshold> thresholds) {
         this.thresholds = thresholds;
     }
 }

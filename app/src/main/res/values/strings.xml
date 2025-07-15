@@ -30,5 +30,8 @@
     <string name="command_time_2_float">Time 2 (Float)</string>
     <string name="command_setting_threshold">Setting Threshold</string>
     <string name="command_settings_title">Command Settings</string>
+    <string name="sensor_number_of_bytes_th">Number of Bytes</string>
+    <string name="sensor_monitoring_th">Monitoring</string>
+    <string name="sensor_realtime_control_th">Realtime Control</string>
 
 </resources>

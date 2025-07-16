@@ -3,12 +3,10 @@ package com.example.myapplication.settings;
 import static com.example.myapplication.utils.CommonUtils.getNumberOfBytesFromDataTypeString;
 import static com.example.myapplication.utils.UIUtils.setupOperationalButtons;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -27,9 +25,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.myapplication.R;
-import com.example.myapplication.db.AppDatabase;
 import com.example.myapplication.db.entity.SensorActuator;
-import com.example.myapplication.db.viewmodel.SensorActuatorViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -120,6 +116,9 @@ public class ActuatorSetting extends Fragment {
         ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, options);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter((adapter));
+
+
+
         return view;
     }
 
@@ -170,7 +169,6 @@ public class ActuatorSetting extends Fragment {
         tableRow.addView(nameText);
         tableRow.addView(dataTypeText);
         tableRow.addView(numberOfChannelsText);
-        tableRow.addView(numberOfBytesText);
         tableRow.addView(monitoringText);
         tableRow.addView(realTimeControlText);
 
@@ -198,6 +196,9 @@ public class ActuatorSetting extends Fragment {
                 realTimeControlCheckbox.setChecked(selectedActuators.get(0).getRealTimeControl() == 1);
             }
         });
+        LinearLayout btnLayout = new LinearLayout(requireContext());
+        btnLayout.setGravity(Gravity.CENTER);
+        btnLayout.addView(changeValueBtn);
 
         ImageButton changeOrderBtn = operationalButtons.get(1);
 
@@ -253,33 +254,4 @@ public class ActuatorSetting extends Fragment {
         monitoringCheckbox.setChecked(false);
         realTimeControlCheckbox.setChecked(false);
     }
-
-    /**
-     * display actuator settings on the table
-     *
-     * @param sas: List of actuator settings
-     */
-    public void displayTable(List<SensorActuator> sas) {
-        actuatorListTable.removeViews(1, actuatorListTable.getChildCount() - 1);
-        for (int i = 0; i < sas.size(); i ++) {
-            addTableRow(sas.get(i), i + 1);
-        }
-    }
-
-    public void editActuator(Long actuatorId) {
-        int cnt = actuatorListTable.getChildCount();
-        for (int i = 1; i < cnt; i ++) {
-            View rowView = actuatorListTable.getChildAt(i);
-            if (rowView instanceof TableRow) {
-                TableRow tableRow = (TableRow) rowView;
-                View layoutView = tableRow.getChildAt(7);
-                if (layoutView instanceof LinearLayout) {
-                    LinearLayout linearLayout = (LinearLayout) layoutView;
-                    ImageButton editBtn = (ImageButton) linearLayout.getChildAt(0);
-                    editBtn.performClick();
-                }
-            }
-        }
-    }
-
 }

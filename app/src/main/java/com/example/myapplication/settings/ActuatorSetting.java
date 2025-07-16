@@ -3,11 +3,14 @@ package com.example.myapplication.settings;
 import static com.example.myapplication.utils.CommonUtils.getNumberOfBytesFromDataTypeString;
 import static com.example.myapplication.utils.UIUtils.setupOperationalButtons;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
-import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,7 +28,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.myapplication.R;
+import com.example.myapplication.db.AppDatabase;
 import com.example.myapplication.db.entity.SensorActuator;
+import com.example.myapplication.db.viewmodel.SensorActuatorViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -236,8 +241,6 @@ public class ActuatorSetting extends Fragment {
             }
         });
 
-        LinearLayout btnLayout = new LinearLayout(requireContext());
-        btnLayout.setGravity(Gravity.CENTER);
 
         btnLayout.addView(changeValueBtn);
         btnLayout.addView(changeOrderBtn);
@@ -254,4 +257,30 @@ public class ActuatorSetting extends Fragment {
         monitoringCheckbox.setChecked(false);
         realTimeControlCheckbox.setChecked(false);
     }
+
+    public void displayTable(List<SensorActuator> sas) {
+        Log.d("displayTable", "This is inside displayTable");
+        actuatorListTable.removeViews(1, actuatorListTable.getChildCount() - 1);
+        for (int i = 0; i < sas.size(); i ++) {
+            addTableRow(sas.get(i), i + 1);
+        }
+    }
+
+    public void editActuator(Long actuatorId) {
+        int cnt = actuatorListTable.getChildCount();
+        for (int i = 1; i < cnt; i ++) {
+            View rowView = actuatorListTable.getChildAt(i);
+            if (rowView instanceof TableRow) {
+                TableRow tableRow = (TableRow) rowView;
+                View layoutView = tableRow.getChildAt(7);
+                if (layoutView instanceof LinearLayout) {
+                    LinearLayout linearLayout = (LinearLayout) layoutView;
+                    ImageButton editBtn = (ImageButton) linearLayout.getChildAt(0);
+                    editBtn.performClick();
+                }
+            }
+        }
+    }
+
+
 }

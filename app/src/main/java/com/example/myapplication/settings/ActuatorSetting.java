@@ -31,6 +31,7 @@ import com.example.myapplication.R;
 import com.example.myapplication.db.AppDatabase;
 import com.example.myapplication.db.entity.SensorActuator;
 import com.example.myapplication.db.viewmodel.SensorActuatorViewModel;
+import com.example.myapplication.utils.Constants;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -117,13 +118,10 @@ public class ActuatorSetting extends Fragment {
             }
         });
 
-        String[] options = { "uint8", "int8", "uint16", "int16", "uint24", "int24", "uint32", "int32", "float", "double"};
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, options);
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, Constants.DATA_TYPES);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter((adapter));
-
-
-
         return view;
     }
 
@@ -144,6 +142,7 @@ public class ActuatorSetting extends Fragment {
      */
     public void addTableRow(SensorActuator data, int index) {
         TableRow tableRow = new TableRow(requireContext());
+        tableRow.setTag(data.getId());
         tableRow.setVerticalGravity(Gravity.CENTER);
         TextView orderText = new TextView(requireContext());
         orderText.setText(String.valueOf(index));
@@ -203,7 +202,6 @@ public class ActuatorSetting extends Fragment {
         });
         LinearLayout btnLayout = new LinearLayout(requireContext());
         btnLayout.setGravity(Gravity.CENTER);
-        btnLayout.addView(changeValueBtn);
 
         ImageButton changeOrderBtn = operationalButtons.get(1);
 
@@ -272,6 +270,8 @@ public class ActuatorSetting extends Fragment {
             View rowView = actuatorListTable.getChildAt(i);
             if (rowView instanceof TableRow) {
                 TableRow tableRow = (TableRow) rowView;
+                Long tagId = (long) tableRow.getTag();
+                if(!Objects.equals(tagId, actuatorId)) continue;
                 View layoutView = tableRow.getChildAt(7);
                 if (layoutView instanceof LinearLayout) {
                     LinearLayout linearLayout = (LinearLayout) layoutView;

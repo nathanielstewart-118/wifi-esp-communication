@@ -107,7 +107,6 @@ public class WiFiHelper {
                                         Constants.LOGGING_BEARER_TOKEN
                                 );
                             }
-
                             callback.accept(results);
                         } catch (Exception e) {
                             Log.e("Exception", "Error in BroadcastReceiver: " + e.getMessage(), e);

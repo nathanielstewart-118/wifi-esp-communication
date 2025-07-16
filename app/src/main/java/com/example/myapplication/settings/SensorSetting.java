@@ -139,6 +139,7 @@ public class SensorSetting extends Fragment {
 
     public void addTableRow(SensorActuator data, int index) {
         TableRow tableRow = new TableRow(requireContext());
+        tableRow.setTag(data.getId());
         tableRow.setVerticalGravity(Gravity.CENTER);
         TextView orderText = new TextView(requireContext());
         orderText.setText(String.valueOf(index));
@@ -265,12 +266,14 @@ public class SensorSetting extends Fragment {
         }
     }
 
-    public void editSensor(Long actuatorId) {
+    public void editSensor(Long sensorId) {
         int cnt = sensorListTable.getChildCount();
         for (int i = 1; i < cnt; i ++) {
             View rowView = sensorListTable.getChildAt(i);
             if (rowView instanceof TableRow) {
                 TableRow tableRow = (TableRow) rowView;
+                Long tagId = (long) tableRow.getTag();
+                if(!Objects.equals(tagId, sensorId)) continue;
                 View layoutView = tableRow.getChildAt(7);
                 if (layoutView instanceof LinearLayout) {
                     LinearLayout linearLayout = (LinearLayout) layoutView;

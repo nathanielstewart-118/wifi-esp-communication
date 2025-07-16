@@ -26,6 +26,13 @@ public interface SensorActuatorDao {
     @Query("SELECT * FROM sensors_and_actuators")
     LiveData<List<SensorActuator>> getAllSensorsAndActuators();
 
+    @Query("SELECT * FROM sensors_and_actuators WHERE sensor_or_actuator = 0")
+    LiveData<List<SensorActuator>> getAllSensors();
+
+    @Query("SELECT * FROM sensors_and_actuators WHERE sensor_or_actuator = 1")
+    LiveData<List<SensorActuator>> getAllActuators();
+
+
     @Query("SELECT * FROM sensors_and_actuators WHERE id = :id")
     LiveData<SensorActuator> getSensorActuatorById(int id);
 

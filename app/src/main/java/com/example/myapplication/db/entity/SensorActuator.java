@@ -17,6 +17,9 @@ public class SensorActuator {
     @ColumnInfo(name = "data_type")
     private String dataType;
 
+    @ColumnInfo(name = "sensor_or_actuator")
+    private Integer sensorOrActuator;
+
     @ColumnInfo(name = "number_of_channels")
     private Integer numberOfChannels;
 
@@ -26,12 +29,13 @@ public class SensorActuator {
     @ColumnInfo(name = "real_time_control")
     private Integer realTimeControl;
 
-    public SensorActuator(String variableName, String dataType, Integer numberOfChannels, Integer monitoring, Integer realTimeControl) {
+    public SensorActuator(String variableName, Integer sensorOrActuator, String dataType, Integer numberOfChannels, Integer monitoring, Integer realTimeControl) {
         this.variableName = variableName;
         this.dataType = dataType;
         this.numberOfChannels = numberOfChannels;
         this.monitoring = monitoring;
         this.realTimeControl = realTimeControl;
+        this.sensorOrActuator = sensorOrActuator;
     }
 
     public Long getId() {
@@ -40,6 +44,14 @@ public class SensorActuator {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Integer getSensorOrActuator() {
+        return sensorOrActuator;
+    }
+
+    public void setSensorOrActuator(Integer sensorOrActuator) {
+        this.sensorOrActuator = sensorOrActuator;
     }
 
     public String getVariableName() {

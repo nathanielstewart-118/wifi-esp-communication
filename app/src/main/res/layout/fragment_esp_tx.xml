@@ -47,7 +47,7 @@
 
                 <!-- Your description text -->
                 <Button
-                    android:id="@+id/btnSider"
+                    android:id="@+id/esp_tx_tcp_btn"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="TCP"
@@ -67,9 +67,17 @@
                     android:textColor="@android:color/black" />
 
 
+
                 <!-- Material 3 switch -->
 
             </LinearLayout>
+
+            <Switch
+                android:id="@+id/esp_tx_crc_toggle"
+                android:layout_width="wrap_content"
+                android:layout_marginHorizontal="30dp"
+                android:layout_height="wrap_content"
+                android:text=" CRC " />
 
         </LinearLayout>
 
@@ -162,7 +170,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:backgroundTint="@color/bs_success"
-                android:id="@+id/load_command_btn"
+                android:id="@+id/esp_tx_load_sensors_btn"
                 android:layout_margin="16dp"
                 android:text="Load Sensors" />
 
@@ -170,7 +178,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:backgroundTint="@color/bs_info"
-                android:id="@+id/update_command_btn"
+                android:id="@+id/esp_tx_load_actuators_btn"
                 android:layout_margin="16dp"
                 android:text="Load Actuators" />
 

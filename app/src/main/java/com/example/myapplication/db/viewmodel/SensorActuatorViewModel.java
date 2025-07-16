@@ -34,6 +34,15 @@ public class SensorActuatorViewModel extends AndroidViewModel {
         return sensorActuatorDao.getAllSensorsAndActuators();
     }
 
+    public LiveData<List<SensorActuator>> getAllSensors() {
+        return sensorActuatorDao.getAllSensors();
+    }
+
+    public LiveData<List<SensorActuator>> getAllActuators() {
+        return sensorActuatorDao.getAllActuators();
+    }
+
+
     // --- INSERT ---
     public void insert(SensorActuator sensorActuator) {
         executorService.execute(() -> {

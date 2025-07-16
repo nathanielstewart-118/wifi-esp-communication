@@ -9,23 +9,30 @@ import androidx.room.RoomDatabase;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
 import com.example.myapplication.db.dao.CommandDao;
+import com.example.myapplication.db.dao.ESPRXRTDao;
+import com.example.myapplication.db.dao.ESPTXDao;
 import com.example.myapplication.db.dao.SensorActuatorDao;
 import com.example.myapplication.db.entity.Command;
+import com.example.myapplication.db.entity.ESPRXRT;
+import com.example.myapplication.db.entity.ESPTX;
 import com.example.myapplication.db.entity.SensorActuator;
 
-@Database(entities = {SensorActuator.class, Command.class}, version = 1)
+@Database(entities = {SensorActuator.class, Command.class, ESPTX.class, ESPRXRT.class}, version = 2)
 public abstract class AppDatabase extends RoomDatabase {
 
     private static AppDatabase instance;
 
     public abstract SensorActuatorDao sensorActuatorDao();
     public abstract CommandDao commandDao();
+    public abstract ESPTXDao espTXDao();
+    public abstract ESPRXRTDao espRXRTDao();
+
 
     public static synchronized AppDatabase getInstance(Context context) {
         if (instance == null) {
             instance = Room.databaseBuilder(
                     context.getApplicationContext(),
-                    AppDatabase.class, "wifi.db"
+                    AppDatabase.class, "wifi_esp1.db"
             ).addCallback(new Callback() {
                 @Override
                 public void onCreate(@NonNull SupportSQLiteDatabase db) {

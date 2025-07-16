@@ -46,13 +46,12 @@
             android:id="@+id/wifi_connect_btn"
             android:layout_margin="16dp"
             android:text="Connect" />
-        <Button
+        <CheckBox
+            android:id="@+id/wifi_auto_connect_checkbox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:backgroundTint="@color/bs_info"
-            android:id="@+id/wifi_auto_connect_btn"
-            android:layout_margin="16dp"
-            android:text="Auto Connect" />
+            android:text="Auto Connect"
+            android:checked="false" />
 
     </LinearLayout>
 

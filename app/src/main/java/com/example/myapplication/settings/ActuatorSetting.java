@@ -1,9 +1,14 @@
 package com.example.myapplication.settings;
 
+import static com.example.myapplication.utils.CommonUtils.getNumberOfBytesFromDataTypeString;
+import static com.example.myapplication.utils.UIUtils.setupOperationalButtons;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
-import android.graphics.Color;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -22,7 +27,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.myapplication.R;
+import com.example.myapplication.db.AppDatabase;
 import com.example.myapplication.db.entity.SensorActuator;
+import com.example.myapplication.db.viewmodel.SensorActuatorViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +47,11 @@ public class ActuatorSetting extends Fragment {
     private TableLayout actuatorListTable;
     private List<SensorActuator> actuators = new ArrayList<>();
     private int selectedSetting = -1;
+    private SensorActuatorViewModel sensorActuatorViewModel;
+    private AppDatabase db;
 
+    private Boolean delegated = false;
+    private Long delegatedId = (long) -1;
 
     public ActuatorSetting() {
 
@@ -49,6 +60,18 @@ public class ActuatorSetting extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_actuator, container, false);
+        db = AppDatabase.getInstance(requireContext());
+        sensorActuatorViewModel = new ViewModelProvider(
+                requireActivity()
+        ).get(SensorActuatorViewModel.class);
+        sensorActuatorViewModel.getAllActuators().observe(getViewLifecycleOwner(), data -> {
+            this.displayTable(data);
+            actuators.addAll(data);
+            if(delegated) {
+                editActuator(delegatedId);
+                delegated = false;
+            }
+        });
         spinner = (Spinner) view.findViewById(R.id.data_type_spinner);
         variableNameEdit = (EditText) view.findViewById(R.id.variable_name_input);
         numberOfChannelsEdit = (EditText) view.findViewById(R.id.number_of_channels_input);
@@ -64,16 +87,31 @@ public class ActuatorSetting extends Fragment {
                 String numberOfChannels = numberOfChannelsEdit.getText().toString();
                 Integer monitoring = monitoringCheckbox.isChecked() ? 1 : 0;
                 Integer realTimeControl = realTimeControlCheckbox.isChecked() ? 1 : 0;
-                SensorActuator actuator = new SensorActuator(variableName, dataType, Integer.parseInt(numberOfChannels), monitoring, realTimeControl);
-                ActuatorSetting.this.addTableRow(actuator, selectedSetting);
-                ActuatorSetting.this.initEditControls();
-                if (selectedSetting == -1) actuators.add(actuator);
-                else {
-                    actuators = actuators.stream()
-                            .map(s -> Objects.equals(s.getVariableName(), actuator.getVariableName()) ? actuator : s)
-                            .collect(Collectors.toList());
-                    actuatorListTable.removeViewAt(selectedSetting + 1);
+                SensorActuator actuator = new SensorActuator(variableName, 1, dataType, Integer.parseInt(numberOfChannels), monitoring, realTimeControl);
+                if (selectedSetting == -1) {
+                    sensorActuatorViewModel.insert(actuator);
+                    sensorActuatorViewModel.getInsertResult().observe(getViewLifecycleOwner(), id -> {
+                        if (id != null && id > 0) {
+                            Toast.makeText(getContext(), "Insert success!", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(getContext(), "Insert failed!", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
                 }
+                else {
+                    actuator.setId((long)selectedSetting);
+                    sensorActuatorViewModel.update(actuator);
+                    sensorActuatorViewModel.getUpdateResult().observe(getViewLifecycleOwner(), res -> {
+                        if(res != null && res != 0) {
+                            Toast.makeText(getContext(), "Update success!", Toast.LENGTH_SHORT).show();
+                        }
+                        else {
+                            Toast.makeText(getContext(), "Update failed!", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+                ActuatorSetting.this.initEditControls();
                 selectedSetting = -1;
             }
         });
@@ -82,19 +120,29 @@ public class ActuatorSetting extends Fragment {
         ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, options);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter((adapter));
-
-
-
         return view;
     }
 
-    public void addTableRow(SensorActuator data, int pos) {
-        int order = pos == -1 ? actuatorListTable.getChildCount() : pos;
-
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        Bundle args = getArguments();
+        if (args != null) {
+            delegated = true;
+            delegatedId = args.getLong("id");
+        }
+    }
+    /**
+     * add a row data to the sensor settings table
+     *
+     * @param data: a sensor setting data
+     * @param index: sequence no in the table of that sensor setting record
+     */
+    public void addTableRow(SensorActuator data, int index) {
         TableRow tableRow = new TableRow(requireContext());
         tableRow.setVerticalGravity(Gravity.CENTER);
         TextView orderText = new TextView(requireContext());
-        orderText.setText(String.valueOf(order));
+        orderText.setText(String.valueOf(index));
         orderText.setGravity(Gravity.CENTER);
         TextView nameText = new TextView(requireContext());
         nameText.setText(data.getVariableName());
@@ -102,6 +150,11 @@ public class ActuatorSetting extends Fragment {
         TextView numberOfChannelsText = new TextView(requireContext());
         numberOfChannelsText.setText(String.valueOf(data.getNumberOfChannels()));
         numberOfChannelsText.setGravity(Gravity.CENTER);
+
+        TextView numberOfBytesText = new TextView(requireContext());
+        numberOfBytesText.setText(String.valueOf(getNumberOfBytesFromDataTypeString(data.getDataType()) * data.getNumberOfChannels()));
+        numberOfBytesText.setGravity(Gravity.CENTER);
+
         TextView dataTypeText = new TextView(requireContext());
         dataTypeText.setText(data.getDataType());
         dataTypeText.setGravity(Gravity.CENTER);
@@ -117,53 +170,38 @@ public class ActuatorSetting extends Fragment {
         tableRow.addView(nameText);
         tableRow.addView(dataTypeText);
         tableRow.addView(numberOfChannelsText);
+        tableRow.addView(numberOfBytesText);
         tableRow.addView(monitoringText);
         tableRow.addView(realTimeControlText);
 
-        ImageButton iconButton = new ImageButton(requireContext());
-        iconButton.setImageResource(R.drawable.baseline_edit_24); // your drawable icon
-        iconButton.setBackgroundColor(Color.TRANSPARENT); // optional styling
+        List<ImageButton> operationalButtons = setupOperationalButtons(data.getId(), requireContext());
 
-        TableRow.LayoutParams params = new TableRow.LayoutParams(
-                100,
-                80
-        );
-        ImageButton changeValueBtn = new ImageButton(requireContext());
-        changeValueBtn.setImageResource(R.drawable.baseline_edit_24);
-        changeValueBtn.setBackgroundColor(Color.TRANSPARENT);
-        changeValueBtn.setColorFilter(Color.parseColor("#198754"));
-        changeValueBtn.setLayoutParams(params);
-        changeValueBtn.setTag(order);
+        ImageButton changeValueBtn = operationalButtons.get(0);
         changeValueBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int index = (int) v.getTag();
-                selectedSetting = index;
-                SensorActuator selectedActuator = actuators.get(index - 1);
-                variableNameEdit.setText(selectedActuator.getVariableName());
+                Long index = (Long) v.getTag();
+                selectedSetting = index.intValue();
+
+                List<SensorActuator> selectedActuators = actuators.stream()
+                        .filter(s -> Objects.equals(s.getId(), index))
+                        .collect(Collectors.toList());
+                if (selectedActuators.isEmpty()) {
+                    return;
+                }
+                variableNameEdit.setText(selectedActuators.get(0).getVariableName());
                 ArrayAdapter<String> adapter = (ArrayAdapter<String>) spinner.getAdapter();
-                int position = adapter.getPosition(selectedActuator.getDataType());
+                int position = adapter.getPosition(selectedActuators.get(0).getDataType());
                 spinner.setSelection(position);
-                numberOfChannelsEdit.setText(String.valueOf(selectedActuator.getNumberOfChannels()));
-                monitoringCheckbox.setChecked(selectedActuator.getMonitoring() == 1);
-                realTimeControlCheckbox.setChecked(selectedActuator.getRealTimeControl() == 1);
+                numberOfChannelsEdit.setText(String.valueOf(selectedActuators.get(0).getNumberOfChannels()));
+                monitoringCheckbox.setChecked(selectedActuators.get(0).getMonitoring() == 1);
+                realTimeControlCheckbox.setChecked(selectedActuators.get(0).getRealTimeControl() == 1);
             }
         });
-        LinearLayout btnLayout = new LinearLayout(requireContext());
-        btnLayout.setGravity(Gravity.CENTER);
-        btnLayout.addView(changeValueBtn);
 
-        ImageButton changeOrderBtn = new ImageButton(requireContext());
-        changeOrderBtn.setImageResource(R.drawable.baseline_bar_chart_24);
-        changeOrderBtn.setBackgroundColor(Color.TRANSPARENT);
-        changeOrderBtn.setColorFilter(Color.parseColor("#0dcaf0"));
-        btnLayout.addView(changeOrderBtn);
+        ImageButton changeOrderBtn = operationalButtons.get(1);
 
-        ImageButton deleteBtn = new ImageButton(requireContext());
-        deleteBtn.setImageResource(R.drawable.baseline_delete_24);
-        deleteBtn.setBackgroundColor(Color.TRANSPARENT);
-        deleteBtn.setColorFilter(Color.parseColor("#dc3545"));
-        deleteBtn.setTag(order);
+        ImageButton deleteBtn = operationalButtons.get(2);
         deleteBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -172,12 +210,22 @@ public class ActuatorSetting extends Fragment {
                         .setMessage("Are you sure you want to proceed?")
                         .setPositiveButton("Yes", (dialog, which) -> {
                             // Handle Yes button click
-                            View parentRow = (View) v.getParent();  // Get the TableRow (parent of Button)
-                            TableLayout tableLayout = (TableLayout) parentRow.getParent();  // TableLayout is parent of TableRow
-
-                            int rowIndex = tableLayout.indexOfChild(parentRow);
-                            actuatorListTable.removeViewAt(rowIndex);
-                            Toast.makeText(requireContext(), "Deleted Successfully!", Toast.LENGTH_SHORT).show();
+                            Long id = (Long) v.getTag();
+                            List<SensorActuator> selectedSensorActuators = actuators.stream()
+                                    .filter(sa -> Objects.equals(sa.getId(), id))
+                                    .collect(Collectors.toList());
+                            if (selectedSensorActuators.isEmpty()) {
+                                return;
+                            }
+                            sensorActuatorViewModel.delete(selectedSensorActuators.get(0));
+                            sensorActuatorViewModel.getDeleteResult().observe(getViewLifecycleOwner(), res -> {
+                                if (res != null && res > 0) {
+                                    Toast.makeText(requireContext(), "Deleted Successfully!", Toast.LENGTH_SHORT).show();
+                                }
+                                else {
+                                    Toast.makeText(requireContext(), "Delete failed", Toast.LENGTH_SHORT).show();
+                                }
+                            });
                         })
                         .setNegativeButton("No", (dialog, which) -> {
                             // Handle No button click (optional)
@@ -186,10 +234,16 @@ public class ActuatorSetting extends Fragment {
                         .show();
             }
         });
+
+        LinearLayout btnLayout = new LinearLayout(requireContext());
+        btnLayout.setGravity(Gravity.CENTER);
+
+        btnLayout.addView(changeValueBtn);
+        btnLayout.addView(changeOrderBtn);
         btnLayout.addView(deleteBtn);
+
         tableRow.addView(btnLayout);
-        if(pos > -1) actuatorListTable.addView(tableRow, pos);
-        else actuatorListTable.addView(tableRow);
+        actuatorListTable.addView(tableRow);
     }
 
     public void initEditControls() {
@@ -199,4 +253,33 @@ public class ActuatorSetting extends Fragment {
         monitoringCheckbox.setChecked(false);
         realTimeControlCheckbox.setChecked(false);
     }
+
+    /**
+     * display actuator settings on the table
+     *
+     * @param sas: List of actuator settings
+     */
+    public void displayTable(List<SensorActuator> sas) {
+        actuatorListTable.removeViews(1, actuatorListTable.getChildCount() - 1);
+        for (int i = 0; i < sas.size(); i ++) {
+            addTableRow(sas.get(i), i + 1);
+        }
+    }
+
+    public void editActuator(Long actuatorId) {
+        int cnt = actuatorListTable.getChildCount();
+        for (int i = 1; i < cnt; i ++) {
+            View rowView = actuatorListTable.getChildAt(i);
+            if (rowView instanceof TableRow) {
+                TableRow tableRow = (TableRow) rowView;
+                View layoutView = tableRow.getChildAt(7);
+                if (layoutView instanceof LinearLayout) {
+                    LinearLayout linearLayout = (LinearLayout) layoutView;
+                    ImageButton editBtn = (ImageButton) linearLayout.getChildAt(0);
+                    editBtn.performClick();
+                }
+            }
+        }
+    }
+
 }

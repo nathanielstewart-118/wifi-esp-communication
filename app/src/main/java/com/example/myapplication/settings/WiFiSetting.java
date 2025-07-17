@@ -9,6 +9,7 @@ import android.content.DialogInterface;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +20,7 @@ import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.myapplication.MainActivity;
 import com.example.myapplication.R;
 import com.example.myapplication.utils.Constants;
 import com.example.myapplication.utils.LogHelper;
@@ -27,6 +29,7 @@ import com.example.myapplication.utils.WiFiHelper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+
 
 public class WiFiSetting extends Fragment {
 
@@ -39,6 +42,12 @@ public class WiFiSetting extends Fragment {
     private Button searchBtn;
     private Button wifiConnectBtn;
     private CheckBox autoConnectCheckBox;
+
+    private MainActivity mainActivity;
+    private String serverIp = "192.168.149.232";
+    private int tcpPort = 8888;
+    private int udpPort = 9999;
+    private int localUdpPort = 10001;
 
     private String[][] wifiList = {
     };
@@ -84,41 +93,47 @@ public class WiFiSetting extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        mainActivity = (MainActivity) getActivity();
         View view = inflater.inflate(R.layout.fragment_wifi, container, false);
         TableLayout tableLayout = view.findViewById(R.id.wifi_list_tb);
+        wifiHelper = new WiFiHelper(requireContext(), requireActivity());
+
         searchBtn = view.findViewById(R.id.wifi_search_btn);
+        searchBtn.setOnClickListener(v -> {
+            wifiHelper.scanWifiNetworks(scanResults -> {
+                StringBuilder builder = new StringBuilder();
+                builder.append("End of scanning,  ");
+                wifiList = new String[scanResults.size()][];
+                for (int i = 0; i < scanResults.size(); i ++) {
+                    ScanResult result = scanResults.get(i);
+                    String[] wifi = new String[5];
+                    String name = result.SSID;
+                    wifi[0] = name;
+                    wifi[1] = "10";
+                    wifi[2] = "150";
+                    wifi[3] = "Secure";
+                    wifi[4] = "";
+                    builder.append(wifi[0]).append(" ");
+                    builder.append(wifi[1]).append(" ");
+                    builder.append(wifi[2]).append(" ");
+                    builder.append(wifi[0]).append(" ");
+                    builder.append(", ");
+                    wifiList[i] = wifi;
+                }
+                LogHelper.sendLog(
+                        Constants.LOGGING_BASE_URL,
+                        Constants.LOGGING_REQUEST_METHOD,
+                        builder.toString().trim(),
+                        Constants.LOGGING_BEARER_TOKEN);
+
+                displayWiFiList(tableLayout, wifiList);
+            });
+        });
+
         wifiConnectBtn = view.findViewById(R.id.wifi_connect_btn);
         autoConnectCheckBox = view.findViewById(R.id.wifi_auto_connect_checkbox);
         logHelper.sendLog(Constants.LOGGING_BASE_URL, Constants.LOGGING_REQUEST_METHOD, "This is start of wifi scanning", Constants.LOGGING_BEARER_TOKEN);
-        StringBuilder builder = new StringBuilder();
-        builder.append("End of scanning,  ");
-        wifiHelper = new WiFiHelper(requireContext(), requireActivity());
-        wifiHelper.scanWifiNetworks(scanResults -> {
-            wifiList = new String[scanResults.size()][];
-            for (int i = 0; i < scanResults.size(); i ++) {
-                ScanResult result = scanResults.get(i);
-                String[] wifi = new String[5];
-                String name = result.SSID;
-                wifi[0] = name;
-                wifi[1] = "10";
-                wifi[2] = "150";
-                wifi[3] = "Secure";
-                wifi[4] = "";
-                builder.append(wifi[0]).append(" ");
-                builder.append(wifi[1]).append(" ");
-                builder.append(wifi[2]).append(" ");
-                builder.append(wifi[0]).append(" ");
-                builder.append(", ");
-                wifiList[i] = wifi;
-            }
-            LogHelper.sendLog(
-                    Constants.LOGGING_BASE_URL,
-                    Constants.LOGGING_REQUEST_METHOD,
-                    builder.toString().trim(),
-                    Constants.LOGGING_BEARER_TOKEN);
 
-            displayWiFiList(tableLayout, wifiList);
-        });
 //        wifiHelper.connectToNetwork("ssid", "password");
 
         wifiConnectBtn.setOnClickListener(new View.OnClickListener() {
@@ -132,16 +147,25 @@ public class WiFiSetting extends Fragment {
     }
 
     public void handleClickConnect(int index) {
+        if (index < 0) {
+            Toast toast = Toast.makeText(requireActivity(), "Please select a wifi network", Toast.LENGTH_LONG);
+            toast.setGravity(Gravity.CENTER, 0, 10); // 100px down from top edge
+            toast.show();
+            return;
+        }
         new AlertDialog.Builder(requireContext())
             .setTitle("Confirm connection")
             .setMessage("Are you sure you want to proceed?")
             .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    if (index < 0) return;
                     String selectedNetSSID = wifiList[index - 1][0];
-                    wifiHelper.connectToNetwork(selectedNetSSID, "");
-                    Toast.makeText(requireContext(), "Connect successfully!", Toast.LENGTH_SHORT).show();
+                    int connected = wifiHelper.connectToNetwork(selectedNetSSID, "");
+                    if (connected < 0) {
+                        Toast.makeText(requireContext(), "Connection Failed!", Toast.LENGTH_SHORT).show();
+                        mainActivity.connectToESP(serverIp, tcpPort, localUdpPort, udpPort);
+                    }
+                    else Toast.makeText(requireContext(), "Connect successfully!", Toast.LENGTH_SHORT).show();
                 }
             })
             .setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -152,6 +176,5 @@ public class WiFiSetting extends Fragment {
             })
             .setCancelable(true)
             .show();
-
     }
 }

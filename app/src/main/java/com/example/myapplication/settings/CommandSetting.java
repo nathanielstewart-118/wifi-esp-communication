@@ -31,6 +31,7 @@ import com.example.myapplication.db.entity.SensorActuator;
 import com.example.myapplication.db.entity.Command;
 import com.example.myapplication.db.viewmodel.CommandViewModel;
 import com.example.myapplication.db.viewmodel.SensorActuatorViewModel;
+import com.example.myapplication.utils.communications.WiFiSocketManager;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
@@ -69,6 +70,9 @@ public class CommandSetting extends Fragment {
     private List<SensorActuator> sensorActuators = new ArrayList<>();
     private List<CommandThreshold> currentCommandThresholds = new ArrayList<>();
 
+    private WiFiSocketManager socketManager = WiFiSocketManager.getInstance();
+
+    private final Gson gson = new Gson();
 
     public CommandSetting() {
 
@@ -88,7 +92,6 @@ public class CommandSetting extends Fragment {
             commands.addAll(data);
             initEditControls();
             if (!data.isEmpty()) {
-                Gson gson = new Gson();
                 Log.w("Warning ------------->", gson.toJson(data.get(0)));
             }
         });
@@ -100,6 +103,9 @@ public class CommandSetting extends Fragment {
 
         addCommandBtn = (Button) commandFragment.findViewById(R.id.command_add_btn);
         sendCommandBtn = (Button) commandFragment.findViewById(R.id.command_send_btn);
+        sendCommandBtn.setOnClickListener(v -> handleClickSendCommandBtn());
+
+
         openThresholdDialogBtn = (Button) commandFragment.findViewById(R.id.command_open_threshold_modal_btn);
         openThresholdDialogBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -389,6 +395,29 @@ public class CommandSetting extends Fragment {
                 thresholdEditTable.addView(tableRow);
                 rowCnt ++;
             }
+        }
+    }
+
+    public void handleClickSendCommandBtn() {
+        if (socketManager.isTCPConnected()) {
+            String dataString = "";
+            if (commands.size() > 0) {
+                Command command = commands.get(0);
+                dataString = gson.toJson(command);
+            }
+            socketManager.sendTCP("Hello from fragment, " + dataString, new WiFiSocketManager.Callback() {
+                @Override
+                public void onSuccess(String response) {
+                    Log.d("Fragment", "Response from TCP: " + response);
+                }
+
+                @Override
+                public void onError(Exception e) {
+                    Log.e("Fragment", "TCP send failed", e);
+                }
+            });
+        } else {
+            Log.e("Fragment", "TCP not connected yet");
         }
     }
 }

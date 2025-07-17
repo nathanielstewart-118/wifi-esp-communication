@@ -26,32 +26,41 @@
                     android:padding="16dp"
                     android:textStyle="bold"
                     android:textColor="@color/white"
-                    android:text="Order">
+                    android:text="Variable Name">
                 </TextView>
                 <TextView
                     android:padding="16dp"
                     android:textStyle="bold"
                     android:textColor="@color/white"
-                    android:text="Initial Value">
+                    android:text="Data Type">
                 </TextView>
                 <TextView
                     android:padding="16dp"
                     android:textStyle="bold"
                     android:textColor="@color/white"
-                    android:text="Upper Limit">
+                    android:text="Channel Count">
                 </TextView>
-                <TextView
-                    android:padding="16dp"
-                    android:textStyle="bold"
-                    android:textColor="@color/white"
-                    android:text="Lower Limit">
-                </TextView>
-                <TextView
-                    android:padding="16dp"
-                    android:textStyle="bold"
-                    android:textColor="@color/white"
-                    android:text="Active">
-                </TextView>
+
+            </TableRow>
+            <TableRow>
+                <EditText
+                    android:id="@+id/esp_rx_rt_variable_name_edit"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp" />
+                <Spinner
+                    android:id="@+id/esp_rx_rt_data_type_spinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="number"
+                    android:padding="8dp" />
+                <EditText
+                    android:id="@+id/esp_rx_rt_channel_count_edit"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="number"
+                    android:padding="8dp" />
+
 
             </TableRow>
         </TableLayout>
@@ -62,7 +71,7 @@
             android:gravity="center_horizontal"
             >
             <Button
-                android:id="@+id/esp_rxrt_save_thresholds_btn"
+                android:id="@+id/esp_rxrt_save_btn"
                 android:layout_width="150dp"
                 android:backgroundTint="@color/bs_success"
                 android:layout_height="wrap_content"
@@ -70,7 +79,7 @@
                 android:text="Save"
                 android:padding="8dp" />
             <Button
-                android:id="@+id/esp_rxrt_close_thresholds_dialog_btn"
+                android:id="@+id/esp_rxrt_close_add_custom_dialog_btn"
                 android:layout_width="150dp"
                 android:backgroundTint="@color/bs_secondary"
                 android:layout_height="wrap_content"

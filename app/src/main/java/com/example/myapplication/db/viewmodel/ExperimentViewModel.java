@@ -8,39 +8,36 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.myapplication.db.AppDatabase;
-import com.example.myapplication.db.dao.ESPRXRTDao;
-import com.example.myapplication.db.dao.ESPTXDao;
-import com.example.myapplication.db.entity.ESPRXRT;
-import com.example.myapplication.db.entity.ESPTX;
+import com.example.myapplication.db.dao.ExperimentDao;
+import com.example.myapplication.db.entity.Experiment;
 
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class ESPRXRTViewModel extends AndroidViewModel {
-    private final ESPRXRTDao espRXRTDao;
+public class ExperimentViewModel extends AndroidViewModel {
+    private final ExperimentDao experimentDao;
     private final ExecutorService executorService;
 
     private final MutableLiveData<Long> insertResult = new MutableLiveData<>();
     private final MutableLiveData<Integer> updateResult = new MutableLiveData<>();
     private final MutableLiveData<Integer> deleteResult = new MutableLiveData<>();
-    private final MutableLiveData<Long> softDeleteResult = new MutableLiveData<>();
 
-    public ESPRXRTViewModel(@NonNull Application application) {
+    public ExperimentViewModel(@NonNull Application application) {
         super(application);
         AppDatabase db = AppDatabase.getInstance(application);
-        this.espRXRTDao = db.espRXRTDao();
+        this.experimentDao = db.experimentDao();
         this.executorService = Executors.newSingleThreadExecutor();
     }
 
-    public LiveData<List<ESPRXRT>> getAllESPRXRTs() {
-        return espRXRTDao.getAllESPRXRTs();
+    public LiveData<List<Experiment>> getAllExperiments() {
+        return experimentDao.getAllExperiments();
     }
 
     // --- INSERT ---
-    public void insert(ESPRXRT esprxrt) {
+    public void insert(Experiment experiment) {
         executorService.execute(() -> {
-            long result = espRXRTDao.insert(esprxrt);
+            long result = experimentDao.insert(experiment);
             insertResult.postValue(result);
         });
     }
@@ -50,9 +47,9 @@ public class ESPRXRTViewModel extends AndroidViewModel {
     }
 
     // --- UPDATE ---
-    public void update(ESPRXRT esprxrt) {
+    public void update(Experiment experiment) {
         executorService.execute(() -> {
-            int result = espRXRTDao.update(esprxrt);
+            int result = experimentDao.update(experiment);
             updateResult.postValue(result);
         });
     }
@@ -62,9 +59,9 @@ public class ESPRXRTViewModel extends AndroidViewModel {
     }
 
     // --- DELETE ---
-    public void delete(ESPRXRT esprxrt) {
+    public void delete(Experiment experiment) {
         executorService.execute(() -> {
-            int result = espRXRTDao.delete(esprxrt);
+            int result = experimentDao.delete(experiment);
             deleteResult.postValue(result);
         });
     }
@@ -73,13 +70,9 @@ public class ESPRXRTViewModel extends AndroidViewModel {
         return deleteResult;
     }
 
-    // --- Soft Delete ---
-    public void softDelete(Long id) {
+    public void getExperimentsByExperimentId(String id) {
         executorService.execute(() -> {
-            long result = espRXRTDao.softDeleteById(id);
-            softDeleteResult.postValue(result);
+//            return experimentDao.getExperimentsByExperimentId(id);
         });
     }
-    public LiveData<Long> getSoftDeleteResult() { return softDeleteResult; }
-
 }

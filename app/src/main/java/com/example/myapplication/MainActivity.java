@@ -2,6 +2,7 @@ package com.example.myapplication; // Replace with your package name
 
 import androidx.fragment.app.Fragment;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Toast;
 
@@ -23,7 +24,10 @@ import com.example.myapplication.settings.ReproductionSetting;
 import com.example.myapplication.settings.SensorSetting;
 import com.example.myapplication.settings.VisualizationSetting;
 import com.example.myapplication.settings.WiFiSetting;
+import com.example.myapplication.utils.communications.WiFiSocketManager;
 import com.google.android.material.navigation.NavigationView;
+
+import java.net.SocketException;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -31,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
     private NavigationView navigationView;
     private Toolbar toolbar;
     private ActionBarDrawerToggle toggle;
+    private WiFiSocketManager socketManager = WiFiSocketManager.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,12 +121,64 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
         });
+
+
+
+
     }
 
-    // Optional: handle back button to close drawer if open
+    public void connectToESP(String serverIp, int tcpPort, int udpLocalPort, int udpPort) {
+        socketManager.connectTCP(serverIp, tcpPort, new WiFiSocketManager.Callback() {
+            @Override
+            public void onSuccess(String response) {
+                Log.d("WiFiSocketManager", "TCP Connected: " + response);
+            }
 
-//    @Override
-//    public void onBackPressed() {
-//
-//    }
+            @Override
+            public void onError(Exception e) {
+                Log.e("WiFiSocketManager", "TCP Connect error", e);
+            }
+        });
+
+        socketManager.setTCPMessageListener(new WiFiSocketManager.TCPMessageListener() {
+            @Override
+            public void onMessageReceived(String message) {
+                Log.d("TCP", "Received from server: " + message);
+                // If you need to update UI:
+                runOnUiThread(() -> {
+                    Toast.makeText(getApplicationContext(), "Received from server: " + message, Toast.LENGTH_SHORT).show();
+                    // update UI safely here
+                });
+            }
+        });
+
+        socketManager.startUDPListening(udpLocalPort, new WiFiSocketManager.Callback() {
+            @Override
+            public void onSuccess(String message) {
+                runOnUiThread(() ->
+                        Toast.makeText(getApplicationContext(), "Received: " + message, Toast.LENGTH_SHORT).show()
+                );
+            }
+
+            @Override
+            public void onError(Exception e) {
+                Log.e("UDP", "Error receiving", e);
+            }
+        });
+
+        socketManager.sendUDP("Hello via UDP!", serverIp, udpPort, new WiFiSocketManager.Callback() {
+            @Override
+            public void onSuccess(String message) {
+                runOnUiThread(() ->
+                        Toast.makeText(getApplicationContext(), "Received: " + message, Toast.LENGTH_SHORT).show()
+                );
+            }
+
+            @Override
+            public void onError(Exception e) {
+                Log.e("UDP", "Error receiving", e);
+            }
+        });
+    }
+
 }

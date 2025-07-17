@@ -272,7 +272,7 @@ public class ActuatorSetting extends Fragment {
                 TableRow tableRow = (TableRow) rowView;
                 Long tagId = (long) tableRow.getTag();
                 if(!Objects.equals(tagId, actuatorId)) continue;
-                View layoutView = tableRow.getChildAt(7);
+                View layoutView = tableRow.getChildAt(6);
                 if (layoutView instanceof LinearLayout) {
                     LinearLayout linearLayout = (LinearLayout) layoutView;
                     ImageButton editBtn = (ImageButton) linearLayout.getChildAt(0);

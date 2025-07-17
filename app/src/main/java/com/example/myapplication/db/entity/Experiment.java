@@ -9,25 +9,35 @@ public class Experiment {
     @PrimaryKey(autoGenerate = true)
     public Long id;
 
+    @ColumnInfo(name="experiment_id")
+    public String experimentId;
+
+    @ColumnInfo(name="experiment_set")
+    public String experimentSet;
+
     @ColumnInfo(name="command_id")
-    public String commandId;
+    public Long commandId;
 
     @ColumnInfo(name="number_of_trials")
     public Integer numberOfTrials;
+
+    @ColumnInfo(name="command")
+    public Float command;
 
     @ColumnInfo(name="pre_run")
     public Float preRun;
 
     @ColumnInfo(name="post_run")
-    public float postRun;
+    public Float postRun;
 
     @ColumnInfo(name="rest")
-    public float rest;
+    public Float rest;
 
     @ColumnInfo(name="rest_random")
-    public float restRandom;
+    public Float restRandom;
 
-    public Experiment(String commandId, Integer numberOfTrials, Float preRun, float postRun, float rest, float restRandom) {
+    public Experiment(String experimentId, String experimentSet, Long commandId, Integer numberOfTrials, Float preRun, Float postRun, Float rest, Float restRandom) {
+        this.experimentId = experimentId;
         this.commandId = commandId;
         this.numberOfTrials = numberOfTrials;
         this.preRun = preRun;
@@ -44,11 +54,27 @@ public class Experiment {
         this.id = id;
     }
 
-    public String getCommandId() {
+    public String getExperimentId() {
+        return experimentId;
+    }
+
+    public void setExperimentId(String experimentId) {
+        this.experimentId = experimentId;
+    }
+
+    public String getExperimentSet() {
+        return experimentSet;
+    }
+
+    public void setExperimentSet(String experimentSet) {
+        this.experimentSet = experimentSet;
+    }
+
+    public Long getCommandId() {
         return commandId;
     }
 
-    public void setCommandId(String commandId) {
+    public void setCommandId(Long commandId) {
         this.commandId = commandId;
     }
 
@@ -60,6 +86,14 @@ public class Experiment {
         this.numberOfTrials = numberOfTrials;
     }
 
+    public Float getCommand() {
+        return command;
+    }
+
+    public void setCommand(Float command) {
+        this.command = command;
+    }
+
     public Float getPreRun() {
         return preRun;
     }
@@ -68,27 +102,27 @@ public class Experiment {
         this.preRun = preRun;
     }
 
-    public float getPostRun() {
+    public Float getPostRun() {
         return postRun;
     }
 
-    public void setPostRun(float postRun) {
+    public void setPostRun(Float postRun) {
         this.postRun = postRun;
     }
 
-    public float getRest() {
+    public Float getRest() {
         return rest;
     }
 
-    public void setRest(float rest) {
+    public void setRest(Float rest) {
         this.rest = rest;
     }
 
-    public float getRestRandom() {
+    public Float getRestRandom() {
         return restRandom;
     }
 
-    public void setRestRandom(float restRandom) {
+    public void setRestRandom(Float restRandom) {
         this.restRandom = restRandom;
     }
 }

@@ -66,7 +66,7 @@ public class WiFiHelper {
                     );
 
                     callback.accept(Collections.emptyList()); // Return early
-//                return;
+                    return;
                 }
 
                 // Register receiver to listen for scan results
@@ -141,11 +141,11 @@ public class WiFiHelper {
                 );
             }
         })
-            .start();
+        .start();
 
     }
 
-    public void connectToNetwork(String ssid, String password) {
+    public int connectToNetwork(String ssid, String password) {
         WifiConfiguration config = new WifiConfiguration();
         config.SSID = "\"" + ssid + "\"";
         config.preSharedKey = "\"" + password + "\"";
@@ -154,5 +154,6 @@ public class WiFiHelper {
         wifiManager.disconnect();
         wifiManager.enableNetwork(netId, true);
         wifiManager.reconnect();
+        return netId;
     }
 }

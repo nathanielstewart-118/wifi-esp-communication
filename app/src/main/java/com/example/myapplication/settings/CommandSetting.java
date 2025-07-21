@@ -31,9 +31,12 @@ import com.example.myapplication.db.entity.SensorActuator;
 import com.example.myapplication.db.entity.Command;
 import com.example.myapplication.db.viewmodel.CommandViewModel;
 import com.example.myapplication.db.viewmodel.SensorActuatorViewModel;
+import com.example.myapplication.utils.Constants;
+import com.example.myapplication.utils.LogHelper;
 import com.example.myapplication.utils.communications.WiFiSocketManager;
 import com.google.gson.Gson;
 
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -399,21 +402,47 @@ public class CommandSetting extends Fragment {
     }
 
     public void handleClickSendCommandBtn() {
+
         if (socketManager.isTCPConnected()) {
             String dataString = "";
-            if (commands.size() > 0) {
-                Command command = commands.get(0);
-                dataString = gson.toJson(command);
+
+            if (commands.size() == 0) {
+                Toast.makeText(requireContext(), "No command to send", Toast.LENGTH_SHORT).show();
             }
-            socketManager.sendTCP("Hello from fragment, " + dataString, new WiFiSocketManager.Callback() {
+            Command command = commands.get(0);
+            ByteBuffer buffer = ByteBuffer.allocate(1 + 2 + 2 + 6 + 4 + 4);
+            buffer.put((byte) Integer.parseInt(command.getCommandCode().replace("0x", ""), 16));                    // 1 byte
+            buffer.putFloat(command.getTime1());     // 2 bytes
+            buffer.putFloat(command.getTime2());     // 2 bytes
+            LogHelper.sendLog(
+                    Constants.LOGGING_BASE_URL,
+                    Constants.LOGGING_REQUEST_METHOD,
+                    "Sending data : via TCP",
+                    Constants.LOGGING_BEARER_TOKEN
+            );
+            Log.d("WiFi Error", "Sending data : via TCP");
+
+            socketManager.sendTCP(buffer.array(), new WiFiSocketManager.Callback() {
                 @Override
-                public void onSuccess(String response) {
-                    Log.d("Fragment", "Response from TCP: " + response);
+                public void onSuccess(byte[] response) {
+                    LogHelper.sendLog(
+                            Constants.LOGGING_BASE_URL,
+                            Constants.LOGGING_REQUEST_METHOD,
+                            "Data transmitted successfully via TCP",
+                            Constants.LOGGING_BEARER_TOKEN
+                    );
+                    Log.d("WiFi Success", "Data transmitted successfully via TCP");
                 }
 
                 @Override
                 public void onError(Exception e) {
-                    Log.e("Fragment", "TCP send failed", e);
+                    LogHelper.sendLog(
+                            Constants.LOGGING_BASE_URL,
+                            Constants.LOGGING_REQUEST_METHOD,
+                            "Data transmission failed via TCP",
+                            Constants.LOGGING_BEARER_TOKEN
+                    );
+                    Log.d("WiFi Success", "Data transmission failed via TCP");
                 }
             });
         } else {

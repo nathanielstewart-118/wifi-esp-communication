@@ -3,12 +3,21 @@ package com.example.myapplication.db.entity;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
+import androidx.room.TypeConverters;
+
+import com.example.myapplication.db.converters.ExperimentCommandsConverter;
+import com.example.myapplication.db.converters.VisualizationRangeConverter;
+
+import java.util.List;
 
 @Entity(tableName = "visualizations")
 public class Visualization {
 
     @PrimaryKey(autoGenerate = true)
     public Long id;
+
+    @ColumnInfo(name="visualization_id")
+    public String visualizationId;
 
     @ColumnInfo(name="sample_rate")
     public Float sampleRate;
@@ -19,38 +28,34 @@ public class Visualization {
     @ColumnInfo(name="buffer_size")
     public Integer bufferSize;
 
-    @ColumnInfo(name="auto_y_axis_range")
-    public Boolean autoYAxisRange;
-
-    @ColumnInfo(name="y_min")
-    public Float yAxisMin;
-
-    @ColumnInfo(name="y_max")
-    public Float yAxisMax;
-
-    @ColumnInfo(name="x_secs")
-    public Boolean xAxisInSeconds; // true = seconds, false = samples
+    @ColumnInfo(name="ranges")
+    @TypeConverters(VisualizationRangeConverter.class)
+    List<VisualizationRange> ranges;
 
     @ColumnInfo(name="save_format")
     public String saveFormat; //
 
-    public Visualization(Float sampleRate, Integer blockSize, Integer bufferSize, Boolean autoYAxisRange, Float yAxisMin, Float yAxisMax, Boolean xAxisInSeconds, String saveFormat) {
+    @ColumnInfo(name="save_path")
+    public String savePath;
+
+    public Visualization(Float sampleRate, Integer blockSize, Integer bufferSize, List<VisualizationRange> ranges, String saveFormat, String savePath) {
         this.sampleRate = sampleRate;
         this.blockSize = blockSize;
         this.bufferSize = bufferSize;
-        this.autoYAxisRange = autoYAxisRange;
-        this.yAxisMin = yAxisMin;
-        this.yAxisMax = yAxisMax;
-        this.xAxisInSeconds = xAxisInSeconds;
+        this.ranges = ranges;
         this.saveFormat = saveFormat;
+        this.savePath = savePath;
     }
 
-    public Float getSampleRate() {
-        return sampleRate;
-    }
-
-    public void setSampleRate(Float sampleRate) {
-        this.sampleRate = sampleRate;
+    public void copyFrom(Visualization other) {
+        this.id = other.getId();
+        this.visualizationId = other.getVisualizationId();
+        this.sampleRate = other.getSampleRate();
+        this.blockSize = other.getBlockSize();
+        this.bufferSize = other.getBufferSize();
+        this.ranges = other.getRanges();
+        this.saveFormat = other.getSaveFormat();
+        this.savePath = other.getSavePath();
     }
 
     public Long getId() {
@@ -59,6 +64,22 @@ public class Visualization {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getVisualizationId() {
+        return visualizationId;
+    }
+
+    public void setVisualizationId(String visualizationId) {
+        this.visualizationId = visualizationId;
+    }
+
+    public Float getSampleRate() {
+        return sampleRate;
+    }
+
+    public void setSampleRate(Float sampleRate) {
+        this.sampleRate = sampleRate;
     }
 
     public Integer getBlockSize() {
@@ -77,36 +98,12 @@ public class Visualization {
         this.bufferSize = bufferSize;
     }
 
-    public Boolean getAutoYAxisRange() {
-        return autoYAxisRange;
+    public List<VisualizationRange> getRanges() {
+        return ranges;
     }
 
-    public void setAutoYAxisRange(Boolean autoYAxisRange) {
-        this.autoYAxisRange = autoYAxisRange;
-    }
-
-    public Float getyAxisMin() {
-        return yAxisMin;
-    }
-
-    public void setyAxisMin(Float yAxisMin) {
-        this.yAxisMin = yAxisMin;
-    }
-
-    public Float getyAxisMax() {
-        return yAxisMax;
-    }
-
-    public void setyAxisMax(Float yAxisMax) {
-        this.yAxisMax = yAxisMax;
-    }
-
-    public Boolean getxAxisInSeconds() {
-        return xAxisInSeconds;
-    }
-
-    public void setxAxisInSeconds(Boolean xAxisInSeconds) {
-        this.xAxisInSeconds = xAxisInSeconds;
+    public void setRanges(List<VisualizationRange> ranges) {
+        this.ranges = ranges;
     }
 
     public String getSaveFormat() {
@@ -115,5 +112,13 @@ public class Visualization {
 
     public void setSaveFormat(String saveFormat) {
         this.saveFormat = saveFormat;
+    }
+
+    public String getSavePath() {
+        return savePath;
+    }
+
+    public void setSavePath(String savePath) {
+        this.savePath = savePath;
     }
 }

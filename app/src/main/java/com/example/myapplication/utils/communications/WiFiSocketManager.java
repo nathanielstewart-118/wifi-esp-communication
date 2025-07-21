@@ -1,18 +1,28 @@
 package com.example.myapplication.utils.communications;
 
+
+import static com.example.myapplication.utils.communications.PacketParser.parseESPData;
+
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 
+import com.example.myapplication.db.entity.ESPReceiveData;
+import com.example.myapplication.utils.communications.PacketParser.*;
+import com.google.gson.Gson;
+
 import java.io.*;
 import java.net.*;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.util.Arrays;
 
 public class WiFiSocketManager {
     private static WiFiSocketManager instance;
 
     // TCP
     private Socket tcpSocket;
-    private PrintWriter tcpOut;
+    private OutputStream tcpOutputStream;
     private BufferedReader tcpIn;
     private Thread tcpListenThread;
     private boolean tcpListening;
@@ -26,10 +36,12 @@ public class WiFiSocketManager {
 
     private Handler mainHandler = new Handler(Looper.getMainLooper());
 
+    private final Gson gson = new Gson();
+
     private WiFiSocketManager() {}
 
     public interface TCPMessageListener {
-        void onMessageReceived(String message);
+        void onMessageReceived(byte[] data);
     }
 
     public interface UDPMessageListener {
@@ -52,7 +64,7 @@ public class WiFiSocketManager {
     }
 
     public interface Callback {
-        void onSuccess(String response);
+        void onSuccess(byte[] data);
         void onError(Exception e);
     }
 
@@ -60,14 +72,14 @@ public class WiFiSocketManager {
     public void connectTCP(String ip, int port, Callback callback) {
         new Thread(() -> {
             try {
-                tcpSocket = new Socket(ip, port);
-                tcpOut = new PrintWriter(tcpSocket.getOutputStream(), true);
+                tcpSocket = new Socket();
+                tcpSocket.connect(new InetSocketAddress(ip, port), 10000);
+                tcpOutputStream = tcpSocket.getOutputStream();
                 tcpIn = new BufferedReader(new InputStreamReader(tcpSocket.getInputStream()));
-
                 startTCPListening();  // 🔥 Start listening immediately after connection
-
-                callback.onSuccess("Connected to TCP");
-            } catch (IOException e) {
+                callback.onSuccess(new byte[10]);
+            } catch (Exception e) {
+                Log.e("SocketError", "I/O error during connection", e);
                 callback.onError(e);
             }
         }).start();
@@ -77,10 +89,18 @@ public class WiFiSocketManager {
         tcpListening = true;
         tcpListenThread = new Thread(() -> {
             try {
-                String line;
-                while (tcpListening && (line = tcpIn.readLine()) != null) {
+                InputStream inputStream = tcpSocket.getInputStream();
+                byte[] buffer = new byte[20]; // max packet size
+                int bytesRead;
+//                while (tcpListening && (line = tcpIn.readLine()) != null) {
+//                    if (tcpMessageListener != null) {
+//                        tcpMessageListener.onMessageReceived(line);
+//                    }
+//                }
+                while (tcpListening && (bytesRead = inputStream.read(buffer)) != -1) {
+                    byte[] data = Arrays.copyOf(buffer, bytesRead);
                     if (tcpMessageListener != null) {
-                        tcpMessageListener.onMessageReceived(line);
+                        tcpMessageListener.onMessageReceived(data);
                     }
                 }
             } catch (IOException e) {
@@ -107,14 +127,14 @@ public class WiFiSocketManager {
     }
 
     // Send data on existing TCP socket, receive response
-    public void sendTCP(String message, Callback callback) {
+    public void sendTCP(byte[] data, Callback callback) {
         new Thread(() -> {
             synchronized (tcpLock) {
                 try {
-                    if (tcpOut != null) {
-                        tcpOut.println(message);
-                        tcpOut.flush();
-                        callback.onSuccess("Sent: " + message);
+                    if (tcpOutputStream != null) {
+                        tcpOutputStream.write(data);
+                        tcpOutputStream.flush();
+                        callback.onSuccess(data);
                     } else {
                         callback.onError(new Exception("TCP output stream is null"));
                     }
@@ -151,19 +171,18 @@ public class WiFiSocketManager {
     }
 
     // Send UDP message and wait for response on existing UDP socket
-    public void sendUDP(String message, String targetIp, int targetPort, Callback callback) {
+    public void sendUDP(byte[] data, String targetIp, int targetPort, Callback callback) {
         new Thread(() -> {
             try {
                 if (udpSocket == null || udpSocket.isClosed()) {
                     udpSocket = new DatagramSocket(); // system chooses available port
                 }
 
-                byte[] data = message.getBytes();
                 InetAddress address = InetAddress.getByName(targetIp);
                 DatagramPacket sendPacket = new DatagramPacket(data, data.length, address, targetPort);
                 udpSocket.send(sendPacket);
 
-                callback.onSuccess("UDP Message Sent");
+                callback.onSuccess(data);
 
             } catch (IOException e) {
                 callback.onError(e);
@@ -186,8 +205,10 @@ public class WiFiSocketManager {
 
                     while (udpListening) {
                         udpSocket.receive(packet);
+                        byte[] received = Arrays.copyOf(packet.getData(), packet.getLength());
+
+                        // Parse the byte array into ESPData
                         Log.d("inform", "UDP Listening ...");
-                        String received = new String(packet.getData(), 0, packet.getLength());
                         callback.onSuccess(received);
                     }
 
@@ -216,7 +237,7 @@ public class WiFiSocketManager {
     // Helper methods to post results on main thread
     private void postSuccess(Callback callback, String response) {
         if (callback != null) {
-            mainHandler.post(() -> callback.onSuccess(response));
+            mainHandler.post(() -> callback.onSuccess(new byte[10]));
         }
     }
 
@@ -225,4 +246,5 @@ public class WiFiSocketManager {
             mainHandler.post(() -> callback.onError(e));
         }
     }
+
 }

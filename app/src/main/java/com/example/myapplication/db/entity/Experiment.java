@@ -3,6 +3,12 @@ package com.example.myapplication.db.entity;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
+import androidx.room.TypeConverters;
+
+import com.example.myapplication.db.converters.CommandThresholdConverter;
+import com.example.myapplication.db.converters.ExperimentCommandsConverter;
+
+import java.util.List;
 
 @Entity(tableName="experiments")
 public class Experiment {
@@ -12,11 +18,12 @@ public class Experiment {
     @ColumnInfo(name="experiment_id")
     public String experimentId;
 
+    @ColumnInfo(name="commands")
+    @TypeConverters(ExperimentCommandsConverter.class)
+    public List<String> commands;
+
     @ColumnInfo(name="experiment_set")
     public String experimentSet;
-
-    @ColumnInfo(name="command_id")
-    public Long commandId;
 
     @ColumnInfo(name="number_of_trials")
     public Integer numberOfTrials;
@@ -36,14 +43,27 @@ public class Experiment {
     @ColumnInfo(name="rest_random")
     public Float restRandom;
 
-    public Experiment(String experimentId, String experimentSet, Long commandId, Integer numberOfTrials, Float preRun, Float postRun, Float rest, Float restRandom) {
+    public Experiment(String experimentId, String experimentSet, List<String> commands, Integer numberOfTrials, Float preRun, Float postRun, Float rest, Float restRandom) {
         this.experimentId = experimentId;
-        this.commandId = commandId;
+        this.commands = commands;
         this.numberOfTrials = numberOfTrials;
         this.preRun = preRun;
         this.postRun = postRun;
         this.rest = rest;
         this.restRandom = restRandom;
+    }
+
+    public void copyFrom(Experiment other) {
+        this.id = other.getId();
+        this.experimentId = other.getExperimentId();
+        this.experimentSet = other.getExperimentSet();
+        this.commands = other.getCommands();
+        this.numberOfTrials = other.getNumberOfTrials();
+        this.command = other.getCommand();
+        this.preRun = other.getPreRun();
+        this.postRun = other.getPostRun();
+        this.rest = other.getRest();
+        this.restRandom = other.getRestRandom();
     }
 
     public Long getId() {
@@ -70,12 +90,12 @@ public class Experiment {
         this.experimentSet = experimentSet;
     }
 
-    public Long getCommandId() {
-        return commandId;
+    public List<String> getCommands() {
+        return commands;
     }
 
-    public void setCommandId(Long commandId) {
-        this.commandId = commandId;
+    public void setCommands(List<String> commands) {
+        this.commands = commands;
     }
 
     public Integer getNumberOfTrials() {

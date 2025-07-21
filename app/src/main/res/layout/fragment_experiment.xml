@@ -27,7 +27,8 @@
                 android:hint="Type here"
                 android:layout_gravity="center_vertical"
                 android:focusable="true"
-                android:focusableInTouchMode="true"                android:completionThreshold="2"
+                android:focusableInTouchMode="true"
+                android:completionThreshold="2"
                 android:inputType="text" />
 
             <Button
@@ -196,7 +197,7 @@
 
 
                 <EditText
-                    android:id="@+id/experiment_command_select"
+                    android:id="@+id/experiment_commands_select"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:divider="@android:color/darker_gray"
@@ -205,42 +206,44 @@
                     android:dividerHeight="1dp"/>
 
                 <EditText
-                    android:id="@+id/experiment_n_trials_input"
+                    android:id="@+id/experiment_n_trials_text"
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
                     android:hint="Enter the total number of commands"
                     android:inputType="number" />
 
                 <EditText
-                    android:id="@+id/experiment_command_input"
+                    android:id="@+id/experiment_command_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:hint="Enter Command Time (in 0.1 degree increments)"
+                    android:inputType="numberDecimal" />
+
+                <EditText
+                    android:id="@+id/experiment_rest_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:hint="Enter Rest Time (in 0.1 degree increments)"
+                    android:inputType="numberDecimal" />
+
+
+
+                <EditText
+                    android:id="@+id/experiment_rest_random_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:hint="Enter Rest Random Time (in 0.1 degree increments)"
+                    android:inputType="numberDecimal" />
+
+                <EditText
+                    android:id="@+id/experiment_pre_run_text"
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
                     android:hint="Enter time (in 0.1 degree increments)"
                     android:inputType="numberDecimal" />
 
                 <EditText
-                    android:id="@+id/experiment_rest_random_input"
-                    android:layout_width="match_parent"
-                    android:layout_height="40dp"
-                    android:hint="Enter time (in 0.1 degree increments)"
-                    android:inputType="numberDecimal" />
-
-                <EditText
-                    android:id="@+id/experiment_pre_run_input"
-                    android:layout_width="match_parent"
-                    android:layout_height="40dp"
-                    android:hint="Enter time (in 0.1 degree increments)"
-                    android:inputType="numberDecimal" />
-
-                <EditText
-                    android:id="@+id/experiment_post_run_input"
-                    android:layout_width="match_parent"
-                    android:layout_height="40dp"
-                    android:hint="Enter time (in 0.1 degree increments)"
-                    android:inputType="numberDecimal" />
-
-                <EditText
-                    android:id="@+id/experiment_run_time_input"
+                    android:id="@+id/experiment_post_run_text"
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
                     android:hint="Enter time (in 0.1 degree increments)"
@@ -271,7 +274,7 @@
                     android:id="@+id/experiment_n_trials_view"
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
-                    android:text="0"
+                    android:text=""
                     android:gravity="center"
                     android:padding="4dp" />
 
@@ -279,7 +282,7 @@
                     android:id="@+id/experiment_command_view"
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
-                    android:text="0"
+                    android:text=""
                     android:gravity="center"
                     android:padding="4dp" />
 
@@ -287,7 +290,7 @@
                     android:id="@+id/experiment_rest_view"
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
-                    android:text="0"
+                    android:text=""
                     android:gravity="center"
                     android:padding="4dp" />
 
@@ -295,7 +298,7 @@
                     android:id="@+id/experiment_rest_random_view"
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
-                    android:text="0"
+                    android:text=""
                     android:gravity="center"
                     android:padding="4dp" />
 
@@ -303,7 +306,7 @@
                     android:id="@+id/experiment_pre_run_view"
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
-                    android:text="0"
+                    android:text=""
                     android:gravity="center"
                     android:padding="4dp" />
 
@@ -311,7 +314,7 @@
                     android:id="@+id/experiment_post_run_view"
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
-                    android:text="0"
+                    android:text=""
                     android:gravity="center"
                     android:padding="4dp" />
 

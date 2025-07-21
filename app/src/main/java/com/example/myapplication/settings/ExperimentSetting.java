@@ -6,6 +6,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -16,6 +17,8 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.myapplication.R;
 import com.example.myapplication.db.entity.Command;
@@ -24,7 +27,10 @@ import com.example.myapplication.db.viewmodel.CommandViewModel;
 import com.example.myapplication.db.viewmodel.ExperimentViewModel;
 import com.example.myapplication.utils.commonuis.MultiSelectDialog;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class ExperimentSetting extends Fragment {
 
@@ -42,12 +48,20 @@ public class ExperimentSetting extends Fragment {
     private EditText nTrialsEdit;
     private EditText commandEdit;
     private EditText restEdit;
-    private EditText restRandom;
-    private EditText preRun;
-    private EditText postRun;
-    private EditText runTime;
-    private MultiSelectDialog commandSelect;
+    private EditText restRandomEdit;
+    private EditText preRunEdit;
+    private EditText postRunEdit;
+    private EditText runTimeEdit;
     private EditText commandList;
+
+    private TextView nTrialsView;
+    private TextView commandView;
+    private TextView restView;
+    private TextView restRandomView;
+    private TextView preRunView;
+    private TextView postRunView;
+    private TextView runTimeView;
+
 
     private Experiment currentExperiment;
     public ExperimentSetting() {
@@ -58,7 +72,22 @@ public class ExperimentSetting extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_experiment, container, false);
         idAutocomplete = (AutoCompleteTextView) view.findViewById(R.id.id_autocomplete);
-        currentExperiment = new Experiment("", "", -1L, 0, 0F, 0F, 0F, 0F);
+        nTrialsEdit = view.findViewById(R.id.experiment_n_trials_text);
+        nTrialsView = view.findViewById(R.id.experiment_n_trials_view);
+        commandEdit = view.findViewById(R.id.experiment_command_text);
+        commandView = view.findViewById(R.id.experiment_command_view);
+        restEdit = view.findViewById(R.id.experiment_rest_text);
+        restView = view.findViewById(R.id.experiment_rest_view);
+        restRandomEdit = view.findViewById(R.id.experiment_rest_random_text);
+        restRandomView = view.findViewById(R.id.experiment_rest_random_view);
+        preRunEdit = view.findViewById(R.id.experiment_pre_run_text);
+        preRunView = view.findViewById(R.id.experiment_pre_run_view);
+        postRunEdit = view.findViewById(R.id.experiment_post_run_text);
+        postRunView = view.findViewById(R.id.experiment_post_run_view);
+        runTimeView = view.findViewById(R.id.experiment_run_time_view);
+
+
+        currentExperiment = new Experiment("", "", new ArrayList<>(), 0, 0F, 0F, 0F, 0F);
         experimentViewModel = new ViewModelProvider(requireActivity()).get(ExperimentViewModel.class);
         experimentViewModel.getAllExperiments().observe(getViewLifecycleOwner(), data -> {
             List<Experiment> dataArray = (List<Experiment>) data;
@@ -77,7 +106,7 @@ public class ExperimentSetting extends Fragment {
             idAutocomplete.setAdapter(adapter);
         });
 
-        commandList = view.findViewById(R.id.experiment_command_select);
+        commandList = view.findViewById(R.id.experiment_commands_select);
         commandViewModel = new ViewModelProvider((requireActivity())).get(CommandViewModel.class);
         commandViewModel.getAllCommands().observe(getViewLifecycleOwner(), data -> {
            List<Command> dataArray = (List<Command>) data;
@@ -89,17 +118,27 @@ public class ExperimentSetting extends Fragment {
                 checkedItems[i] = false;
             }
             commandList.setOnClickListener(v -> {
+                if (candidates.length == 0) {
+                    Toast.makeText(requireContext(), "No commands yet!", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 new AlertDialog.Builder(requireContext())
                     .setTitle("Select Commands")
                     .setMultiChoiceItems(candidates, checkedItems, (dialog, which, isChecked) -> {
                         checkedItems[which] = isChecked;
                     })
                     .setPositiveButton("OK", (dialog, which) -> {
+                        List<String> selected = new ArrayList<>();
+                        String commandListString = "";
                         for (int i = 0; i < checkedItems.length; i++) {
                             if (checkedItems[i]) {
                                 Log.d("SELECTED", candidates[i]);
+                                selected.add(candidates[i]);
+                                commandListString += candidates[i] + ", ";
                             }
                         }
+                        commandList.setText(commandListString.substring(0, commandListString.length() - 2));
+                        currentExperiment.setCommands(selected);
                     })
                     .show();
             });
@@ -118,15 +157,25 @@ public class ExperimentSetting extends Fragment {
         updateBtn.setOnClickListener(v -> handleClickUpdateBtn());
 
         set1Btn = (Button) view.findViewById(R.id.experiment_set1_btn);
-
+        set1Btn.setOnClickListener(v -> {
+            currentExperiment.setExperimentSet("Set1");
+        });
 
         set2Btn = (Button) view.findViewById(R.id.experiment_set2_btn);
-
+        set2Btn.setOnClickListener(v -> {
+            currentExperiment.setExperimentSet("Set2");
+        });
 
         set3Btn = (Button) view.findViewById(R.id.experiment_set3_btn);
-
+        set3Btn.setOnClickListener(v -> {
+            currentExperiment.setExperimentSet("Set3");
+        });
 
         set4Btn = (Button) view.findViewById(R.id.experiment_set4_btn);
+        set4Btn.setOnClickListener(v -> {
+            currentExperiment.setExperimentSet("Set4");
+        });
+
         return view;
     }
 
@@ -136,34 +185,118 @@ public class ExperimentSetting extends Fragment {
     }
 
     public void handleClickSaveBtn() {
-        int nTrials = Integer.parseInt(nTrialsEdit.getText().toString());
-        float command = Float.parseFloat(commandEdit.getText().toString());
-        float rest = Float.parseFloat(restEdit.getText().toString());
-        float rest_random = Float.parseFloat(restRandom.getText().toString());
-        float pre_run = Float.parseFloat(restRandom.getText().toString());
-        float post_run = Float.parseFloat(postRun.getText().toString());
-
-
-        currentExperiment.setNumberOfTrials(nTrials);
-        currentExperiment.setCommand(command);
-        currentExperiment.setRest(rest);
-        currentExperiment.setRestRandom(rest_random);
-        currentExperiment.setPreRun(pre_run);
-        currentExperiment.setPostRun(post_run);
-
-        int experimentIndex = idAutocomplete.getListSelection();
         String experimentId = idAutocomplete.getText().toString();
+        if (experimentId.isEmpty()) {
+            Toast.makeText(requireContext(), "Please enter the experiment title", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        new AlertDialog.Builder(requireContext())
+            .setTitle("Confirm")
+            .setMessage("Are you sure you want to save this data?")
+            .setPositiveButton("Yes", (dialog, which) -> {
+                // Handle Yes button click
+                int nTrials = Integer.parseInt(nTrialsEdit.getText().toString());
+                float command = Float.parseFloat(commandEdit.getText().toString());
+                float rest = Float.parseFloat(restEdit.getText().toString());
+                float rest_random = Float.parseFloat(restRandomEdit.getText().toString());
+                float pre_run = Float.parseFloat(restRandomEdit.getText().toString());
+                float post_run = Float.parseFloat(postRunEdit.getText().toString());
+
+                currentExperiment.setExperimentId(experimentId);
+                currentExperiment.setNumberOfTrials(nTrials);
+                currentExperiment.setCommand(command);
+                currentExperiment.setRest(rest);
+                currentExperiment.setRestRandom(rest_random);
+                currentExperiment.setPreRun(pre_run);
+                currentExperiment.setPostRun(post_run);
+
+                experimentViewModel.findExperimentsByExperimentId(experimentId, data -> {
+                    if (data.isEmpty()) {
+                        currentExperiment.setId(null);
+                        experimentViewModel.insert(currentExperiment);
+                        experimentViewModel.getInsertResult().observe(getViewLifecycleOwner(), id -> {
+                            if (id != null && id > 0) {
+                                Toast.makeText(getContext(), "Insert success!", Toast.LENGTH_SHORT).show();
+                                currentExperiment.setId(-1L);
+                                initUIValues(0);
+                            } else {
+                                Toast.makeText(getContext(), "Insert failed!", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+                    else {
+                        experimentViewModel.update(currentExperiment);
+                        experimentViewModel.getUpdateResult().observe(getViewLifecycleOwner(), id -> {
+                            if (id != null && id > 0) {
+                                Toast.makeText(getContext(), "Update success!", Toast.LENGTH_SHORT).show();
+                            } else {
+                                Toast.makeText(getContext(), "Update failed!", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+                });
+            })
+            .setNegativeButton("No", (dialog, which) -> {
+                // Handle No button click (optional)
+                dialog.dismiss();
+            })
+            .show();
+
     }
 
     public void handleClickLoadBtn() {
-
+        String experimentId = idAutocomplete.getText().toString();
+        experimentViewModel.findExperimentsByExperimentId(experimentId, data -> {
+            if (data.isEmpty()) {
+                Toast.makeText(requireContext(), "Can't find the corresponding Experiment Data", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            List<Experiment> results = (List<Experiment>) data;
+            currentExperiment.copyFrom(results.get(0));
+            setValuesIntoUIs(currentExperiment);
+            Toast.makeText(requireContext(), "Loaded Experiment Data successfully!", Toast.LENGTH_SHORT).show();
+        });
     }
 
     public void handleClickReloadBtn() {
-
+        initUIValues(1);
     }
 
     public void handleClickUpdateBtn() {
 
     }
+
+    @SuppressLint("SetTextI18n")
+    public void setValuesIntoUIs(Experiment experiment) {
+        idAutocomplete.setText(experiment.getExperimentId());
+        nTrialsView.setText(String.valueOf(experiment.getNumberOfTrials()));
+        commandView.setText(String.valueOf(experiment.getCommand()));
+        restView.setText(String.valueOf(experiment.getRest()));
+        restRandomView.setText(String.valueOf(experiment.getRestRandom()));
+        preRunView.setText(String.valueOf(experiment.getPreRun()));
+        postRunView.setText(String.valueOf(experiment.getPostRun()));
+    }
+
+    public void initUIValues(int mode) {
+        if (mode == 0) {
+            idAutocomplete.setText("");
+            nTrialsView.setText("");
+            commandView.setText("");
+            restView.setText("");
+            restRandomView.setText("");
+            preRunView.setText("");
+            postRunView.setText("");
+            runTimeView.setText("");
+        }
+
+        nTrialsEdit.setText("");
+        commandEdit.setText("");
+        restEdit.setText("");
+        restRandomEdit.setText("");
+        preRunEdit.setText("");
+        postRunEdit.setText("");
+        commandList.setText("");
+    }
+
+
 }

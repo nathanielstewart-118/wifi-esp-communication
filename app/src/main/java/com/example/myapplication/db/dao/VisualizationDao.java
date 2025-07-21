@@ -1,6 +1,7 @@
 package com.example.myapplication.db.dao;
 
 import androidx.lifecycle.LiveData;
+import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.Query;
@@ -10,6 +11,7 @@ import com.example.myapplication.db.entity.Visualization;
 
 import java.util.List;
 
+@Dao
 public interface VisualizationDao {
 
     @Insert
@@ -26,4 +28,8 @@ public interface VisualizationDao {
 
     @Query("SELECT * FROM visualizations WHERE id = :id")
     Visualization getVisualizationById(int id);
+
+    @Query("SELECT * FROM visualizations WHERE visualization_id = :vId")
+    List<Visualization> getByVisualizationId(String vId);
+
 }

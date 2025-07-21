@@ -28,13 +28,26 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
+            android:weightSum="3"
             android:orientation="horizontal">
+
+            <AutoCompleteTextView
+                android:id="@+id/visualization_id_autocomplete"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="Type here"
+                android:layout_gravity="center_vertical"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:completionThreshold="2"
+                android:inputType="text" />
 
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:backgroundTint="@color/bs_success"
-                android:id="@+id/actuator_save_btn"
+                android:id="@+id/visualization_save_btn"
                 android:layout_margin="16dp"
                 android:text="Save" />
 
@@ -42,16 +55,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:backgroundTint="@color/bs_info"
-                android:id="@+id/actuator_load_btn"
+                android:id="@+id/visualization_load_btn"
                 android:layout_margin="16dp"
                 android:text="Load" />
 
-            <Spinner
-                android:id="@+id/visualization_records_spinner"
-                android:hint="Select one"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                />
+
         </LinearLayout>
         <LinearLayout
             android:layout_width="match_parent"
@@ -88,17 +96,17 @@
                 android:orientation="vertical"
                 android:layout_weight="1">
                 <EditText
-                    android:id="@+id/visualization_sample_rate_input"
+                    android:id="@+id/visualization_sample_rate_text"
                     android:layout_width="match_parent"
                     android:hint="SPS Unit"
                     android:layout_height="wrap_content" />
                 <EditText
-                    android:id="@+id/visualization_block_size_input"
+                    android:id="@+id/visualization_block_size_text"
                     android:layout_width="match_parent"
                     android:hint="Int unit"
                     android:layout_height="wrap_content" />
                 <EditText
-                    android:id="@+id/visualization_buffer_size_input"
+                    android:id="@+id/visualization_buffer_size_text"
                     android:hint="Int unit"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
@@ -111,6 +119,7 @@
                 android:paddingHorizontal="20dp"
                 android:layout_weight="1">
                 <TextView
+                    android:id="@+id/visualization_sample_rate_view"
                     android:text="0"
                     android:gravity="center"
                     android:layout_width="match_parent"
@@ -118,6 +127,7 @@
                     android:textSize="18sp"
                     android:layout_height="match_parent" />
                 <TextView
+                    android:id="@+id/visualization_block_size_view"
                     android:text="0"
                     android:gravity="center"
                     android:layout_width="match_parent"
@@ -126,6 +136,7 @@
                     android:layout_height="match_parent" />
                 <TextView
                     android:text="0"
+                    android:id="@+id/visualization_buffer_size_view"
                     android:gravity="center"
                     android:layout_width="match_parent"
                     android:textSize="18sp"
@@ -141,12 +152,12 @@
                     android:visibility="invisible"
                     android:layout_height="wrap_content" />
                 <EditText
-                    android:id="@+id/visualization_ms_block_size_input"
+                    android:id="@+id/visualization_ms_block_size_text"
                     android:hint="ms unit notation"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
                 <EditText
-                    android:id="@+id/visualization_sec_buffer_size"
+                    android:id="@+id/visualization_sec_buffer_size_text"
                     android:hint="Sec unit notation"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
@@ -182,7 +193,7 @@
             <TableLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/experiment_list_tb"
+                android:id="@+id/visualization_list_tb"
                 >
                 <TableRow android:background="@color/bs_success">
                     <TextView
@@ -203,7 +214,7 @@
                         android:textStyle="bold"/>
 
                     <TextView
-                        android:text="@string/sensor_th_number_of_channels"
+                        android:text="NChannels"
                         android:textColor="@android:color/white"
                         android:padding="8dp"
                         android:textStyle="bold"/>
@@ -252,46 +263,45 @@
                 android:layout_width="0dp"
                 android:layout_weight="2"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
                 android:gravity="center"
                 >
                 <RadioGroup
-                android:id="@+id/radioGroup"
+                android:id="@+id/visualization_save_format_radio"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_gravity="center"
                 android:layout_margin="16dp">
 
                 <RadioButton
-                    android:id="@+id/radioOption1"
+                    android:id="@+id/visualization_save_format_bin_radio"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="6dp"
                     android:text="bin" />
 
                 <RadioButton
-                    android:id="@+id/radioOption2"
+                    android:id="@+id/visualization_save_format_h5_radio"
                     android:layout_width="wrap_content"
                     android:layout_marginHorizontal="6dp"
                     android:layout_height="wrap_content"
                     android:text="h5" />
 
                 <RadioButton
-                    android:id="@+id/radioOption3"
+                    android:id="@+id/visualization_save_format_csv_radio"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="6dp"
                     android:text="CSV" />
             </RadioGroup>
             </LinearLayout>
-            <Button
+            <EditText
+                android:id="@+id/visualization_save_path_text"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="2"
                 android:layout_gravity="center"
                 android:backgroundTint="@color/bs_info"
-                android:text="Set save path and name" />
+                android:hint="Set save path and name" />
         </LinearLayout>
     </LinearLayout>
 

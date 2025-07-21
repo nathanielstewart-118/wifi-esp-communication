@@ -13,13 +13,15 @@ import com.example.myapplication.db.dao.ESPRXRTDao;
 import com.example.myapplication.db.dao.ESPTXDao;
 import com.example.myapplication.db.dao.ExperimentDao;
 import com.example.myapplication.db.dao.SensorActuatorDao;
+import com.example.myapplication.db.dao.VisualizationDao;
 import com.example.myapplication.db.entity.Command;
 import com.example.myapplication.db.entity.ESPRXRT;
 import com.example.myapplication.db.entity.ESPTX;
 import com.example.myapplication.db.entity.Experiment;
 import com.example.myapplication.db.entity.SensorActuator;
+import com.example.myapplication.db.entity.Visualization;
 
-@Database(entities = {SensorActuator.class, Command.class, ESPTX.class, ESPRXRT.class, Experiment.class}, version = 6)
+@Database(entities = {SensorActuator.class, Command.class, ESPTX.class, ESPRXRT.class, Experiment.class, Visualization.class}, version = 9)
 public abstract class AppDatabase extends RoomDatabase {
 
     private static AppDatabase instance;
@@ -29,6 +31,7 @@ public abstract class AppDatabase extends RoomDatabase {
     public abstract ESPTXDao espTXDao();
     public abstract ESPRXRTDao espRXRTDao();
     public abstract ExperimentDao experimentDao();
+    public abstract VisualizationDao visualizationDao();
 
     public static synchronized AppDatabase getInstance(Context context) {
         if (instance == null) {

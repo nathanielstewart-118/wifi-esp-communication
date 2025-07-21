@@ -29,15 +29,21 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:weightSum="12">
-            <LinearLayout
+            <ScrollView
                 android:orientation="vertical"
                 android:layout_weight="10"
-                android:id="@+id/monitoring_accordion_container"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:padding="12dp"
                 android:background="#EEEEEE">
-            </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/monitoring_accordion_container"
+                    android:layout_weight="2"
+                    android:orientation="vertical">
+                </LinearLayout>
+            </ScrollView>
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"

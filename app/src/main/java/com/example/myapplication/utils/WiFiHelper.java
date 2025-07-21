@@ -7,9 +7,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkCapabilities;
+import android.net.NetworkRequest;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
+import android.net.wifi.WifiNetworkSpecifier;
 import android.util.Log;
 
 import androidx.core.app.ActivityCompat;
@@ -25,12 +30,15 @@ public class WiFiHelper {
     private final WifiManager wifiManager;
     private final Context context;
     private final Activity activity;
+    private Consumer<List<ScanResult>> pendingWifiCallback;
 
     public WiFiHelper(Context context, Activity activity) {
         this.context = context;
         this.activity = activity;
         this.wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
     }
+
+
 
     public void scanWifiNetworks(Consumer<List<ScanResult>> callback) {
         new Thread(() -> {
@@ -47,29 +55,15 @@ public class WiFiHelper {
                     return;
                 }
 
-                // Check and request permission if needed
-                if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
-                        != PackageManager.PERMISSION_GRANTED) {
-
-                    Log.w("Permission", "ACCESS_FINE_LOCATION not granted. Requesting...");
-                    LogHelper.sendLog(
-                            Constants.LOGGING_BASE_URL,
-                            Constants.LOGGING_REQUEST_METHOD,
-                            "ACCESS_FINE_LOCATION permission not granted. Requesting...",
-                            Constants.LOGGING_BEARER_TOKEN
-                    );
-
-                    ActivityCompat.requestPermissions(
-                            activity,
-                            new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                            LOCATION_PERMISSION_REQUEST_CODE
-                    );
-
-                    callback.accept(Collections.emptyList()); // Return early
-                    return;
-                }
 
                 // Register receiver to listen for scan results
+                LogHelper.sendLog(
+                    Constants.LOGGING_BASE_URL,
+                    Constants.LOGGING_REQUEST_METHOD,
+                    "Starting to register receiver to listen for scan results",
+                    Constants.LOGGING_BEARER_TOKEN
+                );
+                Log.d("Info", "Starting to register receiver to listen for scan results");
                 context.registerReceiver(new BroadcastReceiver() {
                     @Override
                     public void onReceive(Context c, Intent intent) {
@@ -79,10 +73,10 @@ public class WiFiHelper {
                             if (!success) {
                                 Log.w("Warning", "Wi-Fi scan did not update results.");
                                 LogHelper.sendLog(
-                                        Constants.LOGGING_BASE_URL,
-                                        Constants.LOGGING_REQUEST_METHOD,
-                                        "Wi-Fi scan results not updated",
-                                        Constants.LOGGING_BEARER_TOKEN
+                                    Constants.LOGGING_BASE_URL,
+                                    Constants.LOGGING_REQUEST_METHOD,
+                                    "Wi-Fi scan results not updated",
+                                    Constants.LOGGING_BEARER_TOKEN
                                 );
                             }
 
@@ -106,20 +100,34 @@ public class WiFiHelper {
                                         "No Wi-Fi networks found",
                                         Constants.LOGGING_BEARER_TOKEN
                                 );
+                                return;
                             }
+                            LogHelper.sendLog(
+                                Constants.LOGGING_BASE_URL,
+                                Constants.LOGGING_REQUEST_METHOD,
+                                "Trying to call callback function with the scanned results",
+                                Constants.LOGGING_BEARER_TOKEN
+                            );
+                            Log.d("Info", "Trying to call callback function with the scanned results");
                             callback.accept(results);
                         } catch (Exception e) {
                             Log.e("Exception", "Error in BroadcastReceiver: " + e.getMessage(), e);
                             LogHelper.sendLog(
-                                    Constants.LOGGING_BASE_URL,
-                                    Constants.LOGGING_REQUEST_METHOD,
-                                    "BroadcastReceiver exception: " + e.getMessage(),
-                                    Constants.LOGGING_BEARER_TOKEN
+                                Constants.LOGGING_BASE_URL,
+                                Constants.LOGGING_REQUEST_METHOD,
+                                "BroadcastReceiver exception: " + e.getMessage(),
+                                Constants.LOGGING_BEARER_TOKEN
                             );
                         }
                     }
                 }, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
-
+                LogHelper.sendLog(
+                    Constants.LOGGING_BASE_URL,
+                    Constants.LOGGING_REQUEST_METHOD,
+                    "Starting to scan wifi networks ...",
+                    Constants.LOGGING_BEARER_TOKEN
+                );
+                Log.d("Info", "Starting to scan wifi networks ...");
                 // Start Wi-Fi scan
                 boolean scanStarted = wifiManager.startScan();
                 if (!scanStarted) {
@@ -146,6 +154,7 @@ public class WiFiHelper {
     }
 
     public int connectToNetwork(String ssid, String password) {
+
         WifiConfiguration config = new WifiConfiguration();
         config.SSID = "\"" + ssid + "\"";
         config.preSharedKey = "\"" + password + "\"";
@@ -154,6 +163,35 @@ public class WiFiHelper {
         wifiManager.disconnect();
         wifiManager.enableNetwork(netId, true);
         wifiManager.reconnect();
+
+        if (netId < 0) {
+            WifiNetworkSpecifier specifier = new WifiNetworkSpecifier.Builder()
+                    .setSsid(ssid)
+                    .setWpa2Passphrase("") // or setIsHiddenSsid(true) if needed
+                    .build();
+
+            NetworkRequest request = new NetworkRequest.Builder()
+                    .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
+                    .setNetworkSpecifier(specifier)
+                    .build();
+
+            ConnectivityManager connectivityManager =
+                    (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+            connectivityManager.requestNetwork(request, new ConnectivityManager.NetworkCallback() {
+                @Override
+                public void onAvailable(Network network) {
+                    // Bind to this network
+                    connectivityManager.bindProcessToNetwork(network); // or setProcessDefaultNetwork()
+
+                }
+
+                @Override
+                public void onUnavailable() {
+                    Log.e("WiFi", "Failed to connect");
+                }
+            });
+        }
         return netId;
     }
 }

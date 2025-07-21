@@ -11,6 +11,7 @@ appcompat = "1.7.1"
 lifecycleRuntime = "2.9.1"
 material = "1.12.0"
 materialVersion = "1.12.0"
+mpandroidchart = "v3.1.0"
 roomRuntime = "2.7.2"
 
 [libraries]
@@ -24,6 +25,7 @@ espresso-core = { group = "androidx.test.espresso", name = "espresso-core", vers
 appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 lifecycle-runtime = { module = "androidx.lifecycle:lifecycle-runtime", version.ref = "lifecycleRuntime" }
 material = { module = "com.google.android.material:material", version.ref = "materialVersion" }
+mpandroidchart = { module = "com.github.PhilJay:MPAndroidChart", version.ref = "mpandroidchart" }
 room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomRuntime" }
 room-runtime = { module = "androidx.room:room-runtime", version.ref = "roomRuntime" }
 

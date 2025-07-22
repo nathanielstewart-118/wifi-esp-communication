@@ -128,10 +128,10 @@ public class CommandSetting extends Fragment {
                     commandViewModel.insert(command);
                     commandViewModel.getInsertResult().observe(getViewLifecycleOwner(), id -> {
                         if (id != null && id > 0) {
-                            Toast.makeText(getContext(), "Insert success!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), R.string.insert_success, Toast.LENGTH_SHORT).show();
                             command.setId(id);
                         } else {
-                            Toast.makeText(getContext(), "Insert failed!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), R.string.insert_failed, Toast.LENGTH_SHORT).show();
                         }
                     });
 
@@ -141,10 +141,10 @@ public class CommandSetting extends Fragment {
                     commandViewModel.update(command);
                     commandViewModel.getUpdateResult().observe(getViewLifecycleOwner(), res -> {
                         if(res != null && res != 0) {
-                            Toast.makeText(getContext(), "Update success!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), R.string.update_success, Toast.LENGTH_SHORT).show();
                         }
                         else {
-                            Toast.makeText(getContext(), "Update Failed", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), R.string.update_failed, Toast.LENGTH_SHORT).show();
                         }
                     });
                 }
@@ -211,7 +211,7 @@ public class CommandSetting extends Fragment {
             }
             currentCommandThresholds.addAll(commandThresholds);
             Log.d("_------------result -------------", new Gson().toJson(currentCommandThresholds));
-            Toast.makeText(requireContext(), "Data Saved!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), R.string.data_saved, Toast.LENGTH_SHORT).show();
             dialog.dismiss(); // Optionally close after saving
         });
     }
@@ -314,10 +314,10 @@ public class CommandSetting extends Fragment {
                             commandViewModel.delete(selectedCommands.get(0));
                             commandViewModel.getDeleteResult().observe(getViewLifecycleOwner(), res -> {
                                 if (res != null && res > 0) {
-                                    Toast.makeText(requireContext(), "Deleted Successfully!", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(requireContext(), R.string.deleted_successfully, Toast.LENGTH_SHORT).show();
                                 }
                                 else {
-                                    Toast.makeText(requireContext(), "Delete failed", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(requireContext(), R.string.delete_failed, Toast.LENGTH_SHORT).show();
                                 }
                             });
                         })
@@ -407,7 +407,7 @@ public class CommandSetting extends Fragment {
             String dataString = "";
 
             if (commands.size() == 0) {
-                Toast.makeText(requireContext(), "No command to send", Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), R.string.no_command_to_send, Toast.LENGTH_SHORT).show();
             }
             Command command = commands.get(0);
             ByteBuffer buffer = ByteBuffer.allocate(1 + 2 + 2 + 6 + 4 + 4);

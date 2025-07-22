@@ -106,7 +106,7 @@ public class ActuatorSetting extends Fragment {
                     sensorActuatorViewModel.update(actuator);
                     sensorActuatorViewModel.getUpdateResult().observe(getViewLifecycleOwner(), res -> {
                         if(res != null && res != 0) {
-                            Toast.makeText(getContext(), "Update success!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), R.string.update_success, Toast.LENGTH_SHORT).show();
                         }
                         else {
                             Toast.makeText(getContext(), "Update failed!", Toast.LENGTH_SHORT).show();

@@ -1,5 +1,6 @@
 package com.example.myapplication.utils;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.Resources;
@@ -25,5 +26,13 @@ public class LocaleHelper {
             return context;
         }
     }
+
+    public static void applyLocale(Activity activity, String languageCode) {
+        Context context = setLocale(activity, languageCode);
+        Resources resources = context.getResources();
+        Configuration config = resources.getConfiguration();
+        activity.getBaseContext().getResources().updateConfiguration(config, resources.getDisplayMetrics());
+    }
+
 }
 

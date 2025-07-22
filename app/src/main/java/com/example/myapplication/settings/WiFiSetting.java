@@ -10,7 +10,9 @@ import android.content.BroadcastReceiver;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.net.wifi.ScanResult;
+import android.os.Build;
 import android.os.Bundle;
+import android.text.InputType;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -18,11 +20,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
-
+import android.widget.FrameLayout;
 import com.example.myapplication.MainActivity;
 import com.example.myapplication.R;
 import com.example.myapplication.utils.Constants;
@@ -62,33 +65,30 @@ public class WiFiSetting extends Fragment {
     }
 
     public void displayWiFiList(TableLayout tableLayout, String[][] data) {
-        for (int k = 0; k < 20; k ++) {
-            for (int i = 0; i < this.wifiList.length; i++) {
-                TableRow tableRow = new TableRow(requireContext());
-                tableRow.setBackgroundResource(R.drawable.row_selector);
-                tableRow.setTag(i + 1);
-                for (int j = 0; j < this.wifiList[i].length; j++) {
-                    TextView textView = new TextView(requireContext());
-                    textView.setText(this.wifiList[i][j]);
-                    textView.setPadding(16, 16, 16, 16);
-                    tableRow.addView(textView);
-                }
-                // Click Listener to change background permanently
-                tableRow.setOnClickListener(v -> {
-                    selectedRowIndex = (int) v.getTag();  // Save selected row index
-                    if(selectedRowIndex == 0) return;
-                    updateRowBackgrounds(tableLayout, data.length);  // Refresh backgrounds
-                    LogHelper.sendLog(
-                            Constants.LOGGING_BASE_URL,
-                            Constants.LOGGING_REQUEST_METHOD,
-                            "User selected wifi: " + wifiList[selectedRowIndex - 1][0],
-                            Constants.LOGGING_BEARER_TOKEN
-                    );
-
-                });
-                tableLayout.addView(tableRow);
+        tableLayout.removeViews(1, tableLayout.getChildCount() - 1);
+        for (int i = 0; i < this.wifiList.length; i++) {
+            TableRow tableRow = new TableRow(requireContext());
+            tableRow.setBackgroundResource(R.drawable.row_selector);
+            tableRow.setTag(i + 1);
+            for (int j = 0; j < this.wifiList[i].length; j++) {
+                TextView textView = new TextView(requireContext());
+                textView.setText(this.wifiList[i][j]);
+                textView.setPadding(16, 16, 16, 16);
+                tableRow.addView(textView);
             }
-
+            // Click Listener to change background permanently
+            tableRow.setOnClickListener(v -> {
+                selectedRowIndex = (int) v.getTag();  // Save selected row index
+                if(selectedRowIndex == 0) return;
+                updateRowBackgrounds(tableLayout, data.length);  // Refresh backgrounds
+                LogHelper.sendLog(
+                        Constants.LOGGING_BASE_URL,
+                        Constants.LOGGING_REQUEST_METHOD,
+                        "User selected wifi: " + wifiList[selectedRowIndex - 1][0],
+                        Constants.LOGGING_BEARER_TOKEN
+                );
+            });
+            tableLayout.addView(tableRow);
         }
     }
 
@@ -125,6 +125,12 @@ public class WiFiSetting extends Fragment {
             }
         });
 
+        LogHelper.sendLog(
+            Constants.LOGGING_BASE_URL,
+            Constants.LOGGING_REQUEST_METHOD,
+            "The current machine's Android SDK version is : " + Build.VERSION.SDK_INT,
+            Constants.LOGGING_BEARER_TOKEN
+        );
         if (!hasLocationPermission()) {
             requestLocationPermission();
         }
@@ -179,85 +185,99 @@ public class WiFiSetting extends Fragment {
                 Constants.LOGGING_BEARER_TOKEN
             );
             Log.d("Warning", "User didn't select an available wifi network, showing toast ...");
-            Toast toast = Toast.makeText(requireActivity(), "Please select a wifi network", Toast.LENGTH_LONG);
+            Toast toast = Toast.makeText(requireActivity(), R.string.please_select_a_wifi_network, Toast.LENGTH_LONG);
             toast.setGravity(Gravity.CENTER, 0, 10); // 100px down from top edge
             toast.show();
             return;
         }
-        new AlertDialog.Builder(requireContext())
-            .setTitle("Confirm connection")
-            .setMessage("Are you sure you want to proceed?")
-            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    LogHelper.sendLog(
-                        Constants.LOGGING_BASE_URL,
-                        Constants.LOGGING_REQUEST_METHOD,
-                        "User clicked confirm connection button",
-                        Constants.LOGGING_BEARER_TOKEN
-                    );
-                    Log.d("Warning", "User clicked confirm connection button");
 
-                    int connected = -1;
-                    String selectedNetSSID = "";
-                    try {
-                        selectedNetSSID = wifiList[index - 1][0];
-                        connected = wifiHelper.connectToNetwork(selectedNetSSID, "mypassword");
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        builder.setTitle("Enter Password");
+        final EditText input = new EditText(requireContext());
+        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        input.setHint("Password");
+
+        // Wrap EditText in a FrameLayout to add margins
+        FrameLayout container = new FrameLayout(requireContext());
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+        );
+        int margin = (int) (20 * getResources().getDisplayMetrics().density); // 20dp margin
+        params.setMargins(margin, margin, margin, margin);
+        input.setLayoutParams(params);
+        container.addView(input);
+
+        // Set the container as the dialog view
+        builder.setView(container);
+
+
+        builder.setPositiveButton("OK", (dialog, which) -> {
+            String password = input.getText().toString();
+            // Handle password here
+            Toast.makeText(requireContext(), getString(R.string.password_entered) + password, Toast.LENGTH_SHORT).show();
+            LogHelper.sendLog(
+                    Constants.LOGGING_BASE_URL,
+                    Constants.LOGGING_REQUEST_METHOD,
+                    "User clicked confirm connection button",
+                    Constants.LOGGING_BEARER_TOKEN
+            );
+            Log.d("Warning", "User clicked confirm connection button");
+
+            String selectedNetSSID = "";
+            try {
+                selectedNetSSID = wifiList[index - 1][0];
+                wifiHelper.connectToNetwork(selectedNetSSID, password, result -> {
+                    if (result == -1) {
+                        Toast.makeText(requireContext(), "WiFi connection failed", Toast.LENGTH_SHORT).show();
                         LogHelper.sendLog(
                             Constants.LOGGING_BASE_URL,
                             Constants.LOGGING_REQUEST_METHOD,
-                            "Try to connect to : " + selectedNetSSID + " ...",
+                            "WiFi Connection failed",
                             Constants.LOGGING_BEARER_TOKEN
                         );
-                        Log.d("WiFi Info", "Try to connect to : " + selectedNetSSID + " ...");
-                    } catch(Exception e) {
-                        LogHelper.sendLog(
-                            Constants.LOGGING_BASE_URL,
-                            Constants.LOGGING_REQUEST_METHOD,
-                            "Connection to : " + selectedNetSSID + " failed: due to" + e.toString(),
-                            Constants.LOGGING_BEARER_TOKEN
-                        );
-                        Log.d("Wifi Error", "Connection to : " + selectedNetSSID + " failed: " + e.toString());
-                    }
-                    if (connected < 0) {
-                        LogHelper.sendLog(
-                            Constants.LOGGING_BASE_URL,
-                            Constants.LOGGING_REQUEST_METHOD,
-                            "Connection to : " + selectedNetSSID + " Failed.",
-                            Constants.LOGGING_BEARER_TOKEN
-                        );
-                        Log.d("WiFi Error", "Connection to : " + selectedNetSSID + " Failed.");
-                        Toast.makeText(requireContext(), "Connection Failed!", Toast.LENGTH_SHORT).show();
-                        // for test purpose
-                        mainActivity.connectToESP();
+                        Log.e("WiFi Failed", "WiFi Connection failed");
                     }
                     else {
-                        Toast.makeText(requireContext(), "Connect successfully!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(requireContext(), "WiFi connection success!", Toast.LENGTH_SHORT).show();
                         LogHelper.sendLog(
-                                Constants.LOGGING_BASE_URL,
-                                Constants.LOGGING_REQUEST_METHOD,
-                                "Connection to : " + selectedNetSSID + " Succeed.",
-                                Constants.LOGGING_BEARER_TOKEN
+                            Constants.LOGGING_BASE_URL,
+                            Constants.LOGGING_REQUEST_METHOD,
+                            "WiFi Connection success",
+                            Constants.LOGGING_BEARER_TOKEN
                         );
-                        Log.d("WiFi Error", "Connection to : " + selectedNetSSID + " Succeed.");
+                        Log.e("WiFi Success", "WiFi Connection success");
                         mainActivity.connectToESP();
                     }
-                }
-            })
-            .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
+                });
+                LogHelper.sendLog(
+                    Constants.LOGGING_BASE_URL,
+                    Constants.LOGGING_REQUEST_METHOD,
+                    "Try to connect to : " + selectedNetSSID + " ...",
+                    Constants.LOGGING_BEARER_TOKEN
+                );
+                Log.d("WiFi Info", "Try to connect to : " + selectedNetSSID + " ...");
+            } catch(Exception e) {
+                LogHelper.sendLog(
+                        Constants.LOGGING_BASE_URL,
+                        Constants.LOGGING_REQUEST_METHOD,
+                        "Connection to : " + selectedNetSSID + " failed: due to" + e.toString(),
+                        Constants.LOGGING_BEARER_TOKEN
+                );
+                Log.d("Wifi Error", "Connection to : " + selectedNetSSID + " failed: " + e.toString());
+            }
+        });
 
-                }
-            })
-            .setCancelable(true)
-            .show();
+        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 
     public void handleClickSearch() {
         clickSearch = true;
         if (!hasLocationPermission()) {
-            Toast.makeText(requireContext(), "Location Permission is not granted.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), R.string.location_permission_is_not_granted, Toast.LENGTH_SHORT).show();
             requestLocationPermission();
             return;
         }
@@ -287,4 +307,25 @@ public class WiFiSetting extends Fragment {
         });
         clickSearch = false;
     }
+
+    private void showPasswordDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        builder.setTitle("Enter Password");
+
+        // Create an EditText for password input
+        final EditText input = new EditText(requireContext());
+        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        input.setHint("Password");
+
+        builder.setView(input);
+
+        builder.setPositiveButton("OK", (dialog, which) -> {
+            String password = input.getText().toString();
+            // Handle password here
+            Toast.makeText(requireContext(), R.string.password_entered + password, Toast.LENGTH_SHORT).show();
+        });
+
+
+    }
+
 }

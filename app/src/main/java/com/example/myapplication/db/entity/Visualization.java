@@ -33,12 +33,12 @@ public class Visualization {
     List<VisualizationRange> ranges;
 
     @ColumnInfo(name="save_format")
-    public String saveFormat; //
+    public Integer saveFormat; //
 
     @ColumnInfo(name="save_path")
     public String savePath;
 
-    public Visualization(Float sampleRate, Integer blockSize, Integer bufferSize, List<VisualizationRange> ranges, String saveFormat, String savePath) {
+    public Visualization(Float sampleRate, Integer blockSize, Integer bufferSize, List<VisualizationRange> ranges, Integer saveFormat, String savePath) {
         this.sampleRate = sampleRate;
         this.blockSize = blockSize;
         this.bufferSize = bufferSize;
@@ -106,11 +106,11 @@ public class Visualization {
         this.ranges = ranges;
     }
 
-    public String getSaveFormat() {
+    public Integer getSaveFormat() {
         return saveFormat;
     }
 
-    public void setSaveFormat(String saveFormat) {
+    public void setSaveFormat(Integer saveFormat) {
         this.saveFormat = saveFormat;
     }
 

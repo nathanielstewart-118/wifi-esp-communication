@@ -64,7 +64,7 @@ public class VisualizationSetting extends Fragment {
     private VisualizationViewModel  visualizationViewModel;
 
     private List<Visualization> visualizations = new ArrayList<>();
-    private Visualization currentVisualization = new Visualization(0F, 0, 0, new ArrayList<>(), "", "");
+    private Visualization currentVisualization = new Visualization(0F, 0, 0, new ArrayList<>(), 0, "");
     private List<SensorActuator> sensorActuators = new ArrayList<>();
     private List<VisualizationRange> sensorActuatorsToDisplay = new ArrayList<>();
     public VisualizationSetting() {
@@ -126,107 +126,117 @@ public class VisualizationSetting extends Fragment {
 
     public void handleClickSaveBtn() {
         String visualizationId = idAutocomplete.getText().toString().trim();
-        String sampleRate = sampleRateEdit.getText().toString().trim();
-        String blockSize = blockSizeEdit.getText().toString().trim();
-        String bufferSize = bufferSizeEdit.getText().toString().trim();
-        String savePath = savePathEdit.getText().toString().trim();
-        int selectedFormatId = saveFormatRadio.getCheckedRadioButtonId();
-        if (selectedFormatId == -1) {
-            currentVisualization.setSaveFormat("");
-        }
-        else {
-            RadioButton selectedRadioButton = getView().findViewById(selectedFormatId);
-            currentVisualization.setSaveFormat(selectedRadioButton.getText().toString());
-        }
-        currentVisualization.setVisualizationId(visualizationId);
-        currentVisualization.setSampleRate(Float.parseFloat(sampleRate));
-        currentVisualization.setBlockSize(Integer.parseInt(blockSize));
-        currentVisualization.setBufferSize(Integer.parseInt(bufferSize));
-        currentVisualization.setSavePath(savePath);
-        int rowCnt = rangeTable.getChildCount();
-        List<VisualizationRange> cRanges = new ArrayList<>();
-        for (int i = 1; i < rowCnt; i ++) {
-            View rowView = rangeTable.getChildAt(i);
-            if(rowView instanceof TableRow) {
-                TableRow row = (TableRow) rowView;
-                Long saId = (Long) row.getTag();
-                VisualizationRange range= new VisualizationRange(saId, 0, 0, 0F, 0F, 0L, 0L);
-                Spinner yRangeSpinner = (Spinner) row.getChildAt(6);
-                int yRangeIndex = yRangeSpinner.getSelectedItemPosition();
-
-                range.setyAxisRange(yRangeIndex);
-                RadioGroup visualizationRadioGroup = (RadioGroup) row.getChildAt(5);
-                int selectedRadioButtonId = visualizationRadioGroup.getCheckedRadioButtonId();
-                int selectedRadioIndex = -1;
-                if(selectedRadioButtonId != -1) {
-                    View selectedRadioButton = visualizationRadioGroup.findViewById(selectedRadioButtonId);
-                    selectedRadioIndex = visualizationRadioGroup.indexOfChild(selectedRadioButton);
-                    range.setVisualizationType(selectedRadioIndex);
-                }
-                EditText upperLimitEdit = (EditText) row.getChildAt(7);
-                range.setUpperLimit(Long.parseLong(upperLimitEdit.getText().toString()));
-                EditText lowerLimitEdit = (EditText) row.getChildAt(8);
-                range.setLowerLimit(Long.parseLong(lowerLimitEdit.getText().toString()));
-                cRanges.add(range);
+        visualizationViewModel.getByVisualizationId(visualizationId, results -> {
+            if (!results.isEmpty()) {
+                currentVisualization.setId(results.get(0).getId());
+            }
+            else {
+                currentVisualization.setId(null);
             }
 
-        }
-        currentVisualization.setRanges(cRanges);
+            String sampleRate = sampleRateEdit.getText().toString().trim();
+            String blockSize = blockSizeEdit.getText().toString().trim();
+            String bufferSize = bufferSizeEdit.getText().toString().trim();
+            String savePath = savePathEdit.getText().toString().trim();
+            int selectedSaveFormatButtonId = saveFormatRadio.getCheckedRadioButtonId();
+            int selectedSaveFormatIndex = -1;
+            if(selectedSaveFormatButtonId != -1) {
+                View selectedRadioButton = saveFormatRadio.findViewById(selectedSaveFormatButtonId);
+                selectedSaveFormatIndex = saveFormatRadio.indexOfChild(selectedRadioButton);
+                currentVisualization.setSaveFormat(selectedSaveFormatIndex);
+            }
+            currentVisualization.setVisualizationId(visualizationId);
+            currentVisualization.setSampleRate(Float.parseFloat(sampleRate));
+            currentVisualization.setBlockSize(Integer.parseInt(blockSize));
+            currentVisualization.setBufferSize(Integer.parseInt(bufferSize));
+            currentVisualization.setSavePath(savePath);
+            int rowCnt = rangeTable.getChildCount();
+            List<VisualizationRange> cRanges = new ArrayList<>();
+            for (int i = 1; i < rowCnt; i ++) {
+                View rowView = rangeTable.getChildAt(i);
+                if(rowView instanceof TableRow) {
+                    TableRow row = (TableRow) rowView;
+                    Long saId = (Long) row.getTag();
+                    VisualizationRange range= new VisualizationRange(saId, 0, 0, 0F, 0F, 0L, 0L);
+                    Spinner yRangeSpinner = (Spinner) row.getChildAt(6);
+                    int yRangeIndex = yRangeSpinner.getSelectedItemPosition();
 
-        if (currentVisualization.getId() != null && currentVisualization.getId() > 0) {
-            visualizationViewModel.update(currentVisualization, id -> {
-                if (id != null && id > 0) {
-                    Toast.makeText(requireContext(), "Update Success!", Toast.LENGTH_SHORT).show();
-                    initUIs("");
-                    LogHelper.sendLog(
-                            Constants.LOGGING_BASE_URL,
-                            Constants.LOGGING_REQUEST_METHOD,
-                            "Visualization update success",
-                            Constants.LOGGING_BEARER_TOKEN
-                    );
-                    Log.d("Visualization update", "Visualization update success");
-
+                    range.setyAxisRange(yRangeIndex);
+                    RadioGroup visualizationRadioGroup = (RadioGroup) row.getChildAt(5);
+                    int selectedRadioButtonId = visualizationRadioGroup.getCheckedRadioButtonId();
+                    int selectedRadioIndex = -1;
+                    if(selectedRadioButtonId != -1) {
+                        View selectedRadioButton = visualizationRadioGroup.findViewById(selectedRadioButtonId);
+                        selectedRadioIndex = visualizationRadioGroup.indexOfChild(selectedRadioButton);
+                        range.setVisualizationType(selectedRadioIndex);
+                    }
+                    EditText upperLimitEdit = (EditText) row.getChildAt(7);
+                    range.setUpperLimit(Long.parseLong(upperLimitEdit.getText().toString()));
+                    EditText lowerLimitEdit = (EditText) row.getChildAt(8);
+                    range.setLowerLimit(Long.parseLong(lowerLimitEdit.getText().toString()));
+                    cRanges.add(range);
                 }
-                else {
-                    Toast.makeText(requireContext(), "Update Failed!", Toast.LENGTH_SHORT).show();
-                    LogHelper.sendLog(
-                            Constants.LOGGING_BASE_URL,
-                            Constants.LOGGING_REQUEST_METHOD,
-                            "Visualization update failed",
-                            Constants.LOGGING_BEARER_TOKEN
-                    );
-                    Log.d("Visualization update", "Visualization update failed");
 
-                }
-            });
-        }
-        else {
-            visualizationViewModel.insert(currentVisualization, id -> {
-                if (id != null && id > 0) {
-                    initUIs("");
-                    Toast.makeText(requireContext(), "Insert Success!", Toast.LENGTH_SHORT).show();
-                    LogHelper.sendLog(
-                            Constants.LOGGING_BASE_URL,
-                            Constants.LOGGING_REQUEST_METHOD,
-                            "Visualization insert success",
-                            Constants.LOGGING_BEARER_TOKEN
-                    );
-                    Log.d("Visualization insertion", "Visualization insert success");
+            }
+            currentVisualization.setRanges(cRanges);
 
-                }
-                else {
-                    Toast.makeText(requireContext(), "Insert Failed!", Toast.LENGTH_SHORT).show();
-                    LogHelper.sendLog(
-                            Constants.LOGGING_BASE_URL,
-                            Constants.LOGGING_REQUEST_METHOD,
-                            "Visualization insert failed",
-                            Constants.LOGGING_BEARER_TOKEN
-                    );
-                    Log.d("Visualization insertion", "Visualization insert failed");
+            if (currentVisualization.getId() != null && currentVisualization.getId() > 0) {
+                visualizationViewModel.update(currentVisualization, id -> {
+                    if (id != null && id > 0) {
+                        Toast.makeText(requireContext(), "Update Success!", Toast.LENGTH_SHORT).show();
+                        initUIs("");
+                        LogHelper.sendLog(
+                                Constants.LOGGING_BASE_URL,
+                                Constants.LOGGING_REQUEST_METHOD,
+                                "Visualization update success",
+                                Constants.LOGGING_BEARER_TOKEN
+                        );
+                        Log.d("Visualization update", "Visualization update success");
 
-                }
-            });
-        }
+                    }
+                    else {
+                        Toast.makeText(requireContext(), "Update Failed!", Toast.LENGTH_SHORT).show();
+                        LogHelper.sendLog(
+                                Constants.LOGGING_BASE_URL,
+                                Constants.LOGGING_REQUEST_METHOD,
+                                "Visualization update failed",
+                                Constants.LOGGING_BEARER_TOKEN
+                        );
+                        Log.d("Visualization update", "Visualization update failed");
+
+                    }
+                });
+            }
+            else {
+                visualizationViewModel.insert(currentVisualization, id -> {
+                    if (id != null && id > 0) {
+                        initUIs("");
+                        Toast.makeText(requireContext(), "Insert Success!", Toast.LENGTH_SHORT).show();
+                        LogHelper.sendLog(
+                                Constants.LOGGING_BASE_URL,
+                                Constants.LOGGING_REQUEST_METHOD,
+                                "Visualization insert success",
+                                Constants.LOGGING_BEARER_TOKEN
+                        );
+                        Log.d("Visualization insertion", "Visualization insert success");
+
+                    }
+                    else {
+                        Toast.makeText(requireContext(), "Insert Failed!", Toast.LENGTH_SHORT).show();
+                        LogHelper.sendLog(
+                                Constants.LOGGING_BASE_URL,
+                                Constants.LOGGING_REQUEST_METHOD,
+                                "Visualization insert failed",
+                                Constants.LOGGING_BEARER_TOKEN
+                        );
+                        Log.d("Visualization insertion", "Visualization insert failed");
+
+                    }
+                });
+            }
+
+
+        });
 
     }
 
@@ -332,6 +342,12 @@ public class VisualizationSetting extends Fragment {
         RadioButton disabledRadio = new RadioButton(requireContext());
         disabledRadio.setText("Disabled");
 
+        Integer visualizationType = range.getVisualizationType();
+        if (visualizationType != null && visualizationType >= 0 && visualizationType < visualizationRadioGroup.getChildCount() ) {
+            RadioButton button = (RadioButton) visualizationRadioGroup.getChildAt(visualizationType);
+            button.setChecked(true);
+        }
+
         visualizationRadioGroup.addView(graphRadio);
         visualizationRadioGroup.addView(tableRadio);
         visualizationRadioGroup.addView(disabledRadio);
@@ -348,7 +364,7 @@ public class VisualizationSetting extends Fragment {
         ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, yAxisOptions);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         yRangeSpinner.setAdapter(adapter);
-
+        yRangeSpinner.setSelection(range.getyAxisRange());
         EditText upperLimitEdit = new EditText(requireContext());
         if (range.getUpperLimit() != null && range.getUpperLimit() > 0) upperLimitEdit.setText(String.valueOf(range.getUpperLimit()));
 
@@ -373,6 +389,7 @@ public class VisualizationSetting extends Fragment {
         blockSizeEdit.setText("");
         bufferSizeEdit.setText("");
         savePathEdit.setText("");
+        saveFormatRadio.clearCheck();
         int cnt = rangeTable.getChildCount();
         if (cnt > 1) rangeTable.removeViews(1, cnt - 1);
     }
@@ -382,7 +399,14 @@ public class VisualizationSetting extends Fragment {
         sampleRateEdit.setText(String.valueOf(data.getSampleRate()));
         blockSizeEdit.setText(String.valueOf(data.getBlockSize()));
         bufferSizeEdit.setText(String.valueOf(data.getBufferSize()));
+        savePathEdit.setText(data.getSavePath());
         // set ranges in range table
         displayRangesTable();
+        Integer saveFormat = data.getSaveFormat();
+        saveFormatRadio.clearCheck();
+        if(saveFormat != null && saveFormat >= 0 && saveFormat < saveFormatRadio.getChildCount()) {
+            RadioButton button = (RadioButton) saveFormatRadio.getChildAt(saveFormat);
+            button.setChecked(true);
+        }
     }
 }

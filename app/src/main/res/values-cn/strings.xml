@@ -1,12 +1,12 @@
 <resources>
-    <string name="app_name">ESP Control</string>
+    <string name="app_name">ESP Control-cn</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="drawer_open">Open drawer</string>
     <string name="drawer_close">Close drawer</string>
-    <string name="wifi"> WIFI </string>
-    <string name="sensor"> Sensor </string>
-    <string name="actuator"> Actuator </string>
+    <string name="wifi"> WIFI-cn </string>
+    <string name="sensor"> Sensor-cn </string>
+    <string name="actuator"> Actuator-cn </string>
     <string name="command"> Command </string>
     <string name="experiment"> Experiment </string>
     <string name="visualization"> Visualization </string>

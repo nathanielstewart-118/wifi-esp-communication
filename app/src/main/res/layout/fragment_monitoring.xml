@@ -17,7 +17,7 @@
                 android:id="@+id/headerText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Monitoring"
+                android:text="@string/monitoring_title"
                 android:textSize="24sp"
                 android:textColor="@android:color/black"
                 android:gravity="center"
@@ -53,7 +53,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:text="Monitoring Control" />
+                    android:text="@string/monitoring_control" />
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -63,7 +63,7 @@
                         android:id="@+id/monitoring_start_btn"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
-                        android:text="Start"
+                        android:text="@string/start"
                         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                         android:layout_marginRight="16dp"
                         android:backgroundTint="@color/bs_success"/>
@@ -72,14 +72,14 @@
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                        android:text="Stop"
+                        android:text="@string/stop"
                         android:backgroundTint="@color/bs_danger"/>
                 </LinearLayout>
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:text="Experiment Set" />
+                    android:text="@string/experiment_set" />
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -89,7 +89,7 @@
                         android:id="@+id/monitoring_experiment_set1_btn"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
-                        android:text="Set1"
+                        android:text="@string/set1"
                         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                         android:layout_marginRight="16dp"
                         android:backgroundTint="@color/bs_info"/>
@@ -98,7 +98,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                        android:text="Set2"
+                        android:text="@string/set2"
                         android:backgroundTint="@color/bs_info"/>
                 </LinearLayout>
                 <LinearLayout
@@ -110,7 +110,7 @@
                         android:id="@+id/monitoring_experiment_set3_btn"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
-                        android:text="Set3"
+                        android:text="@string/set3"
                         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                         android:layout_marginRight="16dp"
                         android:backgroundTint="@color/bs_info"/>
@@ -118,7 +118,7 @@
                         android:id="@+id/monitoring_experiment_set4_btn"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
-                        android:text="Set4"
+                        android:text="@string/set4"
                         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                         android:backgroundTint="@color/bs_info"/>
                 </LinearLayout>
@@ -129,7 +129,7 @@
                         android:id="@+id/monitoring_load_settings_btn"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
-                        android:text="Load Command Settings"
+                        android:text="@string/sensor_load_command_settings"
                         android:layout_marginHorizontal="16dp"
                         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                         android:backgroundTint="@color/bs_info"/>
@@ -138,7 +138,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:text="Command Set" />
+                    android:text="@string/command_set" />
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -148,7 +148,7 @@
                         android:id="@+id/monitoring_command_set1_btn"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
-                        android:text="Set 1"
+                        android:text="@string/set_1"
                         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                         android:layout_marginRight="16dp"
                         android:backgroundTint="@color/bs_primary"/>
@@ -156,7 +156,7 @@
                         android:id="@+id/monitoring_command_set2_btn"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
-                        android:text="Set 2"
+                        android:text="@string/set_2"
                         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                         android:backgroundTint="@color/bs_primary"/>
                 </LinearLayout>
@@ -169,7 +169,7 @@
                         android:id="@+id/monitoring_command_set3_btn"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
-                        android:text="Set 3"
+                        android:text="@string/set_3"
                         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                         android:layout_marginRight="16dp"
                         android:gravity="center"
@@ -178,7 +178,7 @@
                         android:id="@+id/monitoring_command_set4_btn"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
-                        android:text="Set 4"
+                        android:text="@string/set_4"
                         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                         android:backgroundTint="@color/bs_primary"/>
                 </LinearLayout>
@@ -187,12 +187,12 @@
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:layout_marginVertical="30dp"
-                    android:text="Log" />
+                    android:text="@string/log" />
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:text="Log message" />
+                    android:text="@string/log_message" />
 
             </LinearLayout>
         </LinearLayout>

@@ -38,7 +38,7 @@
                 android:id="@+id/actuator_save_btn"
                 android:layout_margin="16dp"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                android:text="Save" />
+                android:text="@string/save_btn" />
 
             <Button
                 android:layout_width="wrap_content"
@@ -47,7 +47,7 @@
                 android:id="@+id/actuator_load_btn"
                 android:layout_margin="16dp"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                android:text="Load" />
+                android:text="@string/load_btn" />
 
         </LinearLayout>
 
@@ -99,13 +99,13 @@
                         android:id="@+id/command_code_input"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="Enter Ox numbers"
+                        android:hint="@string/enter_ox_numbers"
                         android:padding="8dp" />
                     <EditText
                         android:id="@+id/command_time1_float_input"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="Enter the number"
+                        android:hint="@string/enter_the_number"
                         android:inputType="numberDecimal"
                         android:padding="8dp" />
                     <EditText
@@ -113,7 +113,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="numberDecimal"
-                        android:hint="Enter the number"
+                        android:hint="@string/enter_the_number"
                         android:padding="8dp" />
                     <LinearLayout
                         android:layout_width="wrap_content"
@@ -126,7 +126,7 @@
                         android:backgroundTint="@color/bs_secondary"
                         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                         android:layout_height="wrap_content"
-                        android:text="Threshold"
+                        android:text="@string/threshold"
                         android:padding="2dp" />
                     </LinearLayout>
                 </TableRow>
@@ -144,7 +144,7 @@
                 android:layout_weight="1"
                 android:layout_margin="8dp"
                 android:backgroundTint="@color/bs_primary"
-                android:text="Add"
+                android:text="@string/add_btn"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                 android:translationY="45dp" />
         </LinearLayout>
@@ -166,35 +166,35 @@
                     <TableRow>
 
                         <TextView
-                            android:text="Sequence"
+                            android:text="@string/command_sequence_th"
                             android:textColor="@android:color/white"
                             android:padding="8dp"
                             android:background="?attr/colorPrimary"
                             android:textStyle="bold"/>
 
                         <TextView
-                            android:text="Command Code"
+                            android:text="@string/command_code_th"
                             android:textColor="@android:color/white"
                             android:padding="8dp"
                             android:background="?attr/colorPrimary"
                             android:textStyle="bold"/>
 
                         <TextView
-                            android:text="Time 1"
+                            android:text="@string/command_time_1_th"
                             android:textColor="@android:color/white"
                             android:background="?attr/colorPrimary"
                             android:padding="8dp"
                             android:textStyle="bold"/>
 
                         <TextView
-                            android:text="Time 2"
+                            android:text="@string/command_time_2_th"
                             android:textColor="@android:color/white"
                             android:background="?attr/colorPrimary"
                             android:padding="8dp"
                             android:textStyle="bold"/>
 
                         <TextView
-                            android:text="Threshold"
+                            android:text="@string/threshold"
                             android:textColor="@android:color/white"
                             android:padding="8dp"
                             android:background="?attr/colorPrimary"
@@ -221,7 +221,7 @@
                 android:backgroundTint="@color/bs_success"
                 android:id="@+id/command_send_btn"
                 android:layout_margin="16dp"
-                android:text="Send Command ESP" />
+                android:text="@string/command_send_command_esp" />
 
         </LinearLayout>
 

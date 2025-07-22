@@ -17,7 +17,7 @@
                 android:id="@+id/headerText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Data Playback"
+                android:text="@string/data_playback_title"
                 android:textSize="24sp"
                 android:textColor="@android:color/black"
                 android:gravity="center"
@@ -54,7 +54,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                        android:text="Loading Data"
+                        android:text="@string/loading_data"
                         android:backgroundTint="@color/bs_info"/>
 
                 </LinearLayout>
@@ -62,7 +62,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:text="Playback Control" />
+                    android:text="@string/playback_control" />
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -73,7 +73,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                        android:text="Start"
+                        android:text="@string/start"
                         android:layout_marginRight="16dp"
                         android:backgroundTint="@color/bs_success"/>
                     <Button
@@ -81,14 +81,14 @@
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                        android:text="Stop"
+                        android:text="@string/stop"
                         android:backgroundTint="@color/bs_danger"/>
                 </LinearLayout>
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:text="Time control" />
+                    android:text="@string/time_control" />
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -98,7 +98,7 @@
                         android:id="@+id/playback_time_control1_btn"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
-                        android:text="+1s"
+                        android:text="@string/plus_1s"
                         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                         android:layout_marginRight="16dp"
                         android:backgroundTint="@color/bs_primary"/>
@@ -106,7 +106,7 @@
                         android:id="@+id/playback_time_control2_btn"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
-                        android:text="-1s"
+                        android:text="@string/minus_1s"
                         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                         android:backgroundTint="@color/bs_primary"/>
                 </LinearLayout>
@@ -119,7 +119,7 @@
                         android:id="@+id/playback_time_control3_btn"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
-                        android:text="+10s"
+                        android:text="@string/plus_10s"
                         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                         android:layout_marginRight="16dp"
                         android:backgroundTint="@color/bs_primary"/>
@@ -127,7 +127,7 @@
                         android:id="@+id/playback_time_control4_btn"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
-                        android:text="-10s"
+                        android:text="@string/minus_10s"
                         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                         android:backgroundTint="@color/bs_primary"/>
                 </LinearLayout>
@@ -140,7 +140,7 @@
                         android:id="@+id/playback_time_control_next_command_btn"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
-                        android:text="Next\nCommand"
+                        android:text="@string/next_ncommand"
                         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                         android:layout_marginRight="16dp"
                         android:backgroundTint="@color/bs_primary"/>
@@ -149,7 +149,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                        android:text="Previous\nCommand"
+                        android:text="@string/previous_ncommand"
                         android:backgroundTint="@color/bs_primary"/>
                 </LinearLayout>
                 <TextView
@@ -157,12 +157,12 @@
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:layout_marginVertical="30dp"
-                    android:text="Log" />
+                    android:text="@string/log" />
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:text="Log message" />
+                    android:text="@string/log_message" />
 
             </LinearLayout>
         </LinearLayout>

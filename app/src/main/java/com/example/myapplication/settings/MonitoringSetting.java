@@ -13,10 +13,13 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.myapplication.R;
 import com.example.myapplication.db.entity.ESPReceiveData;
+import com.example.myapplication.db.entity.Monitoring;
 import com.example.myapplication.db.entity.SensorActuator;
+import com.example.myapplication.db.viewmodel.MonitoringViewModel;
 import com.example.myapplication.db.viewmodel.SensorActuatorViewModel;
 import com.example.myapplication.db.viewmodel.TCPUDPReceiveViewModel;
 import com.example.myapplication.utils.Constants;
@@ -53,6 +56,7 @@ public class MonitoringSetting extends Fragment {
 
     private SensorActuatorViewModel sensorActuatorViewModel;
     private TCPUDPReceiveViewModel receiveViewModel;
+    private MonitoringViewModel monitoringViewModel;
     private List<SensorActuator> sensorActuators = new ArrayList<>();
     private ScatterChart scatterChart;
     private int[] colors = {
@@ -90,6 +94,7 @@ public class MonitoringSetting extends Fragment {
             displayAccordion(sensorActuators);
         });
 
+        monitoringViewModel = new ViewModelProvider(requireActivity()).get(MonitoringViewModel.class);
         scatterChart = new ScatterChart(requireContext());
         scatterChart.setLayoutParams(new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
@@ -179,13 +184,22 @@ public class MonitoringSetting extends Fragment {
     }
 
     public void updateViews(byte[] data, int cnt) {
+        Monitoring monitoring = new Monitoring(Arrays.toString(data), System.currentTimeMillis());
+        monitoringViewModel.insert(monitoring, result -> {
+           if (result != null && result > 0) {
+               Toast.makeText(getContext(), R.string.insert_success, Toast.LENGTH_SHORT).show();
+           }
+           else {
+               Toast.makeText(getContext(), R.string.insert_failed, Toast.LENGTH_SHORT).show();
+           }
+        });
         if(scatterChart == null) return;
         ESPReceiveData espReceiveData = PacketParser.parseESPData(data, cnt, data.length);
         ScatterData scatterData= scatterChart.getData();
         if (scatterData == null) {
             scatterData = new ScatterData();
             for (int i = 0; i < cnt; i ++) {
-                ScatterDataSet set = new ScatterDataSet(new ArrayList<>(), "Channel " + String.valueOf(i + 1));
+                ScatterDataSet set = new ScatterDataSet(new ArrayList<>(), R.string.channel + " " + String.valueOf(i + 1));
                 set.setDrawValues(false);
                 set.setScatterShape(ScatterChart.ScatterShape.CIRCLE);
                 set.setColor(colors[i % colors.length]);
@@ -209,8 +223,5 @@ public class MonitoringSetting extends Fragment {
         scatterData.notifyDataChanged();
         scatterChart.notifyDataSetChanged();
         scatterChart.invalidate();
-
     }
-
-
 }

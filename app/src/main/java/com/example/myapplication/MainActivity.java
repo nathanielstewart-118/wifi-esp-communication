@@ -3,10 +3,14 @@ package com.example.myapplication; // Replace with your package name
 import androidx.fragment.app.Fragment;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
@@ -46,10 +50,10 @@ public class MainActivity extends AppCompatActivity {
     private Toolbar toolbar;
     private ActionBarDrawerToggle toggle;
     private WiFiSocketManager socketManager = WiFiSocketManager.getInstance();
-
+    private Spinner languageSpinner;
     private TCPUDPReceiveViewModel receiveViewModel;
     private final Gson gson = new Gson();
-
+    private boolean isFirstSelection = true;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
         drawerLayout = findViewById(R.id.drawer_layout);
         navigationView = findViewById(R.id.navigation_view);
         toolbar = findViewById(R.id.toolbar);
-
+        languageSpinner = findViewById(R.id.language_spinner);
         // Set up the toolbar
         setSupportActionBar(toolbar);
 
@@ -135,12 +139,45 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
         });
+        String[] lagnuages = new String[Constants.LANGUAGES.length + 1];
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_spinner_item, Constants.LANGUAGES);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        languageSpinner.setAdapter((adapter));
+        SharedPreferences prefs = getSharedPreferences("settings", MODE_PRIVATE);
+        String currentLang = prefs.getString("lang", "en"); // default to "en"
+        languageSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String selectedLang = parent.getItemAtPosition(position).toString().trim();
+                if (isFirstSelection) {
+                    isFirstSelection = false;
+                    return;
+                }
+                if (!selectedLang.equals(currentLang)) {
+                    // Save the new language
+                    prefs.edit().putString("lang", selectedLang).apply();
+                    Toast.makeText(getApplicationContext(), "Selected: " + selectedLang, Toast.LENGTH_SHORT).show();
+
+                    // Apply locale and restart activity
+                    LocaleHelper.applyLocale(MainActivity.this, selectedLang);
+                    recreate();
+                }
+
+                // Handle the selected item here (e.g., change language, update UI, etc.)
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // Optional: handle case when nothing is selected
+            }
+        });
+
     }
 
-    @Override
-    protected void attachBaseContext(Context newBase) {
-        super.attachBaseContext(LocaleHelper.setLocale(newBase, "fr"));  // "fr" should be dynamically set
-    }
+//    @Override
+//    protected void attachBaseContext(Context newBase) {
+//        super.attachBaseContext(LocaleHelper.setLocale(newBase, "fr"));  // "fr" should be dynamically set
+//    }
 
     public void connectToESP() {
         socketManager.connectTCP(Constants.tcpServerIp, Constants.tcpServerPort, new WiFiSocketManager.Callback() {
@@ -181,10 +218,10 @@ public class MainActivity extends AppCompatActivity {
                 String byteString = Arrays.toString(data);
                 Log.d("TCP", "Received from server: " + byteString);
                 LogHelper.sendLog(
-                        Constants.LOGGING_BASE_URL,
-                        Constants.LOGGING_REQUEST_METHOD,
-                        "Data: " + byteString + " arrived via TCP",
-                        Constants.LOGGING_BEARER_TOKEN
+                    Constants.LOGGING_BASE_URL,
+                    Constants.LOGGING_REQUEST_METHOD,
+                    "Data: " + byteString + " arrived via TCP",
+                    Constants.LOGGING_BEARER_TOKEN
                 );
                 Log.d("WiFi Success", "Data: " + byteString + "arrived via TCP");
                 // If you need to update UI:

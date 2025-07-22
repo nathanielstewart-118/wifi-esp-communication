@@ -210,13 +210,13 @@ public class ESPTXSetting extends Fragment {
                     espTXViewModel.update(currentESPTX);
                     espTXViewModel.getUpdateResult().observe(getViewLifecycleOwner(), id -> {
                         if (id != null && id > 0) {
-                            Toast.makeText(getContext(), "Update success!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), R.string.update_success, Toast.LENGTH_SHORT).show();
                             sensorActuatorsToDisplay = sensorActuatorsToDisplay.stream()
                                     .filter(sa -> !Objects.equals(sa.getSensorActuatorId(), currentESPTX.getSensorActuatorId()))
                                     .collect(Collectors.toList());
                             dialog.dismiss();
                         } else {
-                            Toast.makeText(getContext(), "Update failed!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), R.string.update_failed, Toast.LENGTH_SHORT).show();
                         }
                     });
                 }
@@ -224,13 +224,13 @@ public class ESPTXSetting extends Fragment {
                     espTXViewModel.insert(currentESPTX);
                     espTXViewModel.getInsertResult().observe(getViewLifecycleOwner(), id -> {
                         if (id != null && id > 0) {
-                            Toast.makeText(getContext(), "Insert success!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), R.string.insert_success, Toast.LENGTH_SHORT).show();
                             sensorActuatorsToDisplay = sensorActuatorsToDisplay.stream()
                                     .filter(sa -> !Objects.equals(sa.getSensorActuatorId(), currentESPTX.getSensorActuatorId()))
                                     .collect(Collectors.toList());
                             dialog.dismiss();
                         } else {
-                            Toast.makeText(getContext(), "Insert failed!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), R.string.insert_failed, Toast.LENGTH_SHORT).show();
                         }
                     });
                 }
@@ -352,9 +352,9 @@ public class ESPTXSetting extends Fragment {
             @Override
             public void onClick(View v) {
                 new AlertDialog.Builder(requireContext())
-                    .setTitle("Confirm")
-                    .setMessage("Are you sure you want to delete?")
-                    .setPositiveButton("Yes", (dialog, which) -> {
+                    .setTitle(R.string.confirm)
+                    .setMessage(R.string.are_you_sure_you_want_to_delete)
+                    .setPositiveButton(R.string.yes, (dialog, which) -> {
                         // Handle Yes button click
                         Long id = (Long) v.getTag();
                         List<SensorActuator> selectedSensorActuators = sensorsAndActuators.stream()
@@ -366,14 +366,14 @@ public class ESPTXSetting extends Fragment {
                         espTXViewModel.softDelete(data.getId());
                         espTXViewModel.getSoftDeleteResult().observe(getViewLifecycleOwner(), res -> {
                             if (Objects.equals(res, data.getId())) {
-                                Toast.makeText(requireContext(), "Deleted Successfully!", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(requireContext(), R.string.deleted_successfully, Toast.LENGTH_SHORT).show();
                             }
                             else {
-                                Toast.makeText(requireContext(), "Delete failed", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(requireContext(), R.string.delete_failed, Toast.LENGTH_SHORT).show();
                             }
                         });
                     })
-                    .setNegativeButton("No", (dialog, which) -> {
+                    .setNegativeButton(R.string.no, (dialog, which) -> {
                         // Handle No button click (optional)
                         dialog.dismiss();
                     })

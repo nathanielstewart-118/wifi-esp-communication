@@ -10,7 +10,23 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
-
+        <LinearLayout
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal">
+            <TextView
+                android:id="@+id/esp_rx_header"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/experiment_settings_title"
+                android:textSize="24sp"
+                android:textColor="@android:color/black"
+                android:gravity="center"
+                android:padding="16dp"
+                android:textStyle="bold"/>
+        </LinearLayout>
         <!-- Save & Load Buttons -->
         <LinearLayout
             android:layout_width="500dp"
@@ -24,7 +40,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:hint="Type here"
+                android:hint="@string/type_here"
                 android:layout_gravity="center_vertical"
                 android:focusable="true"
                 android:focusableInTouchMode="true"
@@ -38,7 +54,7 @@
                 android:layout_margin="16dp"
                 android:layout_weight="1"
                 android:backgroundTint="@color/bs_success"
-                android:text="Save" />
+                android:text="@string/save_btn" />
 
             <Button
                 android:id="@+id/experiment_load_btn"
@@ -47,7 +63,7 @@
                 android:layout_margin="16dp"
                 android:layout_weight="1"
                 android:backgroundTint="@color/bs_primary"
-                android:text="load" />
+                android:text="@string/load_btn" />
         </LinearLayout>
 
         <!-- Spacer -->
@@ -68,7 +84,7 @@
                 android:id="@+id/experiment_set1_btn"
                 android:layout_width="90dp"
                 android:layout_height="50dp"
-                android:text="SET1"
+                android:text="@string/set1"
                 android:textStyle="bold"
                 android:textSize="18sp"
                 android:layout_margin="4dp"
@@ -78,7 +94,7 @@
                 android:id="@+id/experiment_set2_btn"
                 android:layout_width="90dp"
                 android:layout_height="50dp"
-                android:text="SET2"
+                android:text="@string/set2"
                 android:textStyle="bold"
                 android:textSize="18sp"
                 android:layout_margin="4dp"
@@ -88,7 +104,7 @@
                 android:id="@+id/experiment_set3_btn"
                 android:layout_width="90dp"
                 android:layout_height="50dp"
-                android:text="SET3"
+                android:text="@string/set3"
                 android:textStyle="bold"
                 android:textSize="18sp"
                 android:layout_margin="4dp"
@@ -98,7 +114,7 @@
                 android:id="@+id/experiment_set4_btn"
                 android:layout_width="90dp"
                 android:layout_height="50dp"
-                android:text="SET4"
+                android:text="@string/set4"
                 android:textStyle="bold"
                 android:textSize="18sp"
                 android:layout_margin="4dp"
@@ -131,56 +147,56 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Command selection"
+                    android:text="@string/command_selection"
                     android:textSize="18sp"
                     android:paddingBottom="18dp" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="N Trials"
+                    android:text="@string/n_trials"
                     android:textSize="18sp"
                     android:paddingVertical="6dp" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Command"
+                    android:text="@string/command"
                     android:textSize="18sp"
                     android:paddingVertical="6dp" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Rest"
+                    android:text="@string/rest"
                     android:textSize="18sp"
                     android:paddingVertical="8dp" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Rest-Random"
+                    android:text="@string/rest_random"
                     android:textSize="18sp"
                     android:paddingVertical="8dp" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Pre-Run"
+                    android:text="@string/pre_run"
                     android:textSize="18sp"
                     android:paddingVertical="8dp" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Post-Run"
+                    android:text="@string/post_run"
                     android:textSize="18sp"
                     android:paddingVertical="8dp" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Run-Time"
+                    android:text="@string/run_time"
                     android:textSize="18sp"
                     android:paddingTop="30dp"
                     android:paddingBottom="4dp" />
@@ -209,21 +225,21 @@
                     android:id="@+id/experiment_n_trials_text"
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
-                    android:hint="Enter the total number of commands"
+                    android:hint="@string/enter_the_total_number_of_commands"
                     android:inputType="number" />
 
                 <EditText
                     android:id="@+id/experiment_command_text"
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
-                    android:hint="Enter Command Time (in 0.1 degree increments)"
+                    android:hint="@string/enter_command_time_in_0_1_degree_increments"
                     android:inputType="numberDecimal" />
 
                 <EditText
                     android:id="@+id/experiment_rest_text"
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
-                    android:hint="Enter Rest Time (in 0.1 degree increments)"
+                    android:hint="@string/enter_rest_time_in_0_1_degree_increments"
                     android:inputType="numberDecimal" />
 
 
@@ -232,21 +248,21 @@
                     android:id="@+id/experiment_rest_random_text"
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
-                    android:hint="Enter Rest Random Time (in 0.1 degree increments)"
+                    android:hint="@string/enter_rest_random_time_in_0_1_degree_increments"
                     android:inputType="numberDecimal" />
 
                 <EditText
                     android:id="@+id/experiment_pre_run_text"
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
-                    android:hint="Enter time (in 0.1 degree increments)"
+                    android:hint="@string/enter_time_in_0_1_degree_increments"
                     android:inputType="numberDecimal" />
 
                 <EditText
                     android:id="@+id/experiment_post_run_text"
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
-                    android:hint="Enter time (in 0.1 degree increments)"
+                    android:hint="@string/enter_time_in_0_1_degree_increments"
                     android:inputType="numberDecimal" />
 
                 <View
@@ -322,7 +338,7 @@
                     android:id="@+id/experiment_run_time_view"
                     android:layout_width="match_parent"
                     android:layout_height="60dp"
-                    android:text="About 1 Run\nDisplay of required time"
+                    android:text="@string/about_1_run_ndisplay_of_required_time"
                     android:gravity="center"
                     android:layout_marginVertical="25dp"
                     android:textAlignment="center"
@@ -361,7 +377,7 @@
                 android:layout_width="0dp"
                 android:layout_height="50dp"
                 android:layout_weight="2"
-                android:text="Update"
+                android:text="@string/update"
                 android:textStyle="bold"
                 android:textSize="18sp"
                 android:backgroundTint="@color/bs_success" />

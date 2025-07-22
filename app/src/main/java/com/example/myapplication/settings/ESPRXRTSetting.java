@@ -445,26 +445,26 @@ public class ESPRXRTSetting extends Fragment {
             esprxrtViewModel.update(currentESPRXRT);
             esprxrtViewModel.getUpdateResult().observe(getViewLifecycleOwner(), id -> {
                 if (id != null && id > 0) {
-                    Toast.makeText(getContext(), "Update success!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), R.string.update_success, Toast.LENGTH_SHORT).show();
                     sensorActuatorsToDisplay = sensorActuatorsToDisplay.stream()
                             .filter(sa -> !Objects.equals(sa.getSensorActuatorId(), finalCurrentESPRXRT.getSensorActuatorId()))
                             .collect(Collectors.toList());
                     dialog.dismiss();
                 } else {
-                    Toast.makeText(getContext(), "Update failed!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), R.string.update_failed, Toast.LENGTH_SHORT).show();
                 }
             });
         } else {
             esprxrtViewModel.insert(currentESPRXRT);
             esprxrtViewModel.getInsertResult().observe(getViewLifecycleOwner(), id -> {
                 if (id != null && id > 0) {
-                    Toast.makeText(getContext(), "Insert success!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), R.string.insert_success, Toast.LENGTH_SHORT).show();
                     sensorActuatorsToDisplay = sensorActuatorsToDisplay.stream()
                             .filter(sa -> !Objects.equals(sa.getSensorActuatorId(), finalCurrentESPRXRT.getSensorActuatorId()))
                             .collect(Collectors.toList());
                     dialog.dismiss();
                 } else {
-                    Toast.makeText(getContext(), "Insert failed!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), R.string.insert_failed, Toast.LENGTH_SHORT).show();
                 }
             });
         }
@@ -505,10 +505,10 @@ public class ESPRXRTSetting extends Fragment {
             esprxrtViewModel.softDelete(espId);
             esprxrtViewModel.getSoftDeleteResult().observe(getViewLifecycleOwner(), res -> {
                 if (Objects.equals(res, espId)) {
-                    Toast.makeText(requireContext(), "Deleted Successfully!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(requireContext(), R.string.deleted_successfully, Toast.LENGTH_SHORT).show();
                 }
                 else {
-                    Toast.makeText(requireContext(), "Delete failed", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(requireContext(), R.string.delete_failed, Toast.LENGTH_SHORT).show();
                 }
             });
         })

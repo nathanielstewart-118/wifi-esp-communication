@@ -119,20 +119,20 @@ public class ExperimentSetting extends Fragment {
             }
             commandList.setOnClickListener(v -> {
                 if (candidates.length == 0) {
-                    Toast.makeText(requireContext(), "No commands yet!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(requireContext(), R.string.no_commands_yet, Toast.LENGTH_SHORT).show();
                     return;
                 }
                 new AlertDialog.Builder(requireContext())
-                    .setTitle("Select Commands")
+                    .setTitle(R.string.select_commands)
                     .setMultiChoiceItems(candidates, checkedItems, (dialog, which, isChecked) -> {
                         checkedItems[which] = isChecked;
                     })
-                    .setPositiveButton("OK", (dialog, which) -> {
+                    .setPositiveButton(R.string.ok, (dialog, which) -> {
                         List<String> selected = new ArrayList<>();
                         String commandListString = "";
                         for (int i = 0; i < checkedItems.length; i++) {
                             if (checkedItems[i]) {
-                                Log.d("SELECTED", candidates[i]);
+                                Log.d(getString(R.string.selected), candidates[i]);
                                 selected.add(candidates[i]);
                                 commandListString += candidates[i] + ", ";
                             }
@@ -187,13 +187,13 @@ public class ExperimentSetting extends Fragment {
     public void handleClickSaveBtn() {
         String experimentId = idAutocomplete.getText().toString();
         if (experimentId.isEmpty()) {
-            Toast.makeText(requireContext(), "Please enter the experiment title", Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), R.string.please_enter_the_experiment_title, Toast.LENGTH_SHORT).show();
             return;
         }
         new AlertDialog.Builder(requireContext())
-            .setTitle("Confirm")
-            .setMessage("Are you sure you want to save this data?")
-            .setPositiveButton("Yes", (dialog, which) -> {
+            .setTitle(R.string.confirm)
+            .setMessage(R.string.are_you_sure_you_want_to_save_this_data)
+            .setPositiveButton(R.string.yes, (dialog, which) -> {
                 // Handle Yes button click
                 int nTrials = Integer.parseInt(nTrialsEdit.getText().toString());
                 float command = Float.parseFloat(commandEdit.getText().toString());
@@ -216,11 +216,11 @@ public class ExperimentSetting extends Fragment {
                         experimentViewModel.insert(currentExperiment);
                         experimentViewModel.getInsertResult().observe(getViewLifecycleOwner(), id -> {
                             if (id != null && id > 0) {
-                                Toast.makeText(getContext(), "Insert success!", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getContext(), R.string.insert_success, Toast.LENGTH_SHORT).show();
                                 currentExperiment.setId(-1L);
                                 initUIValues(0);
                             } else {
-                                Toast.makeText(getContext(), "Insert failed!", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getContext(), R.string.insert_failed, Toast.LENGTH_SHORT).show();
                             }
                         });
                     }
@@ -228,15 +228,15 @@ public class ExperimentSetting extends Fragment {
                         experimentViewModel.update(currentExperiment);
                         experimentViewModel.getUpdateResult().observe(getViewLifecycleOwner(), id -> {
                             if (id != null && id > 0) {
-                                Toast.makeText(getContext(), "Update success!", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getContext(), R.string.update_success, Toast.LENGTH_SHORT).show();
                             } else {
-                                Toast.makeText(getContext(), "Update failed!", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getContext(), R.string.update_failed, Toast.LENGTH_SHORT).show();
                             }
                         });
                     }
                 });
             })
-            .setNegativeButton("No", (dialog, which) -> {
+            .setNegativeButton(R.string.no, (dialog, which) -> {
                 // Handle No button click (optional)
                 dialog.dismiss();
             })
@@ -248,13 +248,13 @@ public class ExperimentSetting extends Fragment {
         String experimentId = idAutocomplete.getText().toString();
         experimentViewModel.findExperimentsByExperimentId(experimentId, data -> {
             if (data.isEmpty()) {
-                Toast.makeText(requireContext(), "Can't find the corresponding Experiment Data", Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), R.string.can_t_find_the_corresponding_experiment_data, Toast.LENGTH_SHORT).show();
                 return;
             }
             List<Experiment> results = (List<Experiment>) data;
             currentExperiment.copyFrom(results.get(0));
             setValuesIntoUIs(currentExperiment);
-            Toast.makeText(requireContext(), "Loaded Experiment Data successfully!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), R.string.loaded_experiment_data_successfully, Toast.LENGTH_SHORT).show();
         });
     }
 

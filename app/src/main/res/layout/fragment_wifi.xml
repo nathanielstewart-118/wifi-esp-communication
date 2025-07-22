@@ -16,7 +16,7 @@
             android:id="@+id/headerText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="WIFI Access and Connection"
+            android:text="@string/wifi_setting_screen_title"
             android:textSize="24sp"
             android:textColor="@android:color/black"
             android:gravity="center"
@@ -50,7 +50,7 @@
             android:id="@+id/wifi_auto_connect_checkbox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Auto Connect"
+            android:text="@string/wifi_auto_connect"
             android:checked="false" />
 
     </LinearLayout>

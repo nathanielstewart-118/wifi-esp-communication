@@ -92,10 +92,10 @@ public class SensorSetting extends Fragment {
                     sensorActuatorViewModel.insert(sensor);
                     sensorActuatorViewModel.getInsertResult().observe(getViewLifecycleOwner(), id -> {
                         if (id != null && id > 0) {
-                            Toast.makeText(getContext(), "Insert success!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), R.string.insert_success, Toast.LENGTH_SHORT).show();
                             sensor.setId(id);
                         } else {
-                            Toast.makeText(getContext(), "Insert failed!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), R.string.insert_failed, Toast.LENGTH_SHORT).show();
                         }
                     });
 

@@ -26,31 +26,31 @@
                     android:padding="16dp"
                     android:textStyle="bold"
                     android:textColor="@color/white"
-                    android:text="Order">
+                    android:text="@string/sensor_th_order">
                 </TextView>
                 <TextView
                     android:padding="16dp"
                     android:textStyle="bold"
                     android:textColor="@color/white"
-                    android:text="Initial Value">
+                    android:text="@string/initial_value">
                 </TextView>
                 <TextView
                     android:padding="16dp"
                     android:textStyle="bold"
                     android:textColor="@color/white"
-                    android:text="Upper Limit">
+                    android:text="@string/upper_limit">
                 </TextView>
                 <TextView
                     android:padding="16dp"
                     android:textStyle="bold"
                     android:textColor="@color/white"
-                    android:text="Lower Limit">
+                    android:text="@string/lower_limit">
                 </TextView>
                 <TextView
                     android:padding="16dp"
                     android:textStyle="bold"
                     android:textColor="@color/white"
-                    android:text="Active">
+                    android:text="@string/active">
                 </TextView>
 
             </TableRow>
@@ -67,7 +67,7 @@
                 android:backgroundTint="@color/bs_success"
                 android:layout_height="wrap_content"
                 android:layout_margin="16dp"
-                android:text="Save"
+                android:text="@string/save_btn"
                 android:padding="8dp" />
             <Button
                 android:id="@+id/esp_rxrt_close_thresholds_dialog_btn"
@@ -75,7 +75,7 @@
                 android:backgroundTint="@color/bs_secondary"
                 android:layout_height="wrap_content"
                 android:layout_margin="16dp"
-                android:text="Cancel"
+                android:text="@string/cancel"
                 android:padding="8dp" />
 
         </LinearLayout>

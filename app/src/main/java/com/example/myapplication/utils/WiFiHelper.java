@@ -15,12 +15,10 @@ import android.net.wifi.ScanResult;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiNetworkSpecifier;
+import android.os.Build;
 import android.util.Log;
 
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-
-import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -153,21 +151,11 @@ public class WiFiHelper {
 
     }
 
-    public int connectToNetwork(String ssid, String password) {
-
-        WifiConfiguration config = new WifiConfiguration();
-        config.SSID = "\"" + ssid + "\"";
-        config.preSharedKey = "\"" + password + "\"";
-
-        int netId = wifiManager.addNetwork(config);
-        wifiManager.disconnect();
-        wifiManager.enableNetwork(netId, true);
-        wifiManager.reconnect();
-
-        if (netId < 0) {
+    public void connectToNetwork(String ssid, String password, Consumer<Integer> callback) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             WifiNetworkSpecifier specifier = new WifiNetworkSpecifier.Builder()
                     .setSsid(ssid)
-                    .setWpa2Passphrase("") // or setIsHiddenSsid(true) if needed
+                    .setWpa2Passphrase(password) // or setIsHiddenSsid(true) if needed
                     .build();
 
             NetworkRequest request = new NetworkRequest.Builder()
@@ -184,14 +172,83 @@ public class WiFiHelper {
                     // Bind to this network
                     connectivityManager.bindProcessToNetwork(network); // or setProcessDefaultNetwork()
 
+                    callback.accept(1);
                 }
 
                 @Override
                 public void onUnavailable() {
+                    LogHelper.sendLog(
+                            Constants.LOGGING_BASE_URL,
+                            Constants.LOGGING_REQUEST_METHOD,
+                            "WiFi Connection Failed",
+                            Constants.LOGGING_BEARER_TOKEN
+                    );
                     Log.e("WiFi", "Failed to connect");
+                    callback.accept(-1);
                 }
             });
+        } else {
+//            WifiConfiguration config = new WifiConfiguration();
+//            config.SSID = "\"" + ssid + "\"";
+//            config.preSharedKey = "\"" + password + "\"";
+//
+//            int netId = wifiManager.addNetwork(config);
+//            if (netId != -1) {
+//                wifiManager.disconnect();
+//                wifiManager.enableNetwork(netId, true);
+//                wifiManager.reconnect();
+//            }
+
+            int netID = -1;
+            String confSSID = String.format("\"%s\"", ssid);
+            String confPassword = String.format("\"%s\"", password);
+            WifiConfiguration config = new WifiConfiguration();
+            config.SSID = confSSID;
+            config.preSharedKey = confPassword;
+            WifiManager wifiManager = (WifiManager) context.getSystemService(context.WIFI_SERVICE);
+            forgotAllNetwork(context);
+
+
+            netID = wifiManager.addNetwork(config);
+            wifiManager.disconnect();
+            wifiManager.enableNetwork(netID, true);
+            wifiManager.reconnect();
+
+            config = new WifiConfiguration();
+            config.SSID = confSSID;
+            config.preSharedKey = confPassword;
+            netID = wifiManager.addNetwork(config);
+            callback.accept(netID);
         }
-        return netId;
+    }
+
+    public static void forgotAllNetwork(Context context) {
+
+        WifiManager wm= (WifiManager)context.getSystemService(Context.WIFI_SERVICE);
+
+        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        List<WifiConfiguration> list = wm.getConfiguredNetworks();
+
+        if (list == null){
+
+            return ;
+
+        }
+
+        for (int i = 0; i<list.size(); i++){
+
+            WifiConfiguration conf = list.get(i);
+
+            wm.removeNetwork(conf.networkId);
+        }
     }
 }

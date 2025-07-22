@@ -38,7 +38,7 @@
             android:backgroundTint="@color/bs_success"
             android:id="@+id/sensor_save_btn"
             android:layout_margin="16dp"
-            android:text="Save" />
+            android:text="@string/save_btn" />
 
         <Button
             android:layout_width="wrap_content"
@@ -46,7 +46,7 @@
             android:backgroundTint="@color/bs_info"
             android:id="@+id/sensor_load_btn"
             android:layout_margin="16dp"
-            android:text="Load" />
+            android:text="@string/load_btn" />
 
     </LinearLayout>
 
@@ -144,7 +144,7 @@
             android:layout_weight="1"
             android:layout_margin="8dp"
             android:backgroundTint="@color/bs_primary"
-            android:text="Add"
+            android:text="@string/add_btn"
             android:textAppearance="@style/TextAppearance.AppCompat.Body1"
             android:translationY="45dp" />
     </LinearLayout>
@@ -246,7 +246,7 @@
             android:backgroundTint="@color/bs_success"
             android:id="@+id/load_command_btn"
             android:layout_margin="16dp"
-            android:text="Load Command Settings" />
+            android:text="@string/sensor_load_command_settings" />
 
         <Button
             android:layout_width="wrap_content"
@@ -254,7 +254,7 @@
             android:backgroundTint="@color/bs_info"
             android:id="@+id/update_command_btn"
             android:layout_margin="16dp"
-            android:text="Command Settings Update" />
+            android:text="@string/sensor_command_settings_update" />
 
         <Button
             android:layout_width="wrap_content"
@@ -262,7 +262,7 @@
             android:backgroundTint="@color/bs_success"
             android:id="@+id/esp_tx_upgrade_btn"
             android:layout_margin="16dp"
-            android:text="ESP TX Upgrade" />
+            android:text="@string/sensor_esp_tx_upgrade" />
 
         <Button
             android:layout_width="wrap_content"
@@ -270,7 +270,7 @@
             android:backgroundTint="@color/bs_info"
             android:id="@+id/esp_rxrt_upgrade_btn"
             android:layout_margin="16dp"
-            android:text="ESP RXRT Upgrade" />
+            android:text="@string/sensor_esp_rxrt_upgrade" />
     </LinearLayout>
 
 </LinearLayout>

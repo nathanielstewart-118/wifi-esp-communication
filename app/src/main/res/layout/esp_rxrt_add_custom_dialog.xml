@@ -26,19 +26,19 @@
                     android:padding="16dp"
                     android:textStyle="bold"
                     android:textColor="@color/white"
-                    android:text="Variable Name">
+                    android:text="@string/sensor_th_variable_name">
                 </TextView>
                 <TextView
                     android:padding="16dp"
                     android:textStyle="bold"
                     android:textColor="@color/white"
-                    android:text="Data Type">
+                    android:text="@string/sensor_th_data_type">
                 </TextView>
                 <TextView
                     android:padding="16dp"
                     android:textStyle="bold"
                     android:textColor="@color/white"
-                    android:text="Channel Count">
+                    android:text="@string/sensor_th_number_of_channels">
                 </TextView>
 
             </TableRow>
@@ -76,7 +76,7 @@
                 android:backgroundTint="@color/bs_success"
                 android:layout_height="wrap_content"
                 android:layout_margin="16dp"
-                android:text="Save"
+                android:text="@string/save_btn"
                 android:padding="8dp" />
             <Button
                 android:id="@+id/esp_rxrt_close_add_custom_dialog_btn"
@@ -84,7 +84,7 @@
                 android:backgroundTint="@color/bs_secondary"
                 android:layout_height="wrap_content"
                 android:layout_margin="16dp"
-                android:text="Cancel"
+                android:text="@string/cancel"
                 android:padding="8dp" />
 
         </LinearLayout>

@@ -22,5 +22,6 @@ public class Constants {
     public static final int tcpServerPort = 8080;
     public static final int udpLocalPort = 9999;
     public static final int udpPort = 10001;
+    public static final String[] LANGUAGES = { "en", "cn", "fr", "de" };
 
 }

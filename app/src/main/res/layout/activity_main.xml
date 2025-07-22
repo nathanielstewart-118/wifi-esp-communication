@@ -22,8 +22,15 @@
             android:layout_width="match_parent"
             android:background="?attr/colorPrimary"
             android:layout_height="?attr/actionBarSize"
+            android:orientation="horizontal"
             android:theme="@style/ThemeOverlay.Material3.Dark.ActionBar"
-            app:popupTheme="@style/ThemeOverlay.Material3.Light" />
+            app:popupTheme="@style/ThemeOverlay.Material3.Light" >
+            <Spinner
+                android:id="@+id/language_spinner"
+                android:layout_width="wrap_content"
+                android:layout_gravity="end"
+                android:layout_height="match_parent" />
+        </com.google.android.material.appbar.MaterialToolbar>
         <FrameLayout
             android:id="@+id/fragment_container"
             android:layout_width="match_parent"

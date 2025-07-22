@@ -26,25 +26,25 @@
                     android:padding="16dp"
                     android:textStyle="bold"
                     android:textColor="@color/white"
-                    android:text="Order">
+                    android:text="@string/sensor_th_order">
                 </TextView>
                 <TextView
                     android:padding="16dp"
                     android:textStyle="bold"
                     android:textColor="@color/white"
-                    android:text="Outlier">
+                    android:text="@string/outlier">
                 </TextView>
                 <TextView
                     android:padding="16dp"
                     android:textStyle="bold"
                     android:textColor="@color/white"
-                    android:text="Comparison">
+                    android:text="@string/comparison">
                 </TextView>
                 <TextView
                     android:padding="16dp"
                     android:textStyle="bold"
                     android:textColor="@color/white"
-                    android:text="Activate">
+                    android:text="@string/activate">
                 </TextView>
 
             </TableRow>
@@ -61,7 +61,7 @@
                 android:backgroundTint="@color/bs_success"
                 android:layout_height="wrap_content"
                 android:layout_margin="16dp"
-                android:text="Save"
+                android:text="@string/save_btn"
                 android:padding="8dp" />
             <Button
                 android:id="@+id/esp_tx_close_outliers_modal_btn"
@@ -69,7 +69,7 @@
                 android:backgroundTint="@color/bs_secondary"
                 android:layout_height="wrap_content"
                 android:layout_margin="16dp"
-                android:text="Cancel"
+                android:text="@string/cancel"
                 android:padding="8dp" />
 
         </LinearLayout>

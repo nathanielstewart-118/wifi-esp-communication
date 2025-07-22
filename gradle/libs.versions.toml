@@ -3,6 +3,8 @@ agp = "8.6.0"
 appcompatVersion = "1.6.1"
 core = "1.16.0"
 drawerlayout = "1.2.0"
+gradle = "2.9.0"
+gradleVersion = "4.2.0"
 gson = "2.11.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
@@ -18,6 +20,8 @@ roomRuntime = "2.7.2"
 appcompat-v161 = { module = "androidx.appcompat:appcompat", version.ref = "appcompatVersion" }
 core = { module = "androidx.core:core", version.ref = "core" }
 drawerlayout = { module = "androidx.drawerlayout:drawerlayout", version.ref = "drawerlayout" }
+gradle = { module = "com.deploygate:gradle", version.ref = "gradle" }
+gradle-v420 = { module = "com.deploygate:gradle", version.ref = "gradleVersion" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }

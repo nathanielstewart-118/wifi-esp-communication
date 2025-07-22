@@ -26,19 +26,19 @@
                     android:padding="16dp"
                     android:textStyle="bold"
                     android:textColor="@color/white"
-                    android:text="Order/Type">
+                    android:text="@string/order_type">
                 </TextView>
                 <TextView
                     android:padding="16dp"
                     android:textStyle="bold"
                     android:textColor="@color/white"
-                    android:text="Channel">
+                    android:text="@string/channel">
                 </TextView>
                 <TextView
                     android:padding="16dp"
                     android:textStyle="bold"
                     android:textColor="@color/white"
-                    android:text="Threshold">
+                    android:text="@string/threshold">
                 </TextView>
 
             </TableRow>
@@ -55,7 +55,7 @@
                 android:backgroundTint="@color/bs_success"
                 android:layout_height="wrap_content"
                 android:layout_margin="16dp"
-                android:text="Save"
+                android:text="@string/save_btn"
                 android:padding="8dp" />
             <Button
                 android:id="@+id/command_close_threshold_modal_btn"
@@ -63,7 +63,7 @@
                 android:backgroundTint="@color/bs_secondary"
                 android:layout_height="wrap_content"
                 android:layout_margin="16dp"
-                android:text="Cancel"
+                android:text="@string/cancel"
                 android:padding="8dp" />
 
         </LinearLayout>

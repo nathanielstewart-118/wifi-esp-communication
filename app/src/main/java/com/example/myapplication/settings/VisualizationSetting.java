@@ -385,7 +385,7 @@ public class VisualizationSetting extends Fragment {
         SensorActuator s = null;
         if(!sas.isEmpty()) s = sas.get(0);
 
-        int fixedWidthInDp = 500;
+        int fixedWidthInDp = 250;
         int fixedWidthInPx = (int) TypedValue.applyDimension(
                 TypedValue.COMPLEX_UNIT_DIP,
                 fixedWidthInDp,

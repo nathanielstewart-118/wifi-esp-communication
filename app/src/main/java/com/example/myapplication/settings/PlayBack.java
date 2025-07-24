@@ -209,13 +209,10 @@ public class PlayBack extends Fragment {
         new Thread(() -> {
             long startTime = monitoringDao.getFirstTimestamp();
             lastTimestamp = startTime;
-            while (isPlaying) {
                 List<Monitoring> batch = monitoringDao.getRecordsAfter(lastTimestamp, currentVisualization.getBufferSize() * currentVisualization.getBufferSize());
-                if (batch.isEmpty()) break;
-
+                if (batch.isEmpty()) return;
                 for(Monitoring m: batch) {
                     if(!isPlaying) break;
-
                     long waitTime = m.getCreated_at() - lastTimestamp;
                     lastTimestamp = m.getCreated_at();
                     Map<Long, Object> parsed = PacketParser.parse(rangeDTOs, CommonUtils.fromStringToByteArray(m.getData()));
@@ -226,23 +223,16 @@ public class PlayBack extends Fragment {
                             @Override
                             public void run() {
                                 updateChartWithData(scatterChart, values, rangeDTO.getSensorActuatorId());
-//                                try {
-//                                    Thread.sleep(200);
-//                                } catch (InterruptedException e) {
-//                                    throw new RuntimeException(e);
-//                                }
-                                handler.postDelayed(this, waitTime);
                             }
                         };
-
                         handler.post(updater);
-
                     }
-
-
+                    try {
+                        Thread.sleep(waitTime);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
-
-            }
         }).start();
     }
 

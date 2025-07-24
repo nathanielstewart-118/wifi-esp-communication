@@ -115,6 +115,10 @@ public class WiFiSetting extends Fragment {
             handleClickSearch();
         });
 
+
+        mainActivity.connectToESP();
+
+
         wifiConnectBtn = view.findViewById(R.id.wifi_connect_btn);
         autoConnectCheckBox = view.findViewById(R.id.wifi_auto_connect_checkbox);
 

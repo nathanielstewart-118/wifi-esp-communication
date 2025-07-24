@@ -137,5 +137,9 @@
     <string name="are_you_sure_you_want_to_save_this_data">Are you sure you want to save this data?</string>
     <string name="can_t_find_the_corresponding_experiment_data">Can\'t find the corresponding Experiment Data</string>
     <string name="loaded_experiment_data_successfully">Loaded Experiment Data successfully!</string>
+    <string name="no_records_found">No records found</string>
+    <string name="record_loaded_successfully">Record loaded successfully.</string>
+    <string name="you_need_to_save_the_visualization_setting_first_before_completing">You need to save the visualization setting first before completing</string>
+    <string name="enter_visualization_setting_title">Enter Visualization Setting Title</string>
 
 </resources>

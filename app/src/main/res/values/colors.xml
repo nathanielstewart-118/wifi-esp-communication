@@ -18,7 +18,7 @@
     <color name="bs_light">#f8f9fa</color>
     <color name="bs_dark">#212529</color>
     <color name="tr_light">#f8f9fa</color> <!-- Bootstrap's table-light -->
-
+    <color name="transparent">#00000000</color>
     <!-- Selected Row Backgrounds -->
     <color name="tr_primary">#0d6efd</color> <!-- Bootstrap's primary -->
     <color name="tr_success">#198754</color> <!-- Bootstrap's success -->

@@ -34,9 +34,12 @@ public interface SensorActuatorDao {
 
 
     @Query("SELECT * FROM sensors_and_actuators WHERE id = :id")
-    LiveData<SensorActuator> getSensorActuatorById(int id);
+    SensorActuator getSensorActuatorById(Long id);
 
     @Query("INSERT into sensors_and_actuators('variable_name', 'data_type', 'number_of_channels', 'monitoring', 'real_time_control') values('a', 'uint8', 3, 0, 0)")
     void insertByRaw();
+
+    @Query("SELECT * FROM sensors_and_actuators WHERE id IN (:ids)")
+    List<SensorActuator> getByIds(List<Long> ids);
 
 }

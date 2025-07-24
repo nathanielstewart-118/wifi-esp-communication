@@ -145,6 +145,8 @@ public class WiFiSocketManager {
         }).start();
     }
 
+
+
     public boolean isTCPConnected() {
         return tcpSocket != null && tcpSocket.isConnected() && !tcpSocket.isClosed();
     }

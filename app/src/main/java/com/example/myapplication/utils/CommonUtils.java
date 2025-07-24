@@ -1,5 +1,8 @@
 package com.example.myapplication.utils;
 
+import java.nio.ByteBuffer;
+import java.util.Random;
+
 public class CommonUtils {
 
     public static int getNumberOfBytesFromDataTypeString(String type) {
@@ -20,5 +23,20 @@ public class CommonUtils {
             default:
                 return 0;
         }
+    }
+
+    public static float generateRandomValueInInterval(Float a, Float b) {
+        Random random = new Random();
+        return a + random.nextFloat() * (b - a);
+    }
+
+    public static byte[] fromStringToByteArray(String input) {
+        input = input.replaceAll("\\[|\\]|\\s", ""); // Remove [ ] and spaces
+        String[] byteValues = input.split(",");
+        byte[] bytes = new byte[byteValues.length];
+        for (int i = 0; i < byteValues.length; i++) {
+            bytes[i] = Byte.parseByte(byteValues[i]);
+        }
+        return bytes;
     }
 }

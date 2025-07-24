@@ -1,6 +1,8 @@
 package com.example.myapplication.db.viewmodel;
 
 import android.app.Application;
+import android.os.Handler;
+import android.os.Looper;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -14,6 +16,7 @@ import com.example.myapplication.db.dao.SensorActuatorDao;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.function.Consumer;
 
 public class SensorActuatorViewModel extends AndroidViewModel {
     private final SensorActuatorDao sensorActuatorDao;
@@ -77,6 +80,15 @@ public class SensorActuatorViewModel extends AndroidViewModel {
 
     public LiveData<Integer> getDeleteResult() {
         return deleteResult;
+    }
+
+    public void getById(Long id, Consumer<SensorActuator> callback) {
+        executorService.execute(() -> {
+            SensorActuator sensorActuator = sensorActuatorDao.getSensorActuatorById(id);
+            new Handler(Looper.getMainLooper()).post(() -> {
+                callback.accept(sensorActuator);
+            });
+        });
     }
 
 }

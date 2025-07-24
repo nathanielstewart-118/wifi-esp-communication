@@ -4,6 +4,10 @@
         <item name="android:backgroundTint">?attr/colorPrimary</item>
         <item name="android:padding">8dp</item>
         <item name="android:textColor">?android:textColorPrimary</item>
-        <item name="android:popupBackground">?attr/colorSurface</item>
     </style>
+
+    <style name="AppTheme.Launcher" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowBackground">@drawable/splash_background</item>
+    </style>
+
 </resources>

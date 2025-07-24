@@ -2,7 +2,6 @@ package com.example.myapplication; // Replace with your package name
 
 import androidx.fragment.app.Fragment;
 
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
@@ -29,7 +28,7 @@ import com.example.myapplication.settings.ESPRXRTSetting;
 import com.example.myapplication.settings.ESPTXSetting;
 import com.example.myapplication.settings.ExperimentSetting;
 import com.example.myapplication.settings.MonitoringSetting;
-import com.example.myapplication.settings.ReproductionSetting;
+import com.example.myapplication.settings.PlayBack;
 import com.example.myapplication.settings.SensorSetting;
 import com.example.myapplication.settings.VisualizationSetting;
 import com.example.myapplication.settings.WiFiSetting;
@@ -40,7 +39,6 @@ import com.example.myapplication.utils.communications.WiFiSocketManager;
 import com.google.android.material.navigation.NavigationView;
 import com.google.gson.Gson;
 
-import java.net.SocketException;
 import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity {
@@ -121,7 +119,7 @@ public class MainActivity extends AppCompatActivity {
                 } else if (id == R.id.monitoring_menu_item) {
                     selectedFragment = new MonitoringSetting();
                 } else if (id == R.id.reproduction_menu_item) {
-                    selectedFragment = new ReproductionSetting();
+                    selectedFragment = new PlayBack();
                 } else if (id == R.id.esp_tx_menu_item) {
                     selectedFragment = new ESPTXSetting();
                 } else if (id == R.id.esp_rxrt_menu_item) {

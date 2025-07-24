@@ -2,6 +2,8 @@ package com.example.myapplication.settings;
 
 import static com.example.myapplication.utils.CommonUtils.getNumberOfBytesFromDataTypeString;
 
+import static java.lang.Float.NaN;
+
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -27,6 +29,7 @@ import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.myapplication.MainActivity;
 import com.example.myapplication.R;
 import com.example.myapplication.db.entity.SensorActuator;
 import com.example.myapplication.db.entity.Visualization;
@@ -35,7 +38,9 @@ import com.example.myapplication.db.viewmodel.SensorActuatorViewModel;
 import com.example.myapplication.db.viewmodel.VisualizationViewModel;
 import com.example.myapplication.utils.Constants;
 import com.example.myapplication.utils.LogHelper;
+import com.google.gson.Gson;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -62,11 +67,15 @@ public class VisualizationSetting extends Fragment {
 
     private SensorActuatorViewModel sensorActuatorViewModel;
     private VisualizationViewModel  visualizationViewModel;
-
+    private MainActivity mainActivity;
     private List<Visualization> visualizations = new ArrayList<>();
-    private Visualization currentVisualization = new Visualization(0F, 0, 0, new ArrayList<>(), 0, "");
+    private Visualization currentVisualization = new Visualization("", 0, 0, 0, new ArrayList<>(), 0, "", 0, System.currentTimeMillis());
     private List<SensorActuator> sensorActuators = new ArrayList<>();
     private List<VisualizationRange> sensorActuatorsToDisplay = new ArrayList<>();
+
+    private final Gson gson = new Gson();
+
+
     public VisualizationSetting() {
 
     }
@@ -74,7 +83,9 @@ public class VisualizationSetting extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_visualization, container, false);
+        mainActivity = (MainActivity) getActivity();
         idAutocomplete = (AutoCompleteTextView) view.findViewById(R.id.visualization_id_autocomplete);
+
         saveBtn = view.findViewById(R.id.visualization_save_btn);
         loadBtn = view.findViewById(R.id.visualization_load_btn);
         loadSensorActuatorBtn = view.findViewById(R.id.visualization_load_sensor_actuator_btn);
@@ -116,10 +127,27 @@ public class VisualizationSetting extends Fragment {
                     android.R.layout.simple_dropdown_item_1line,
                     candidates
             );
-
             idAutocomplete.setAdapter(adapter);
         });
 
+        // in order to update the block size ms unit and buffer size sec unit notation
+        sampleRateEdit.setOnFocusChangeListener((v, hasFocus) -> {
+            if(!hasFocus) {
+                handleFocusChangeOnSettings();
+            }
+        });
+
+        blockSizeEdit.setOnFocusChangeListener((v, hasFocus) -> {
+            if(!hasFocus) {
+                handleFocusChangeOnSettings();
+            }
+        });
+
+        bufferSizeEdit.setOnFocusChangeListener((v, hasFocus) -> {
+            if(!hasFocus) {
+                handleFocusChangeOnSettings();
+            }
+        });
 
         return view;
     }
@@ -127,10 +155,11 @@ public class VisualizationSetting extends Fragment {
     public void handleClickSaveBtn() {
         String visualizationId = idAutocomplete.getText().toString().trim();
         visualizationViewModel.getByVisualizationId(visualizationId, results -> {
-            if (!results.isEmpty()) {
+            // if it's already saved
+            if (!results.isEmpty()) {   // set id for update
                 currentVisualization.setId(results.get(0).getId());
             }
-            else {
+            else {  // set id null for insertion
                 currentVisualization.setId(null);
             }
 
@@ -146,10 +175,16 @@ public class VisualizationSetting extends Fragment {
                 currentVisualization.setSaveFormat(selectedSaveFormatIndex);
             }
             currentVisualization.setVisualizationId(visualizationId);
-            currentVisualization.setSampleRate(Float.parseFloat(sampleRate));
-            currentVisualization.setBlockSize(Integer.parseInt(blockSize));
-            currentVisualization.setBufferSize(Integer.parseInt(bufferSize));
+            try {
+                currentVisualization.setSampleRate(Integer.parseInt(sampleRate));
+                currentVisualization.setBlockSize(Integer.parseInt(blockSize));
+                currentVisualization.setBufferSize(Integer.parseInt(bufferSize));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             currentVisualization.setSavePath(savePath);
+
+            // get ranges value from the ranges table
             int rowCnt = rangeTable.getChildCount();
             List<VisualizationRange> cRanges = new ArrayList<>();
             for (int i = 1; i < rowCnt; i ++) {
@@ -171,9 +206,15 @@ public class VisualizationSetting extends Fragment {
                         range.setVisualizationType(selectedRadioIndex);
                     }
                     EditText upperLimitEdit = (EditText) row.getChildAt(7);
-                    range.setUpperLimit(Long.parseLong(upperLimitEdit.getText().toString()));
+                    String upperLimitString = upperLimitEdit.getText().toString().trim();
                     EditText lowerLimitEdit = (EditText) row.getChildAt(8);
-                    range.setLowerLimit(Long.parseLong(lowerLimitEdit.getText().toString()));
+                    String lowerLimitString = lowerLimitEdit.getText().toString().trim();
+                    try {
+                        range.setUpperLimit(Long.parseLong(upperLimitEdit.getText().toString()));
+                        range.setLowerLimit(Long.parseLong(lowerLimitEdit.getText().toString()));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                     cRanges.add(range);
                 }
 
@@ -219,6 +260,16 @@ public class VisualizationSetting extends Fragment {
                                 Constants.LOGGING_BEARER_TOKEN
                         );
                         Log.d("Visualization insertion", "Visualization insert success");
+                        sensorActuatorsToDisplay = sensorActuatorsToDisplay
+                            .stream()
+                            .filter(sa -> {
+                                List<VisualizationRange> filtered = currentVisualization.getRanges()
+                                    .stream()
+                                    .filter(r -> Objects.equals(r.getSensorActuatorId(), sa.getSensorActuatorId()))
+                                    .collect(Collectors.toList());
+                                return filtered.isEmpty();
+                            })
+                            .collect(Collectors.toList());
 
                     }
                     else {
@@ -240,11 +291,17 @@ public class VisualizationSetting extends Fragment {
 
     }
 
+    /*
+     *  handler function for "Load" button click event
+     *
+     */
     public void handleClickLoadBtn() {
         String visualizationId = idAutocomplete.getText().toString();
         visualizationViewModel.getByVisualizationId(visualizationId, results -> {
             if (results.isEmpty()) {
-                Toast.makeText(requireContext(), "No records found", Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), R.string.no_records_found, Toast.LENGTH_SHORT).show();
+                initUIs(visualizationId);
+                currentVisualization = new Visualization("", 0, 0, 0, new ArrayList<>(), 0, "", 0, System.currentTimeMillis());
                 LogHelper.sendLog(
                     Constants.LOGGING_BASE_URL,
                     Constants.LOGGING_REQUEST_METHOD,
@@ -256,7 +313,7 @@ public class VisualizationSetting extends Fragment {
             else {
                 currentVisualization.copyFrom(results.get(0));
                 initUisWithData(results.get(0));
-                Toast.makeText(requireContext(), "Record loaded successfully.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), R.string.record_loaded_successfully, Toast.LENGTH_SHORT).show();
                 LogHelper.sendLog(
                     Constants.LOGGING_BASE_URL,
                     Constants.LOGGING_REQUEST_METHOD,
@@ -268,36 +325,59 @@ public class VisualizationSetting extends Fragment {
         });
     }
 
+    /*
+     * handler function for "Import Sensor Actuator Data" button click event
+     */
     public void handleClickLoadSensorActuator() {
-        List<VisualizationRange> target = new ArrayList<>();
-        target.addAll(currentVisualization.getRanges());
-        target.addAll(sensorActuatorsToDisplay);
-        for (SensorActuator sa: sensorActuators) {
-            List<VisualizationRange> filtered = target.stream()
-                    .filter(v -> Objects.equals(v.getSensorActuatorId(), sa.getId()))
-                    .collect(Collectors.toList());
-            if(filtered.isEmpty()) {
-                sensorActuatorsToDisplay.add(new VisualizationRange(sa.getId(), -1, 0, 0F, 0F, 0L, 0L));
-            }
-        }
+//        for (SensorActuator sa: sensorActuators) {
+//            sensorActuatorsToDisplay.add(new VisualizationRange(sa.getId(), -1, 0, 0F, 0F, 0L, 0L));
+//        }
         displayRangesTable();
 
     }
 
+    /*
+     * handler function for "Setup Complete" button click handler
+     */
     public void handleClickSetupComplete() {
-
+        if(currentVisualization.getId() == null) {
+            Toast.makeText(requireContext(), R.string.you_need_to_save_the_visualization_setting_first_before_completing, Toast.LENGTH_SHORT).show();
+            return;
+        }
+        visualizationViewModel.setActivated(currentVisualization.getId(), result -> {
+            Toast.makeText(requireContext(), "Setup successfully completed", Toast.LENGTH_SHORT).show();
+        });
+        List<SensorActuator> targets = new ArrayList<>();
+        for (VisualizationRange r: currentVisualization.getRanges()) {
+        }
+        mainActivity.sendTCP(gson.toJson(currentVisualization.getRanges()).getBytes(StandardCharsets.UTF_8));
     }
 
+    /*
+     * display ranges table from the previously saved data
+     */
     public void displayRangesTable() {
         rangeTable.removeViews(1, rangeTable.getChildCount() - 1);
-        List<VisualizationRange> rangesToDisplay = new ArrayList<>();
-        rangesToDisplay.addAll(currentVisualization.getRanges());
-        rangesToDisplay.addAll(sensorActuatorsToDisplay);
+        List<VisualizationRange> rangesToDisplay = new ArrayList<>(currentVisualization.getRanges());
+        for (SensorActuator sa: sensorActuators) {
+            List<VisualizationRange> filtered = rangesToDisplay
+                .stream()
+                .filter(rtd -> Objects.equals(rtd.getSensorActuatorId(), sa.getId()))
+                .collect(Collectors.toList());
+            if(filtered.isEmpty()) rangesToDisplay.add(new VisualizationRange(sa.getId(), -1, 0, 0F, 0F, 0L, 0L));
+        }
         for (int i = 0; i < rangesToDisplay.size(); i ++) {
             addDisplayRangeTableRow(rangesToDisplay.get(i), i + 1);
         }
     }
 
+    /*
+     * add a row with range data to the range table
+     * @params:
+     *      VisualizationRange range: for data display
+     *      int index: row index in the range table
+     * @return
+     */
     public void addDisplayRangeTableRow(VisualizationRange range, int index) {
         List<SensorActuator> sas = sensorActuators.stream()
                 .filter(s -> Objects.equals(s.getId(), range.getSensorActuatorId()))
@@ -305,7 +385,7 @@ public class VisualizationSetting extends Fragment {
         SensorActuator s = null;
         if(!sas.isEmpty()) s = sas.get(0);
 
-        int fixedWidthInDp = 300;
+        int fixedWidthInDp = 500;
         int fixedWidthInPx = (int) TypedValue.applyDimension(
                 TypedValue.COMPLEX_UNIT_DIP,
                 fixedWidthInDp,
@@ -341,16 +421,15 @@ public class VisualizationSetting extends Fragment {
 
         RadioButton disabledRadio = new RadioButton(requireContext());
         disabledRadio.setText("Disabled");
-
+        visualizationRadioGroup.addView(graphRadio);
+        visualizationRadioGroup.addView(tableRadio);
+        visualizationRadioGroup.addView(disabledRadio);
         Integer visualizationType = range.getVisualizationType();
         if (visualizationType != null && visualizationType >= 0 && visualizationType < visualizationRadioGroup.getChildCount() ) {
             RadioButton button = (RadioButton) visualizationRadioGroup.getChildAt(visualizationType);
             button.setChecked(true);
         }
 
-        visualizationRadioGroup.addView(graphRadio);
-        visualizationRadioGroup.addView(tableRadio);
-        visualizationRadioGroup.addView(disabledRadio);
         visualizationRadioGroup.setOrientation(LinearLayout.HORIZONTAL);
         visualizationRadioGroup.setLayoutParams(params);
         Spinner yRangeSpinner = new Spinner(requireContext());
@@ -371,6 +450,8 @@ public class VisualizationSetting extends Fragment {
         EditText lowerLimitEdit = new EditText(requireContext());
         if(range.getLowerLimit() != null && range.getLowerLimit() > 0) lowerLimitEdit.setText(String.valueOf(range.getLowerLimit()));
 
+        handleFocusChangeOnSettings();
+
         row.addView(orderView);
         row.addView(variableNameView);
         row.addView(dataTypeView);
@@ -382,7 +463,13 @@ public class VisualizationSetting extends Fragment {
         row.addView(lowerLimitEdit);
         rangeTable.addView(row);
     }
-
+    /*
+     * initialize all input elements with empty string except id autcomplete with id
+     * @params
+     *      String id: visualization id string to fill the autocomplete
+     * @return
+     *      void
+     */
     public void initUIs(String id) {
         idAutocomplete.setText(id);
         sampleRateEdit.setText("");
@@ -394,6 +481,13 @@ public class VisualizationSetting extends Fragment {
         if (cnt > 1) rangeTable.removeViews(1, cnt - 1);
     }
 
+    /*
+     * initialize all input elements with visualization data
+     * @params
+     *      Visualization data: data to display in the input uis
+     * @return
+     *      void
+     */
     public void initUisWithData(Visualization data) {
         idAutocomplete.setText(data.getVisualizationId());
         sampleRateEdit.setText(String.valueOf(data.getSampleRate()));
@@ -408,5 +502,24 @@ public class VisualizationSetting extends Fragment {
             RadioButton button = (RadioButton) saveFormatRadio.getChildAt(saveFormat);
             button.setChecked(true);
         }
+    }
+
+    /*
+     * handler function to caculate the block size ms and buffer size sec when inputing sample rate, block size, buffer size
+     */
+    public void handleFocusChangeOnSettings() {
+        try {
+            Integer sampleRate = Integer.parseInt(sampleRateEdit.getText().toString().trim());
+            Integer blockSize = Integer.parseInt(blockSizeEdit.getText().toString().trim());
+            Integer bufferSize = Integer.parseInt(bufferSizeEdit.getText().toString().trim());
+            if (sampleRate == null || blockSize == null || bufferSize == null) return;
+            Float msUnit = 1000F / sampleRate * blockSize;
+            Float secUnit = (float) (bufferSize * blockSize) / sampleRate;
+            msUnitEdit.setText(msUnit.isNaN()? "" : String.format("%.2f", msUnit));
+            secUnitEdit.setText(secUnit.isNaN() ? "" : String.format("%.2f", secUnit));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 }

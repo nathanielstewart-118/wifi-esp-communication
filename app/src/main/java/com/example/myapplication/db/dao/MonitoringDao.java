@@ -29,4 +29,11 @@ public interface MonitoringDao {
     @Query("SELECT * FROM monitorings WHERE id = :id")
     Monitoring getMonitoringById(Long id);
 
+    @Query("SELECT * FROM monitorings WHERE created_at > :afterTimestamp ORDER BY created_at ASC LIMIT :limit")
+    List<Monitoring> getRecordsAfter(long afterTimestamp, int limit);
+
+    @Query("SELECT MIN(created_at) FROM monitorings")
+    long getFirstTimestamp();
+
+
 }

@@ -1,9 +1,15 @@
 package com.example.myapplication.utils.communications;
 
 import com.example.myapplication.db.entity.ESPReceiveData;
+import com.example.myapplication.db.entity.RangeDTO;
+import com.example.myapplication.db.entity.SensorActuator;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 public class PacketParser {
 
@@ -31,7 +37,6 @@ public class PacketParser {
 
         return result;
     }
-
 
     private static String bytesToHex(byte[] bytes) {
         StringBuilder sb = new StringBuilder();
@@ -65,6 +70,72 @@ public class PacketParser {
 
         return buffer.array();
     }
+
+    public static Map<Long, Object> parse(List<RangeDTO> variables, byte[] data) {
+        Map<Long, Object> result = new LinkedHashMap<>();
+        ByteBuffer buffer = ByteBuffer.wrap(data).order(ByteOrder.LITTLE_ENDIAN);
+        try {
+            for (RangeDTO var : variables) {
+                List<Object> values = new ArrayList<>();
+
+                for (int i = 0; i < var.getNumberOfChannels(); i++) {
+                    switch (var.getDataType()) {
+                        case "uint8":
+                            values.add(Byte.toUnsignedInt(buffer.get()));
+                            break;
+                        case "int8":
+                            values.add(buffer.get());
+                            break;
+                        case "uint16":
+                            values.add(Short.toUnsignedInt(buffer.getShort()));
+                            break;
+                        case "int16":
+                            values.add(buffer.getShort());
+                            break;
+                        case "uint24":
+                            values.add(toUnsigned24(buffer));
+                            break;
+                        case "int24":
+                            values.add(toSigned24(buffer));
+                            break;
+                        case "uint32":
+                            values.add(Integer.toUnsignedLong(buffer.getInt()));
+                            break;
+                        case "int32":
+                            values.add(buffer.getInt());
+                            break;
+                        case "float":
+                            values.add(buffer.getFloat());
+                            break;
+                        case "double":
+                            values.add(buffer.getDouble());
+                            break;
+                        default:
+                            throw new IllegalArgumentException("Unknown type: " + var.getDataType());
+                    }
+                }
+                result.put(var.getSensorActuatorId(), values);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+    private static int toUnsigned24(ByteBuffer buffer) {
+        int b1 = Byte.toUnsignedInt(buffer.get());
+        int b2 = Byte.toUnsignedInt(buffer.get());
+        int b3 = Byte.toUnsignedInt(buffer.get());
+        return (b3 << 16) | (b2 << 8) | b1;
+    }
+
+    private static int toSigned24(ByteBuffer buffer) {
+        int b1 = Byte.toUnsignedInt(buffer.get());
+        int b2 = Byte.toUnsignedInt(buffer.get());
+        int b3 = buffer.get(); // signed high byte
+        return (b3 << 16) | (b2 << 8) | b1;
+    }
+
 
 }
 

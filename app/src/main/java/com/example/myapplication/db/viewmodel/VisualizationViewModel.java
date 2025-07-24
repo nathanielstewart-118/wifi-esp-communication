@@ -10,17 +10,23 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.myapplication.db.AppDatabase;
+import com.example.myapplication.db.dao.SensorActuatorDao;
 import com.example.myapplication.db.dao.VisualizationDao;
+import com.example.myapplication.db.entity.RangeDTO;
+import com.example.myapplication.db.entity.SensorActuator;
 import com.example.myapplication.db.entity.Visualization;
+import com.example.myapplication.db.entity.VisualizationRange;
 
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 public class VisualizationViewModel extends AndroidViewModel {
     private final VisualizationDao visualizationDao;
     private final ExecutorService executorService;
+    private final SensorActuatorDao sensorActuatorDao;
 
     private final MutableLiveData<Long> insertResult = new MutableLiveData<>();
     private final MutableLiveData<Integer> updateResult = new MutableLiveData<>();
@@ -30,6 +36,7 @@ public class VisualizationViewModel extends AndroidViewModel {
         super(application);
         AppDatabase db = AppDatabase.getInstance(application);
         this.visualizationDao = db.visualizationDao();
+        this.sensorActuatorDao = db.sensorActuatorDao();
         this.executorService = Executors.newSingleThreadExecutor();
     }
 
@@ -72,6 +79,43 @@ public class VisualizationViewModel extends AndroidViewModel {
     public void getByVisualizationId(String vId, Consumer<List<Visualization>> callback) {
         executorService.execute(() -> {
             List<Visualization> results = visualizationDao.getByVisualizationId(vId);
+            new Handler(Looper.getMainLooper()).post(() -> {
+               callback.accept(results);
+            });
+        });
+    }
+
+    public void getActivatedVisualization(Consumer<Visualization> callback) {
+        executorService.execute(() -> {
+           List<Visualization> results = visualizationDao.getActivatedVisualization();
+           new Handler(Looper.getMainLooper()).post(() -> {
+               Visualization visualization;
+               if (results.isEmpty()) visualization = null;
+               else visualization = results.get(0);
+               callback.accept(visualization);
+           });
+        });
+    }
+
+    public void setActivated(Long id, Consumer<Integer> callback) {
+        executorService.execute(() -> {
+            visualizationDao.setActivated(id);
+            new Handler(Looper.getMainLooper()).post(() -> {
+               callback.accept(1);
+            });
+        });
+    }
+
+    public void getCorrespondingSAs(Long id, Consumer<List<RangeDTO>> callback) {
+        executorService.execute(() -> {
+            Visualization v = visualizationDao.getVisualizationById(id);
+            List<RangeDTO> results = v.getRanges()
+                .stream()
+                .map(r -> {
+                    SensorActuator s = sensorActuatorDao.getSensorActuatorById(r.getSensorActuatorId());
+                    return new RangeDTO(id, s.getId(), s.getVariableName(), s.getDataType(), s.getNumberOfChannels(), r.getVisualizationType(), r.getyAxisRange(), r.getUpperLimit(), r.getLowerLimit());
+                })
+                .collect(Collectors.toList());
             new Handler(Looper.getMainLooper()).post(() -> {
                callback.accept(results);
             });

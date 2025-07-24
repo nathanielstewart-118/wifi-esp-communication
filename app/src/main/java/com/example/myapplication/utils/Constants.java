@@ -1,5 +1,7 @@
 package com.example.myapplication.utils;
 
+import android.graphics.Color;
+
 public class Constants {
 
     public static final String LOGGING_BASE_URL = "https://s1385328.eu-nbg-2.betterstackdata.com";
@@ -18,10 +20,17 @@ public class Constants {
     };
 
     public static final String[] VISUALIZATION_OPTIONS = { "Graph", "Table", "Disabled" };
-    public static final String tcpServerIp = "192.168.4.1";
-    public static final int tcpServerPort = 8080;
+//    public static final String tcpServerIp = "192.168.4.1";
+    public static final String tcpServerIp = "192.168.149.232";
+//    public static final int tcpServerPort = 8080;
+    public static final int tcpServerPort = 9999;
     public static final int udpLocalPort = 9999;
     public static final int udpPort = 10001;
     public static final String[] LANGUAGES = { "en", "cn", "fr", "de" };
+    public static final Integer MAX_VARIABLE_NUMBER_IN_PACKET = 100;
+    public static final int[] COLORS = {
+            Color.RED, Color.BLUE, Color.GREEN, Color.MAGENTA,
+            Color.CYAN, Color.YELLOW, Color.GRAY, Color.BLACK
+    };
 
 }

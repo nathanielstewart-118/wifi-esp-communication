@@ -11,6 +11,9 @@ public class Monitoring {
     @PrimaryKey(autoGenerate = true)
     private Long id;
 
+    @ColumnInfo(name="visualization_id")
+    private Long visualizationId;
+
     @ColumnInfo(name="data")
     private String data;
 
@@ -20,9 +23,10 @@ public class Monitoring {
     @ColumnInfo(name="updated_at")
     private Long updated_at;
 
-    public Monitoring(String data, Long created_at) {
+    public Monitoring(String data, Long visualizationId, Long created_at) {
         this.data = data;
         this.created_at = created_at;
+        this.visualizationId = visualizationId;
     }
 
     public Long getId() {
@@ -31,6 +35,14 @@ public class Monitoring {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Long getVisualizationId() {
+        return visualizationId;
+    }
+
+    public void setVisualizationId(Long visualizationId) {
+        this.visualizationId = visualizationId;
     }
 
     public String getData() {

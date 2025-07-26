@@ -12,24 +12,6 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:orientation="horizontal">
-        <TextView
-            android:id="@+id/headerText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/wifi_setting_screen_title"
-            android:textSize="24sp"
-            android:textColor="@android:color/black"
-            android:gravity="center"
-            android:padding="16dp"
-            android:textStyle="bold"/>
-    </LinearLayout>
-
-    <LinearLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:orientation="horizontal">
 
         <Button
             android:layout_width="wrap_content"
@@ -37,13 +19,16 @@
             android:backgroundTint="@color/bs_primary"
             android:id="@+id/wifi_search_btn"
             android:layout_margin="16dp"
+            android:background="@drawable/ripple_primary_button"
+            android:textColor="@color/basic_button_text_color"
             android:text="Search" />
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:backgroundTint="@color/bs_success"
+            android:background="@drawable/ripple_success_button"
             android:id="@+id/wifi_connect_btn"
+            android:textColor="@color/basic_button_text_color"
             android:layout_margin="16dp"
             android:text="Connect" />
         <CheckBox
@@ -68,16 +53,18 @@
 
         <ScrollView
             android:layout_width="wrap_content"
+            android:padding="16dp"
             android:layout_height="match_parent">
         <TableLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:stretchColumns="*"
             android:id="@+id/wifi_list_tb"
-            android:padding="16dp">
+            android:background="@drawable/table_border"
+            >
 
             <!-- Table Header -->
-            <TableRow android:background="?attr/colorPrimary">
+            <TableRow android:background="@color/bs_primary">
                 <TextView
                     android:text="@string/wifi_th_network_name"
                     android:textColor="@android:color/white"
@@ -107,7 +94,19 @@
                     android:padding="8dp"
                     android:textStyle="bold"/>
             </TableRow>
-
+            <TableRow
+                android:background="@drawable/table_border">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_span="5"
+                    android:text="⚠️ There is no wifi available networks now."
+                    android:textColor="@android:color/black"
+                    android:gravity="center"
+                    android:padding="16dp"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+            </TableRow>
             <!-- Table Row -->
 
             <!-- Add more rows as needed -->

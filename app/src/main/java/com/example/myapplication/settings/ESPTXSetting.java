@@ -24,6 +24,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -36,6 +37,7 @@ import com.example.myapplication.db.entity.ESPTXOutlier;
 import com.example.myapplication.db.entity.SensorActuator;
 import com.example.myapplication.db.viewmodel.ESPTXViewModel;
 import com.example.myapplication.db.viewmodel.SensorActuatorViewModel;
+import com.example.myapplication.utils.Constants;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
@@ -67,7 +69,7 @@ public class ESPTXSetting extends Fragment {
     List<SensorActuator> sensorsAndActuators = new ArrayList<>();
     List<ESPTX> sensorActuatorsToDisplay = new ArrayList<>();
     List<ESPTX> esptxesAndSensorsAndActuators = new ArrayList<>() ;
-    ESPTX currentESPTX = new ESPTX((long)-1, null, 0, (long) 0, (long) 0);
+    ESPTX currentESPTX = new ESPTX((long)-1, null, 0, 0L, 0L);
     private final Gson gson = new Gson();
 
     public ESPTXSetting() {
@@ -77,6 +79,7 @@ public class ESPTXSetting extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_esp_tx, container, false);
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(Constants.TITLES[4]);
         espTXListTable = (TableLayout) view.findViewById(R.id.esp_tx_list_tb);
         espTXViewModel = new ViewModelProvider(
                 requireActivity()
@@ -145,17 +148,17 @@ public class ESPTXSetting extends Fragment {
 
 
         tcpBtn = (Button) view.findViewById(R.id.esp_tx_tcp_btn);
+        tcpBtn.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.ripple_white_button));
         udpBtn = (Button) view.findViewById(R.id.esp_tx_udp_btn);
-        tcpBtn.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.tr_active));
 
         tcpBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                tcpBtn.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.tr_active));
-                tcpBtn.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.rounded_button));
-                udpBtn.setBackgroundColor(Color.TRANSPARENT);
-                udpBtn.setBackgroundTintList(null);
-                udpBtn.setBackgroundColor(Color.TRANSPARENT);
+                tcpBtn.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.ripple_white_button));
+                tcpBtn.setTextColor(ContextCompat.getColor(requireContext(), R.color.bs_primary));
+                udpBtn.setBackground(null);
+                udpBtn.setTextColor(ContextCompat.getColor(requireContext(), R.color.white));
+
 
             }
         });
@@ -163,12 +166,10 @@ public class ESPTXSetting extends Fragment {
         udpBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                udpBtn.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.tr_active));
-                udpBtn.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.rounded_button));
-                tcpBtn.setBackgroundColor(Color.TRANSPARENT);
-                tcpBtn.setBackgroundTintList(null);
-                tcpBtn.setBackgroundColor(Color.TRANSPARENT);
-
+                udpBtn.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.ripple_white_button));
+                udpBtn.setTextColor(ContextCompat.getColor(requireContext(), R.color.bs_primary));
+                tcpBtn.setBackground(null);
+                tcpBtn.setTextColor(ContextCompat.getColor(requireContext(), R.color.white));
             }
         });
         return view;
@@ -243,11 +244,12 @@ public class ESPTXSetting extends Fragment {
 
     }
     public void displayESPTXTable() {
-        espTXListTable.removeViews(1, espTXListTable.getChildCount() - 1);
         List<ESPTX> wholeData = new ArrayList<>();
         wholeData.addAll(esptxes);
         wholeData.addAll(sensorActuatorsToDisplay);
         int cnt = wholeData.size();
+        if (cnt == 0) return;
+        espTXListTable.removeViews(1, espTXListTable.getChildCount() - 1);
         for (int i = 0; i < cnt; i ++) {
             ESPTX esptx = wholeData.get(i);
             if (esptx.getDeleted() == 0) {

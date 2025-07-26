@@ -4,13 +4,13 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="drawer_open">Open drawer</string>
     <string name="drawer_close">Close drawer</string>
-    <string name="wifi"> WIFI </string>
-    <string name="sensor"> Sensor </string>
-    <string name="actuator"> Actuator </string>
-    <string name="command"> Command </string>
-    <string name="experiment"> Experiment </string>
-    <string name="visualization"> Visualization </string>
-    <string name="monitoring"> Monitoring </string>
+    <string name="wifi"> » WIFI </string>
+    <string name="sensor"> » Sensor </string>
+    <string name="actuator"> » Actuator </string>
+    <string name="command"> » Command </string>
+    <string name="experiment"> » Experiment </string>
+    <string name="visualization"> » Visualization </string>
+    <string name="monitoring"> » Monitoring </string>
     <string name="reproduction"> Reproduction </string>
     <string name="wifi_th_network_name">Network Name</string>
     <string name="wifi_th_signal_strength">Signal Strength</string>
@@ -141,5 +141,19 @@
     <string name="record_loaded_successfully">Record loaded successfully.</string>
     <string name="you_need_to_save_the_visualization_setting_first_before_completing">You need to save the visualization setting first before completing</string>
     <string name="enter_visualization_setting_title">Enter Visualization Setting Title</string>
-
+    <string name="esp_tx">» ESP TX</string>
+    <string name="esp_rxrt">» ESP RXRT</string>
+    <string name="playback">» Playback</string>
+    <string name="enter_actuator_setting_title">Enter Actuator Setting Title</string>
+    <string name="enter_sensor_setting_title">Enter Sensor Setting Title</string>
+    <string name="please_enter_the_title_first">Please Enter The Title First!</string>
+    <string name="sensor_setting_saved_successfully">Sensor Setting Saved Successfully.</string>
+    <string name="unexpected_error_occurred_please_load_and_check">Unexpected error occurred. Please load and check.</string>
+    <string name="an_error_occurred_while_saving_please_load_and_check">An error occurred while saving. Please load and check.</string>
+    <string-array name="my_array_items">
+        <item>en</item>
+        <item>cn</item>
+        <item>fr</item>
+        <item>de</item>
+    </string-array>
 </resources>

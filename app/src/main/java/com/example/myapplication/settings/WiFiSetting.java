@@ -1,6 +1,7 @@
 package com.example.myapplication.settings;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
@@ -68,6 +69,7 @@ public class WiFiSetting extends Fragment {
         tableLayout.removeViews(1, tableLayout.getChildCount() - 1);
         for (int i = 0; i < this.wifiList.length; i++) {
             TableRow tableRow = new TableRow(requireContext());
+            tableRow.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.table_border));
             tableRow.setBackgroundResource(R.drawable.row_selector);
             tableRow.setTag(i + 1);
             for (int j = 0; j < this.wifiList[i].length; j++) {
@@ -106,6 +108,7 @@ public class WiFiSetting extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mainActivity = (MainActivity) getActivity();
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(Constants.TITLES[0]);
         View view = inflater.inflate(R.layout.fragment_wifi, container, false);
         wifiListTable = view.findViewById(R.id.wifi_list_tb);
         wifiHelper = new WiFiHelper(requireContext(), requireActivity());

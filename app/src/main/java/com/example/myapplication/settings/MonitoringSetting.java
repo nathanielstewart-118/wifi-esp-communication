@@ -2,6 +2,8 @@ package com.example.myapplication.settings;
 
 import static com.example.myapplication.utils.Constants.COLORS;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -95,6 +97,7 @@ public class MonitoringSetting extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_monitoring, container, false);
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(Constants.TITLES[8]);
         accordionContainer = view.findViewById(R.id.monitoring_accordion_container);
         receiveViewModel = new ViewModelProvider(requireActivity()).get(TCPUDPReceiveViewModel.class);
         receiveViewModel.getData().observe(getViewLifecycleOwner(), data -> {
@@ -253,15 +256,15 @@ public class MonitoringSetting extends Fragment {
             header.setTextSize(18);
             header.setTypeface(null, Typeface.BOLD);
             header.setPadding(24, 24, 24, 24);
-            header.setBackgroundColor(Color.parseColor("#CCCCCC"));
-            header.setTextColor(Color.BLACK);
+            header.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.bs_primary));
+
+            header.setTextColor(Color.WHITE);
 
             // Content container
             LinearLayout contentLayout = new LinearLayout(requireContext());
             contentLayout.setOrientation(LinearLayout.VERTICAL);
             contentLayout.setVisibility(View.GONE);
             contentLayout.setPadding(24, 24, 24, 24);
-            contentLayout.setBackgroundColor(Color.parseColor("#EEEEEE"));
             contentLayout.setLayoutParams(new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 500
@@ -318,7 +321,7 @@ public class MonitoringSetting extends Fragment {
             chartsMap.put(visualizationRange.getSensorActuatorId(), scatterChart);
             currentWindowStartMap.put(visualizationRange.getSensorActuatorId(), 0F);
             contentLayout.addView(scatterChart);
-
+            contentLayout.setVisibility(View.VISIBLE);
             // Save reference for updates
             accordionContentMap.put(result.getId(), contentLayout);
 
@@ -426,6 +429,7 @@ public class MonitoringSetting extends Fragment {
 //                    scatterChart.moveViewToAnimated(maxX, 0f, YAxis.AxisDependency.LEFT, 300);
 
     }
+
     private static double randomBetween(double low, double high) {
         Random random = new Random();
         return low + (high - low) * random.nextDouble();

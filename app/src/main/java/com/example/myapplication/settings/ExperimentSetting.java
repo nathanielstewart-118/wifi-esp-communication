@@ -3,6 +3,7 @@ package com.example.myapplication.settings;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -25,6 +26,7 @@ import com.example.myapplication.db.entity.Command;
 import com.example.myapplication.db.entity.Experiment;
 import com.example.myapplication.db.viewmodel.CommandViewModel;
 import com.example.myapplication.db.viewmodel.ExperimentViewModel;
+import com.example.myapplication.utils.Constants;
 import com.example.myapplication.utils.commonuis.MultiSelectDialog;
 
 import java.util.ArrayList;
@@ -71,6 +73,7 @@ public class ExperimentSetting extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_experiment, container, false);
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(Constants.TITLES[6]);
         idAutocomplete = (AutoCompleteTextView) view.findViewById(R.id.id_autocomplete);
         nTrialsEdit = view.findViewById(R.id.experiment_n_trials_text);
         nTrialsView = view.findViewById(R.id.experiment_n_trials_view);

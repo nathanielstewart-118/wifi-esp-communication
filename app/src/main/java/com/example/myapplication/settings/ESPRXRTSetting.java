@@ -26,6 +26,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -89,6 +90,7 @@ public class ESPRXRTSetting extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(Constants.TITLES[5]);
         View view = inflater.inflate(R.layout.fragment_esp_rxrt, container, false);
         espRXRTListTable = (TableLayout) view.findViewById(R.id.esp_rxrt_list_tb);
         addCustomBtn = (Button) view.findViewById(R.id.esp_rxrt_add_custom_btn);
@@ -97,8 +99,8 @@ public class ESPRXRTSetting extends Fragment {
         addCustomBtn = (Button) view.findViewById(R.id.esp_rxrt_add_custom_btn);
 
         tcpBtn = (Button) view.findViewById(R.id.esp_rxrt_tcp_btn);
+        tcpBtn.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.ripple_white_button));
         udpBtn = (Button) view.findViewById(R.id.esp_rxrt_udp_btn);
-        tcpBtn.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.tr_active));
 
         esprxrtViewModel = new ViewModelProvider( requireActivity()).get(ESPRXRTViewModel.class);
         esprxrtViewModel.getAllESPRXRTs().observe(getViewLifecycleOwner(), data -> {
@@ -160,24 +162,20 @@ public class ESPRXRTSetting extends Fragment {
         tcpBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                tcpBtn.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.tr_active));
-                tcpBtn.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.rounded_button));
-                udpBtn.setBackgroundColor(Color.TRANSPARENT);
-                udpBtn.setBackgroundTintList(null);
-                udpBtn.setBackgroundColor(Color.TRANSPARENT);
-
+                tcpBtn.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.ripple_white_button));
+                tcpBtn.setTextColor(ContextCompat.getColor(requireContext(), R.color.bs_primary));
+                udpBtn.setBackground(null);
+                udpBtn.setTextColor(ContextCompat.getColor(requireContext(), R.color.white));
             }
         });
 
         udpBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                udpBtn.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.tr_active));
-                udpBtn.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.rounded_button));
-                tcpBtn.setBackgroundColor(Color.TRANSPARENT);
-                tcpBtn.setBackgroundTintList(null);
-                tcpBtn.setBackgroundColor(Color.TRANSPARENT);
-
+                udpBtn.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.ripple_white_button));
+                udpBtn.setTextColor(ContextCompat.getColor(requireContext(), R.color.bs_primary));
+                tcpBtn.setBackground(null);
+                tcpBtn.setTextColor(ContextCompat.getColor(requireContext(), R.color.white));
             }
         });
 
@@ -220,11 +218,12 @@ public class ESPRXRTSetting extends Fragment {
     }
 
     public void displayESPRXRTTable() {
-        espRXRTListTable.removeViews(1, espRXRTListTable.getChildCount() - 1);
         List<ESPRXRT> wholeData = new ArrayList<>();
         wholeData.addAll(esprxrts);
         wholeData.addAll(sensorActuatorsToDisplay);
         int cnt = wholeData.size();
+        if (cnt == 0) return;
+        espRXRTListTable.removeViews(1, espRXRTListTable.getChildCount() - 1);
         int index = 1;
         for (int i = 0; i < cnt; i ++) {
             ESPRXRT esprxrt = wholeData.get(i);
@@ -241,7 +240,7 @@ public class ESPRXRTSetting extends Fragment {
                 80
         );
         TableRow tableRow = new TableRow(requireContext());
-
+        tableRow.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.table_border));
         TextView orderText = new TextView(requireContext());
         orderText.setText(String.valueOf(order));
         orderText.setGravity(Gravity.CENTER);
@@ -376,7 +375,7 @@ public class ESPRXRTSetting extends Fragment {
     public ESPRXRT initEmptyESPRXRT() {
         List<ESPRXRTThreshold> thresholds = new ArrayList<>();
         Long currentTime = System.currentTimeMillis();
-        ESPRXRT esprxrt = new ESPRXRT((long) -1, -1, "", "", -1, thresholds, -1, currentTime, currentTime);
+        ESPRXRT esprxrt = new ESPRXRT((long) -1, -1, "", "", -1, thresholds, -1, currentTime);
         return esprxrt;
     }
 
@@ -389,8 +388,8 @@ public class ESPRXRTSetting extends Fragment {
         esprxrt.setNumberOfChannels(sensorActuator.getNumberOfChannels());
         esprxrt.setDeleted(0);
         long currentTime = System.currentTimeMillis();
-        esprxrt.setCreated_at(currentTime);
-        esprxrt.setUpdated_at(currentTime);
+        esprxrt.setCreatedAt(currentTime);
+        esprxrt.setUpdatedAt(currentTime);
         return esprxrt;
     }
 

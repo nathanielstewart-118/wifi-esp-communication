@@ -11,6 +11,9 @@ public class SensorActuator {
     @PrimaryKey(autoGenerate = true)
     private Long id;
 
+    @ColumnInfo(name="title")
+    private String title;
+
     @ColumnInfo(name = "variable_name")
     private String variableName;
 
@@ -29,21 +32,38 @@ public class SensorActuator {
     @ColumnInfo(name = "real_time_control")
     private Integer realTimeControl;
 
-    public SensorActuator(String variableName, Integer sensorOrActuator, String dataType, Integer numberOfChannels, Integer monitoring, Integer realTimeControl) {
+    @ColumnInfo(name="created_at")
+    private Long createdAt;
+
+
+    public SensorActuator(String title, String variableName, Integer sensorOrActuator, String dataType, Integer numberOfChannels, Integer monitoring, Integer realTimeControl, Long createdAt) {
         this.variableName = variableName;
+        this.title = title;
         this.dataType = dataType;
         this.numberOfChannels = numberOfChannels;
         this.monitoring = monitoring;
         this.realTimeControl = realTimeControl;
         this.sensorOrActuator = sensorOrActuator;
+        this.createdAt = createdAt;
     }
 
+    public String getAutoCompleteText() {
+        return this.title;
+    }
     public Long getId() {
         return id;
     }
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public Integer getSensorOrActuator() {
@@ -92,5 +112,13 @@ public class SensorActuator {
 
     public void setRealTimeControl(Integer realTimeControl) {
         this.realTimeControl = realTimeControl;
+    }
+
+    public Long getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Long createdAt) {
+        this.createdAt = createdAt;
     }
 }

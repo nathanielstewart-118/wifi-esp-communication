@@ -25,18 +25,21 @@
                 <TextView
                     android:padding="16dp"
                     android:textStyle="bold"
+                    android:gravity="center"
                     android:textColor="@color/white"
                     android:text="@string/order_type">
                 </TextView>
                 <TextView
                     android:padding="16dp"
                     android:textStyle="bold"
+                    android:gravity="center"
                     android:textColor="@color/white"
                     android:text="@string/channel">
                 </TextView>
                 <TextView
                     android:padding="16dp"
                     android:textStyle="bold"
+                    android:gravity="center"
                     android:textColor="@color/white"
                     android:text="@string/threshold">
                 </TextView>
@@ -52,18 +55,20 @@
             <Button
                 android:id="@+id/command_threshold_save_btn"
                 android:layout_width="150dp"
-                android:backgroundTint="@color/bs_success"
+                android:background="@drawable/ripple_success_button"
                 android:layout_height="wrap_content"
                 android:layout_margin="16dp"
+                android:textColor="@color/basic_button_text_color"
                 android:text="@string/save_btn"
                 android:padding="8dp" />
             <Button
                 android:id="@+id/command_close_threshold_modal_btn"
                 android:layout_width="150dp"
-                android:backgroundTint="@color/bs_secondary"
+                android:background="@drawable/ripple_info_button"
                 android:layout_height="wrap_content"
                 android:layout_margin="16dp"
                 android:text="@string/cancel"
+                android:textColor="@color/basic_button_text_color"
                 android:padding="8dp" />
 
         </LinearLayout>

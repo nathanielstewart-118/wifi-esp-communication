@@ -138,7 +138,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         String[] lagnuages = new String[Constants.LANGUAGES.length + 1];
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_spinner_item, Constants.LANGUAGES);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getApplicationContext(), R.array.my_array_items, R.layout.language_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         languageSpinner.setAdapter((adapter));
         SharedPreferences prefs = getSharedPreferences("settings", MODE_PRIVATE);

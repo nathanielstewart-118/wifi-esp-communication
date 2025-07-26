@@ -23,12 +23,15 @@
             android:background="?attr/colorPrimary"
             android:layout_height="?attr/actionBarSize"
             android:orientation="horizontal"
+            android:paddingTop="10dp"
+            android:backgroundTint="@color/bs_primary"
             android:theme="@style/ThemeOverlay.Material3.Dark.ActionBar"
             app:popupTheme="@style/ThemeOverlay.Material3.Light" >
             <Spinner
                 android:id="@+id/language_spinner"
                 android:layout_width="wrap_content"
                 android:layout_gravity="end"
+                android:textColor="@color/white"
                 android:layout_height="match_parent" />
         </com.google.android.material.appbar.MaterialToolbar>
         <FrameLayout
@@ -41,12 +44,15 @@
 
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/navigation_view"
-        android:layout_width="150dp"
+        android:layout_width="230dp"
         android:layout_height="match_parent"
         android:layout_gravity="start"
         android:fitsSystemWindows="true"
-        app:itemTextColor="@color/nav_item_text_color"
+        android:background="@color/bs_primary"
+        app:itemTextColor="@color/white"
         app:itemIconTint="@color/nav_item_text_color"
-        app:menu="@menu/drawer_menu" />
+        app:menu="@menu/drawer_menu"
+        app:headerLayout="@layout/nav_header"
+        app:itemTextAppearance="@style/CustomMenuTextAppearance"/>
 
 </androidx.drawerlayout.widget.DrawerLayout>

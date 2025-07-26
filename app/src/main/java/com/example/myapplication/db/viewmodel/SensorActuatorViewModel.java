@@ -1,6 +1,7 @@
 package com.example.myapplication.db.viewmodel;
 
 import android.app.Application;
+import android.hardware.Sensor;
 import android.os.Handler;
 import android.os.Looper;
 
@@ -12,7 +13,9 @@ import androidx.lifecycle.MutableLiveData;
 import com.example.myapplication.db.AppDatabase;
 import com.example.myapplication.db.entity.SensorActuator;
 import com.example.myapplication.db.dao.SensorActuatorDao;
+import com.example.myapplication.db.entity.SensorActuatorIdWithTitle;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -54,6 +57,19 @@ public class SensorActuatorViewModel extends AndroidViewModel {
         });
     }
 
+    public void insertBatch(List<SensorActuator> sas, Consumer<List<Long>> callback) {
+        executorService.execute(() -> {
+            List<Long> results = new ArrayList<>();
+            for (SensorActuator sa: sas) {
+                long insertedId = sensorActuatorDao.insert(sa);
+                if(insertedId >= 0) results.add(insertedId);
+            }
+            new Handler(Looper.getMainLooper()).post(() -> {
+               callback.accept(results);
+            });
+        });
+    }
+
     public LiveData<Long> getInsertResult() {
         return insertResult;
     }
@@ -68,6 +84,22 @@ public class SensorActuatorViewModel extends AndroidViewModel {
 
     public LiveData<Integer> getUpdateResult() {
         return updateResult;
+    }
+
+    public void updateBatch(List<SensorActuator> sensorActuators, Consumer<List<Long>> callback) {
+        executorService.execute(() -> {
+            List<Long> results = new ArrayList<>();
+            if (!sensorActuators.isEmpty()) {
+                sensorActuatorDao.deleteByTitle(sensorActuators.get(0).getTitle());
+                for (SensorActuator sa : sensorActuators) {
+                    Long result = sensorActuatorDao.insert(sa);
+                    if (result > 0) results.add(result);
+                }
+            }
+            new Handler(Looper.getMainLooper()).post(() -> {
+                callback.accept(results);
+            });
+        });
     }
 
     // --- DELETE ---
@@ -90,5 +122,21 @@ public class SensorActuatorViewModel extends AndroidViewModel {
             });
         });
     }
+
+    public void getByTitle(String title, int sensorOrActuator, Consumer<List<SensorActuator>> callback) {
+        executorService.execute(() -> {
+            List<SensorActuator> results = sensorActuatorDao.getByTitle(title, sensorOrActuator);
+            new Handler(Looper.getMainLooper()).post(() -> {
+               callback.accept(results);
+            });
+        });
+    }
+
+    public LiveData<List<String>> getAllTitles(int sensorOrActuator) {
+        return sensorActuatorDao.getAllTitles(sensorOrActuator);
+    }
+
+
+
 
 }

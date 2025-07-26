@@ -7,36 +7,23 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginVertical="20dp"
         android:orientation="vertical">
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="horizontal">
-            <TextView
-                android:id="@+id/headerText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/data_playback_title"
-                android:textSize="24sp"
-                android:textColor="@android:color/black"
-                android:gravity="center"
-                android:padding="16dp"
-                android:textStyle="bold"/>
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
             android:orientation="horizontal"
+            android:padding="12dp"
             android:weightSum="12">
             <LinearLayout
                 android:orientation="vertical"
                 android:layout_weight="10"
                 android:id="@+id/playback_accordion_container"
                 android:layout_width="0dp"
+                android:layout_marginRight="20dp"
+                android:background="@drawable/accordion_border"
                 android:layout_height="wrap_content"
-                android:padding="12dp"
-                android:background="#EEEEEE">
+                >
             </LinearLayout>
             <LinearLayout
                 android:layout_width="0dp"
@@ -48,25 +35,29 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
+                    android:layout_marginVertical="12dp"
                     android:orientation="horizontal">
                     <Button
                         android:id="@+id/playback_loading_btn"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                         android:text="@string/loading_data"
-                        android:backgroundTint="@color/bs_info"/>
+                        android:padding="8dp"
+                        android:textColor="@color/basic_button_text_color"
+                        android:background="@drawable/ripple_info_button"/>
 
                 </LinearLayout>
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
+                    android:layout_marginVertical="12dp"
                     android:text="@string/playback_control" />
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
+                    android:layout_marginBottom="6dp"
                     android:orientation="horizontal">
                     <Button
                         android:id="@+id/monitoring_start_btn"
@@ -74,20 +65,23 @@
                         android:layout_height="match_parent"
                         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                         android:text="@string/start"
+                        android:textColor="@color/basic_button_text_color"
                         android:layout_marginRight="16dp"
-                        android:backgroundTint="@color/bs_success"/>
+                        android:background="@drawable/ripple_success_button"/>
                     <Button
                         android:id="@+id/monitoring_stop_btn"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                         android:text="@string/stop"
-                        android:backgroundTint="@color/bs_danger"/>
+                        android:textColor="@color/basic_button_text_color"
+                        android:background="@drawable/ripple_danger_button"/>
                 </LinearLayout>
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
+                    android:layout_marginTop="18dp"
+                    android:layout_marginBottom="6dp"
                     android:text="@string/time_control" />
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -99,58 +93,65 @@
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:text="@string/plus_1s"
+                        android:textColor="@color/basic_button_text_color"
                         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                         android:layout_marginRight="16dp"
-                        android:backgroundTint="@color/bs_primary"/>
+                        android:background="@drawable/ripple_primary_button"/>
                     <Button
                         android:id="@+id/playback_time_control2_btn"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:text="@string/minus_1s"
+                        android:textColor="@color/basic_button_text_color"
                         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                        android:backgroundTint="@color/bs_primary"/>
+                        android:background="@drawable/ripple_primary_button"/>
                 </LinearLayout>
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
+                    android:layout_marginVertical="12dp"
                     android:orientation="horizontal">
                     <Button
                         android:id="@+id/playback_time_control3_btn"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:text="@string/plus_10s"
+                        android:textColor="@color/basic_button_text_color"
                         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                         android:layout_marginRight="16dp"
-                        android:backgroundTint="@color/bs_primary"/>
+                        android:background="@drawable/ripple_primary_button"/>
                     <Button
                         android:id="@+id/playback_time_control4_btn"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:text="@string/minus_10s"
+                        android:textColor="@color/basic_button_text_color"
                         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                        android:backgroundTint="@color/bs_primary"/>
+                        android:background="@drawable/ripple_primary_button"/>
                 </LinearLayout>
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:orientation="horizontal">
+                    android:orientation="vertical">
                     <Button
                         android:id="@+id/playback_time_control_next_command_btn"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:text="@string/next_ncommand"
+                        android:layout_marginVertical="12dp"
+                        android:textColor="@color/basic_button_text_color"
                         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                        android:layout_marginRight="16dp"
-                        android:backgroundTint="@color/bs_primary"/>
+                        android:background="@drawable/ripple_info_button"/>
                     <Button
                         android:id="@+id/playback_time_control_previous_command_btn"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                         android:text="@string/previous_ncommand"
-                        android:backgroundTint="@color/bs_primary"/>
+                        android:textColor="@color/basic_button_text_color"
+                        android:background="@drawable/ripple_info_button"/>
                 </LinearLayout>
                 <TextView
                     android:layout_width="match_parent"

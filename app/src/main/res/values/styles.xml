@@ -9,5 +9,9 @@
     <style name="AppTheme.Launcher" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:windowBackground">@drawable/splash_background</item>
     </style>
-
+    <style name="CustomMenuTextAppearance" parent="TextAppearance.AppCompat.Body1">
+        <item name="android:textSize">18sp</item>
+        <item name="android:textColor">#FFFFFF</item> <!-- Optional -->
+        <item name="android:fontFamily">sans-serif-medium</item> <!-- Optional -->
+    </style>
 </resources>

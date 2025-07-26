@@ -2,7 +2,10 @@ package com.example.myapplication.utils;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.ImageButton;
+import android.widget.Spinner;
 import android.widget.TableRow;
 
 import com.example.myapplication.R;
@@ -22,7 +25,7 @@ public class UIUtils {
         );
         ImageButton changeValueBtn = new ImageButton(context);
         changeValueBtn.setImageResource(R.drawable.baseline_edit_24);
-        changeValueBtn.setBackgroundColor(Color.WHITE);
+        changeValueBtn.setBackgroundColor(Color.TRANSPARENT);
         changeValueBtn.setColorFilter(Color.parseColor("#198754"));
         changeValueBtn.setLayoutParams(params);
         changeValueBtn.setTag(id);
@@ -43,5 +46,55 @@ public class UIUtils {
         buttons.add(deleteBtn);
         return buttons;
 
+    }
+
+    public static int setSpinnerWithContent(Spinner spinner, String targetValue) {
+        try {
+            ArrayAdapter<String> adapter = (ArrayAdapter<String>) spinner.getAdapter();
+            int position = adapter.getPosition(targetValue); // Find its position
+            spinner.setSelection(position);
+            return 1;
+        } catch (Exception e) {
+            return -1;
+        }
+    }
+
+    public static int getIndexFromSpinnerContent(Spinner spinner, String targetValue) {
+        for (int i = 0; i < spinner.getCount(); i++) {
+            String item = spinner.getItemAtPosition(i).toString();
+            if (item.equalsIgnoreCase(targetValue)) {
+                return i;
+            }
+        }
+        return -1; // Not found
+    }
+
+    public static int initSpinnerWithSuggestionList(Spinner spinner, List<String> suggestions, Context context) {
+        if (spinner == null) return -1;
+        try {
+            ArrayAdapter<String> adapter = new ArrayAdapter<>(context,
+                    android.R.layout.simple_spinner_item, suggestions);
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            spinner.setAdapter(adapter);
+            return 1;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return -1;
+        }
+    }
+
+    public static int initAutoCompleteWithSuggestionList(AutoCompleteTextView autoCompleteTextView, List<String> suggestions, Context context) {
+        if ( autoCompleteTextView == null || context == null) {
+            return -1;
+        }
+        try {
+            ArrayAdapter<String> adapter = new ArrayAdapter<>(context,
+                    android.R.layout.simple_dropdown_item_1line, suggestions);
+            autoCompleteTextView.setAdapter(adapter);
+            return 1;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return -1;
+        }
     }
 }

@@ -24,6 +24,7 @@
                 android:background="@color/bs_primary">
                 <TextView
                     android:padding="16dp"
+                    android:gravity="center"
                     android:textStyle="bold"
                     android:textColor="@color/white"
                     android:text="@string/sensor_th_order">
@@ -32,24 +33,28 @@
                     android:padding="16dp"
                     android:textStyle="bold"
                     android:textColor="@color/white"
+                    android:gravity="center"
                     android:text="@string/initial_value">
                 </TextView>
                 <TextView
                     android:padding="16dp"
                     android:textStyle="bold"
                     android:textColor="@color/white"
+                    android:gravity="center"
                     android:text="@string/upper_limit">
                 </TextView>
                 <TextView
                     android:padding="16dp"
                     android:textStyle="bold"
                     android:textColor="@color/white"
+                    android:gravity="center"
                     android:text="@string/lower_limit">
                 </TextView>
                 <TextView
                     android:padding="16dp"
                     android:textStyle="bold"
                     android:textColor="@color/white"
+                    android:gravity="center"
                     android:text="@string/active">
                 </TextView>
 
@@ -64,17 +69,19 @@
             <Button
                 android:id="@+id/esp_rxrt_save_thresholds_btn"
                 android:layout_width="150dp"
-                android:backgroundTint="@color/bs_success"
+                android:background="@drawable/ripple_success_button"
                 android:layout_height="wrap_content"
                 android:layout_margin="16dp"
                 android:text="@string/save_btn"
+                android:textColor="@color/basic_button_text_color"
                 android:padding="8dp" />
             <Button
                 android:id="@+id/esp_rxrt_close_thresholds_dialog_btn"
                 android:layout_width="150dp"
-                android:backgroundTint="@color/bs_secondary"
+                android:background="@drawable/ripple_info_button"
                 android:layout_height="wrap_content"
                 android:layout_margin="16dp"
+                android:textColor="@color/basic_button_text_color"
                 android:text="@string/cancel"
                 android:padding="8dp" />
 

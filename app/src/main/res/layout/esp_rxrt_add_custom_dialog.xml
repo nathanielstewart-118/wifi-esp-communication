@@ -24,6 +24,7 @@
                 android:background="@color/bs_primary">
                 <TextView
                     android:padding="16dp"
+                    android:gravity="center"
                     android:textStyle="bold"
                     android:textColor="@color/white"
                     android:text="@string/sensor_th_variable_name">
@@ -31,11 +32,13 @@
                 <TextView
                     android:padding="16dp"
                     android:textStyle="bold"
+                    android:gravity="center"
                     android:textColor="@color/white"
                     android:text="@string/sensor_th_data_type">
                 </TextView>
                 <TextView
                     android:padding="16dp"
+                    android:gravity="center"
                     android:textStyle="bold"
                     android:textColor="@color/white"
                     android:text="@string/sensor_th_number_of_channels">
@@ -73,18 +76,20 @@
             <Button
                 android:id="@+id/esp_rxrt_save_btn"
                 android:layout_width="150dp"
-                android:backgroundTint="@color/bs_success"
+                android:background="@drawable/ripple_success_button"
                 android:layout_height="wrap_content"
                 android:layout_margin="16dp"
                 android:text="@string/save_btn"
+                android:textColor="@color/basic_button_text_color"
                 android:padding="8dp" />
             <Button
                 android:id="@+id/esp_rxrt_close_add_custom_dialog_btn"
                 android:layout_width="150dp"
-                android:backgroundTint="@color/bs_secondary"
+                android:background="@drawable/ripple_info_button"
                 android:layout_height="wrap_content"
                 android:layout_margin="16dp"
                 android:text="@string/cancel"
+                android:textColor="@color/basic_button_text_color"
                 android:padding="8dp" />
 
         </LinearLayout>

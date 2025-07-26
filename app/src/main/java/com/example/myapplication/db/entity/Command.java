@@ -10,10 +10,10 @@ import com.example.myapplication.db.converters.CommandThresholdConverter;
 import java.util.List;
 
 @Entity(tableName="commands")
-public class Command {
+public class Command extends BaseEntity {
 
-    @PrimaryKey(autoGenerate = true)
-    private Long id;
+    @ColumnInfo(name = "title")
+    private String title;
 
     @ColumnInfo(name = "command_code")
     private String commandCode;
@@ -28,19 +28,15 @@ public class Command {
     @TypeConverters(CommandThresholdConverter.class)
     private List<CommandThreshold> thresholds;
 
-    public Long getId() {
-        return id;
-    }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Command(String commandCode, float time1, float time2, List<CommandThreshold> thresholds) {
+    public Command(String title, String commandCode, float time1, float time2, Integer displayOrder, List<CommandThreshold> thresholds) {
         this.commandCode = commandCode;
+        this.title = title;
         this.time1 = time1;
         this.time2 = time2;
+        this.displayOrder = displayOrder;
         this.thresholds = thresholds;
+        this.createdAt = System.currentTimeMillis();
     }
 
     public String getCommandCode() {
@@ -49,6 +45,14 @@ public class Command {
 
     public void setCommandCode(String commandCode) {
         this.commandCode = commandCode;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public Float getTime1() {
@@ -74,6 +78,7 @@ public class Command {
     public void setThresholds(List<CommandThreshold> thresholds) {
         this.thresholds = thresholds;
     }
+
 }
 
 

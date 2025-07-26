@@ -2,6 +2,8 @@ package com.example.myapplication.settings;
 
 import static com.example.myapplication.utils.Constants.COLORS;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -71,6 +73,7 @@ public class PlayBack extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_reproduction, container, false);
         AppDatabase db = AppDatabase.getInstance(requireContext());
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(Constants.TITLES[9]);
 
         monitoringDao = db.monitoringDao();
 
@@ -116,15 +119,15 @@ public class PlayBack extends Fragment {
             header.setTextSize(18);
             header.setTypeface(null, Typeface.BOLD);
             header.setPadding(24, 24, 24, 24);
-            header.setBackgroundColor(Color.parseColor("#CCCCCC"));
-            header.setTextColor(Color.BLACK);
+            header.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.bs_primary));
+
+            header.setTextColor(Color.WHITE);
 
             // Content container
             LinearLayout contentLayout = new LinearLayout(requireContext());
             contentLayout.setOrientation(LinearLayout.VERTICAL);
             contentLayout.setVisibility(View.GONE);
             contentLayout.setPadding(24, 24, 24, 24);
-            contentLayout.setBackgroundColor(Color.parseColor("#EEEEEE"));
             contentLayout.setLayoutParams(new LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
                     500
@@ -181,7 +184,7 @@ public class PlayBack extends Fragment {
             chartsMap.put(visualizationRange.getSensorActuatorId(), scatterChart);
             currentWindowStartMap.put(visualizationRange.getSensorActuatorId(), 0F);
             contentLayout.addView(scatterChart);
-
+            contentLayout.setVisibility(View.VISIBLE);
             // Save reference for updates
             accordionContentMap.put(result.getId(), contentLayout);
 

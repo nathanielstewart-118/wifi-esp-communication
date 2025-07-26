@@ -11,23 +11,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:orientation="horizontal">
-            <TextView
-                android:id="@+id/headerText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Visualization Settings"
-                android:textSize="24sp"
-                android:textColor="@android:color/black"
-                android:gravity="center"
-                android:padding="16dp"
-                android:textStyle="bold"/>
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
             android:weightSum="3"
             android:orientation="horizontal">
 
@@ -46,7 +29,8 @@
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:backgroundTint="@color/bs_success"
+                android:background="@drawable/ripple_success_button"
+                android:textColor="@color/basic_button_text_color"
                 android:id="@+id/visualization_save_btn"
                 android:layout_margin="16dp"
                 android:text="Save" />
@@ -54,7 +38,8 @@
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:backgroundTint="@color/bs_info"
+                android:background="@drawable/ripple_primary_button"
+                android:textColor="@color/basic_button_text_color"
                 android:id="@+id/visualization_load_btn"
                 android:layout_margin="16dp"
                 android:text="Load" />
@@ -173,15 +158,19 @@
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:backgroundTint="@color/bs_info"
+                android:background="@drawable/ripple_primary_button"
                 android:layout_margin="16dp"
+                android:paddingHorizontal="16dp"
+                android:textColor="@color/basic_button_text_color"
                 android:id="@+id/visualization_load_sensor_actuator_btn"
                 android:text="Importing Sensor Actuator Data" />
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="16dp"
-                android:backgroundTint="@color/bs_success"
+                android:background="@drawable/ripple_success_button"
+                android:textColor="@color/basic_button_text_color"
+                android:padding="16dp"
                 android:id="@+id/visualization_setup_complete_btn"
                 android:text="Setup Complete" />
 
@@ -201,17 +190,20 @@
             <TableLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:stretchColumns="*"
                 android:id="@+id/visualization_list_tb"
                 >
-                <TableRow android:background="@color/bs_success">
+                <TableRow android:background="@color/bs_primary">
                     <TextView
                         android:text="Order"
                         android:textColor="@android:color/white"
                         android:padding="8dp"
+                        android:gravity="center"
                         android:textStyle="bold"/>
                     <TextView
                         android:text="@string/sensor_th_variable_name"
                         android:textColor="@android:color/white"
+                        android:gravity="center"
                         android:padding="8dp"
                         android:textStyle="bold"/>
 
@@ -219,40 +211,61 @@
                         android:text="@string/sensor_th_data_type"
                         android:textColor="@android:color/white"
                         android:padding="8dp"
+                        android:gravity="center"
                         android:textStyle="bold"/>
 
                     <TextView
                         android:text="NChannels"
                         android:textColor="@android:color/white"
+                        android:gravity="center"
                         android:padding="8dp"
                         android:textStyle="bold"/>
-
                     <TextView
                         android:text="Count Byte"
                         android:textColor="@android:color/white"
                         android:padding="8dp"
+                        android:gravity="center"
                         android:textStyle="bold"/>
                     <TextView
                         android:text="Visualization"
                         android:textColor="@android:color/white"
                         android:padding="8dp"
+                        android:gravity="center"
                         android:textStyle="bold"/>
                     <TextView
                         android:text="Y-axis range"
                         android:textColor="@android:color/white"
                         android:padding="8dp"
+                        android:gravity="center"
                         android:textStyle="bold"/>
                     <TextView
                         android:text="Upper Limit"
                         android:textColor="@android:color/white"
                         android:padding="8dp"
+                        android:gravity="center"
                         android:textStyle="bold"/>
                     <TextView
                         android:text="Lower Limit"
                         android:textColor="@android:color/white"
                         android:padding="8dp"
+                        android:gravity="center"
                         android:textStyle="bold"/>
                 </TableRow>
+
+                <TableRow
+                    android:background="@drawable/table_border">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_span="10"
+                        android:text="⚠️ There is no visualization setting now."
+                        android:textColor="@android:color/black"
+                        android:gravity="center"
+                        android:padding="16dp"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+                </TableRow>
+
             </TableLayout>
             </ScrollView>
             </HorizontalScrollView>

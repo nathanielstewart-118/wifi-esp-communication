@@ -9,7 +9,7 @@
     <color name="white">#FFFFFFFF</color>
     <color name="nav_item_normal">#444444</color>
     <color name="nav_item_checked">#FF5722</color>
-    <color name="bs_primary">#0d6efd</color>
+    <color name="bs_primary">#006ffd</color>
     <color name="bs_secondary">#6c757d</color>
     <color name="bs_success">#198754</color>
     <color name="bs_danger">#dc3545</color>
@@ -28,4 +28,7 @@
 
     <!-- Optional: Active row (light gray-blue shade) -->
     <color name="tr_active">#e9ecef</color>  <!-- Similar to Bootstrap's active row -->
+
+    <color name="blue_primary">#007bff</color>
+    <color name="ripple_color">#33FFFFFF</color> <!-- White translucent ripple -->
 </resources>

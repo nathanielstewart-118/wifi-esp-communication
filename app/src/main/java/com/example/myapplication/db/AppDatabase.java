@@ -23,7 +23,7 @@ import com.example.myapplication.db.entity.Monitoring;
 import com.example.myapplication.db.entity.SensorActuator;
 import com.example.myapplication.db.entity.Visualization;
 
-@Database(entities = {SensorActuator.class, Command.class, ESPTX.class, ESPRXRT.class, Experiment.class, Visualization.class, Monitoring.class}, version = 15)
+@Database(entities = {SensorActuator.class, Command.class, ESPTX.class, ESPRXRT.class, Experiment.class, Visualization.class, Monitoring.class}, version = 18)
 public abstract class AppDatabase extends RoomDatabase {
 
     private static AppDatabase instance;

@@ -29,4 +29,12 @@ public interface CommandDao {
     @Query("SELECT * FROM commands WHERE id = :id")
     Command getCommandById(int id);
 
+    @Query("SELECT DISTINCT title FROM commands")
+    LiveData<List<String>> getAllTitles();
+
+    @Query("SELECT * FROM commands WHERE title=:title")
+    List<Command> getByTitle(String title);
+
+    @Query(("DELETE FROM commands WHERE title = :title"))
+    void deleteByTitle(String title);
 }

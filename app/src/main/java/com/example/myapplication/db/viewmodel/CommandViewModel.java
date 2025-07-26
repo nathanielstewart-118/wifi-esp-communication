@@ -1,6 +1,8 @@
 package com.example.myapplication.db.viewmodel;
 
 import android.app.Application;
+import android.os.Handler;
+import android.os.Looper;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -12,9 +14,11 @@ import com.example.myapplication.db.dao.CommandDao;
 import com.example.myapplication.db.entity.Command;
 import com.example.myapplication.db.entity.SensorActuator;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.function.Consumer;
 
 public class CommandViewModel extends AndroidViewModel {
 
@@ -48,11 +52,38 @@ public class CommandViewModel extends AndroidViewModel {
         return insertResult;
     }
 
+    public void insertBatch(List<Command> commands, Consumer<List<Long>> callback) {
+        executorService.execute(() -> {
+            List<Long> results = new ArrayList<>();
+            for(Command com: commands) {
+                Long result = commandDao.insert(com);
+                if (result > 0) results.add(result);
+            }
+            new Handler(Looper.getMainLooper()).post(() -> {
+                callback.accept(results);
+            });
+        });
+    }
+
     // --- UPDATE ---
     public void update(Command command) {
         executorService.execute(() -> {
             int result = commandDao.update(command);
             updateResult.postValue(result);
+        });
+    }
+
+    public void updateBatch(List<Command> commands, Consumer<List<Long>> callback) {
+        executorService.execute(() -> {
+            commandDao.deleteByTitle(commands.get(0).getTitle());
+            List<Long> results = new ArrayList<>();
+            for(Command com: commands) {
+                Long result = commandDao.insert(com);
+                if (result > 0) results.add(result);
+            }
+            new Handler(Looper.getMainLooper()).post(() -> {
+                callback.accept(results);
+            });
         });
     }
 
@@ -71,5 +102,18 @@ public class CommandViewModel extends AndroidViewModel {
     public LiveData<Integer> getDeleteResult() {
         return deleteResult;
     }
-    
+
+    public void getByTitle(String title, Consumer<List<Command>> callback) {
+        executorService.execute(() -> {
+            List<Command> results = commandDao.getByTitle(title);
+            new Handler(Looper.getMainLooper()).post(() -> {
+                callback.accept(results);
+            });
+        });
+    }
+
+    public LiveData<List<String>> getAllTitles() {
+        return commandDao.getAllTitles();
+    }
+
 }

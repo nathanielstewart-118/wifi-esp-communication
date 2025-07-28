@@ -1,0 +1,414 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:weightSum="3"
+        android:orientation="horizontal">
+        <AutoCompleteTextView
+            android:id="@+id/sensor_setting_id_autocomplete"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="@string/enter_sensor_setting_title"
+            android:layout_gravity="center_vertical"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:completionThreshold="2"
+            android:inputType="text" />
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/ripple_success_button"
+            android:textColor="@color/basic_button_text_color"
+            android:id="@+id/sensor_save_btn"
+            android:layout_margin="16dp"
+            android:text="@string/save_btn" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/ripple_primary_button"
+            android:textColor="@color/basic_button_text_color"
+            android:id="@+id/sensor_load_btn"
+            android:layout_margin="16dp"
+            android:text="@string/load_btn" />
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="50dp"
+                android:padding="16dp"
+                android:orientation="horizontal">
+
+                <TableLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="9"
+                    android:id="@+id/wifi_list_tb"
+                    android:stretchColumns="*"
+                    android:gravity="center"
+                    android:background="@drawable/table_border">
+
+                    <!-- Table Header -->
+                    <TableRow android:background="@color/bs_primary">
+                        <TextView
+                            android:text="@string/sensor_th_variable_name"
+                            android:textColor="@android:color/white"
+                            android:gravity="center"
+                            android:padding="8dp"
+                            android:textStyle="bold"/>
+
+                        <TextView
+                            android:text="@string/sensor_th_data_type"
+                            android:gravity="center"
+                            android:textColor="@android:color/white"
+                            android:padding="8dp"
+                            android:textStyle="bold"/>
+
+                        <TextView
+                            android:text="@string/sensor_th_number_of_channels"
+                            android:gravity="center"
+                            android:textColor="@android:color/white"
+                            android:padding="8dp"
+                            android:textStyle="bold"/>
+
+                        <TextView
+                            android:text="@string/sensor_th_monitoring_esp_tx"
+                            android:gravity="center"
+                            android:textColor="@android:color/white"
+                            android:padding="8dp"
+                            android:textStyle="bold"/>
+                        <TextView
+                            android:text="@string/sensor_th_real_time_control_esp_rx_rt"
+                            android:textColor="@android:color/white"
+                            android:padding="8dp"
+                            android:textStyle="bold"/>
+                        <TextView
+                            android:text="Actions"
+                            android:gravity="center"
+                            android:textColor="@android:color/white"
+                            android:padding="8dp"
+                            android:textStyle="bold"/>
+                    </TableRow>
+
+                    <TableRow
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+                        <EditText
+                            android:id="@+id/variable_name_input"
+                            android:layout_gravity="center_vertical"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:padding="8dp" />
+                        <Spinner
+                            android:id="@+id/data_type_spinner"
+                            android:layout_gravity="center_vertical"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" />
+
+                        <EditText
+                            android:id="@+id/number_of_channels_input"
+                            android:layout_gravity="center_vertical"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="number"
+                            android:padding="8dp" />
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:gravity="center">
+                            <CheckBox
+                                android:id="@+id/monitoring_esp_tx_checkbox"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:checked="false" />
+                        </LinearLayout>
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:gravity="center">
+                            <CheckBox
+                                android:id="@+id/real_time_control_checkbox"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textAlignment="center"
+                                android:checked="false" />
+                        </LinearLayout>
+                        <Button
+                            android:id="@+id/sensor_add_btn"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="8dp"
+                            android:background="@drawable/ripple_success_button"
+                            android:text="@string/add_btn"
+                            android:textColor="@color/basic_button_text_color"/>
+                    </TableRow>
+                </TableLayout>
+            </LinearLayout>
+
+            <TableLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/sensor_list_tb"
+                android:stretchColumns="*"
+                android:gravity="center"
+                android:padding="16dp">
+                <TableRow
+                    android:background="@color/bs_primary">
+
+                    <TextView
+                        android:text="@string/sensor_th_order"
+                        android:gravity="center"
+                        android:textColor="@android:color/white"
+                        android:padding="8dp"
+                        android:textStyle="bold"/>
+
+                    <TextView
+                        android:text="@string/sensor_th_variable_name"
+                        android:gravity="center"
+                        android:textColor="@android:color/white"
+                        android:padding="8dp"
+                        android:textStyle="bold"/>
+
+                    <TextView
+                        android:text="@string/sensor_th_data_type"
+                        android:gravity="center"
+                        android:textColor="@android:color/white"
+                        android:padding="8dp"
+                        android:textStyle="bold"/>
+
+                    <TextView
+                        android:text="@string/sensor_th_number_of_channels"
+                        android:gravity="center"
+                        android:textColor="@android:color/white"
+                        android:padding="8dp"
+                        android:textStyle="bold"/>
+                    <TextView
+                        android:text="@string/sensor_number_of_bytes_th"
+                        android:gravity="center"
+                        android:textColor="@android:color/white"
+                        android:padding="8dp"
+                        android:textStyle="bold"/>
+
+                    <TextView
+                        android:text="@string/sensor_monitoring_th"
+                        android:gravity="center"
+                        android:textColor="@android:color/white"
+                        android:padding="8dp"
+                        android:textStyle="bold"/>
+                    <TextView
+                        android:text="@string/sensor_realtime_control_th"
+                        android:gravity="center"
+                        android:textColor="@android:color/white"
+                        android:padding="8dp"
+                        android:textStyle="bold"/>
+
+                    <TextView
+                        android:text="Actions"
+                        android:gravity="center"
+                        android:textColor="@android:color/white"
+                        android:padding="8dp"
+                        android:textStyle="bold"/>
+                </TableRow>
+
+                <TableRow
+                    android:background="@drawable/table_border">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_span="7"
+                        android:text="⚠️ There is ESP packet settings now."
+                        android:textColor="@android:color/black"
+                        android:gravity="center"
+                        android:padding="16dp"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+                </TableRow>
+            </TableLayout>
+
+            <TableLayout
+                android:id="@+id/esp_thresholds_list_tb"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:stretchColumns="*"
+                android:gravity="center"
+                android:padding="16dp">
+                <TableRow
+                    android:background="@color/bs_primary">
+                    <TextView
+                        android:text="Variable Name/\nData Type"
+                        android:textColor="@color/white"
+                        android:padding="6dp"
+                        android:textStyle="bold"
+                        android:gravity="center"/>
+                    <TextView
+                        android:text="Channel\nOrder"
+                        android:textColor="@color/white"
+                        android:padding="6dp"
+                        android:textStyle="bold"
+                        android:gravity="center"/>
+                    <TextView
+                        android:text="Setting Thresholds"
+                        android:textColor="@color/white"
+                        android:layout_span="3"
+                        android:padding="6dp"
+                        android:textStyle="bold"
+                        android:layout_gravity="center"
+                        android:gravity="center"/>
+                    <TextView
+                        android:text="Threshold\nEnable"
+                        android:textColor="@color/white"
+                        android:padding="6dp"
+                        android:textStyle="bold"
+                        android:gravity="center"/>
+                    <TextView
+                        android:text="Outlier Settings"
+                        android:textColor="@color/white"
+                        android:padding="6dp"
+                        android:layout_gravity="center"
+                        android:layout_span="2"
+                        android:textStyle="bold"
+                        android:gravity="center"/>
+                    <TextView
+                        android:text="Outliers\nEnable"
+                        android:textColor="@color/white"
+                        android:padding="6dp"
+                        android:textStyle="bold"
+                        android:gravity="center"/>
+                </TableRow>
+                <TableRow
+                    android:background="@color/bs_primary">
+                    <TextView
+                        android:text=""/>
+                    <TextView
+                        android:text=""
+                        android:textColor="@color/white"
+                        android:padding="6dp"
+                        android:textStyle="bold"
+                        android:gravity="center"/>
+                    <TextView
+                        android:text="Initial"
+                        android:textColor="@color/white"
+                        android:padding="6dp"
+                        android:textStyle="bold"
+                        android:gravity="center"/>
+                    <TextView
+                        android:text="Lower"
+                        android:textColor="@color/white"
+                        android:padding="6dp"
+                        android:textStyle="bold"
+                        android:gravity="center"/>
+                    <TextView
+                        android:text="Upper"
+                        android:textColor="@color/white"
+                        android:padding="6dp"
+                        android:textStyle="bold"
+                        android:gravity="center"/>
+                    <TextView
+                        android:text=""
+                        android:textColor="@color/white"
+                        android:padding="6dp"
+                        android:textStyle="bold"
+                        android:gravity="center"/>
+                    <TextView
+                        android:text="Outlier"
+                        android:textColor="@color/white"
+                        android:padding="6dp"
+                        android:textStyle="bold"
+                        android:gravity="center"/>
+                    <TextView
+                        android:text="Compare"
+                        android:textColor="@color/white"
+                        android:padding="6dp"
+                        android:textStyle="bold"
+                        android:gravity="center"/>
+                    <TextView
+                        android:text=""
+                        android:textColor="@color/white"
+                        android:padding="6dp"
+                        android:textStyle="bold"
+                        android:gravity="center"/>
+                </TableRow>
+                <TableRow
+                    android:background="@drawable/table_border">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_span="9"
+                        android:text="⚠️ There is no threshold data now."
+                        android:textColor="@android:color/black"
+                        android:gravity="center"
+                        android:padding="16dp"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+                </TableRow>
+            </TableLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:visibility="gone"
+                android:orientation="horizontal">
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/ripple_success_button"
+                    android:id="@+id/load_command_btn"
+                    android:layout_margin="16dp"
+                    android:padding="16dp"
+                    android:textColor="@color/basic_button_text_color"
+                    android:text="@string/sensor_load_command_settings" />
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/ripple_info_button"
+                    android:id="@+id/update_command_btn"
+                    android:textColor="@color/basic_button_text_color"
+                    android:padding="16dp"
+                    android:layout_margin="16dp"
+                    android:text="@string/sensor_command_settings_update" />
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/ripple_success_button"
+                    android:id="@+id/esp_tx_upgrade_btn"
+                    android:textColor="@color/basic_button_text_color"
+                    android:layout_margin="16dp"
+                    android:padding="18dp"
+                    android:text="@string/sensor_esp_tx_upgrade" />
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/ripple_info_button"
+                    android:padding="16dp"
+                    android:textColor="@color/basic_button_text_color"
+                    android:id="@+id/esp_rxrt_upgrade_btn"
+                    android:layout_margin="16dp"
+                    android:text="@string/sensor_esp_rxrt_upgrade" />
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

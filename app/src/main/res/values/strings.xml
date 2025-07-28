@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">ESP Control</string>
+    <string name="app_name">Data Hub Monitoring</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="drawer_open">Open drawer</string>
@@ -150,6 +150,7 @@
     <string name="sensor_setting_saved_successfully">Sensor Setting Saved Successfully.</string>
     <string name="unexpected_error_occurred_please_load_and_check">Unexpected error occurred. Please load and check.</string>
     <string name="an_error_occurred_while_saving_please_load_and_check">An error occurred while saving. Please load and check.</string>
+    <string name="esp_packet">» ESP Packet</string>
     <string-array name="my_array_items">
         <item>en</item>
         <item>cn</item>

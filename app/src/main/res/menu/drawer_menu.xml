@@ -5,8 +5,7 @@
 <!--    <item android:id="@+id/nav_settings" android:title="Settings" android:icon="@android:drawable/ic_menu_preferences"/>-->
 <!--    <item android:id="@+id/nav_wifi" android:title="WiFi" />-->
     <item android:id="@+id/wifi_menu_item" android:enabled="true" android:title="@string/wifi" />
-    <item android:id="@+id/sensor_menu_item" android:enabled="true" android:title="@string/sensor"/>
-    <item android:id="@+id/actuator_menu_item" android:enabled="true" android:title="@string/actuator"/>
+    <item android:id="@+id/sensor_menu_item" android:enabled="true" android:title="@string/esp_packet"/>
     <item android:id="@+id/command_menu_item" android:enabled="true" android:title="@string/command"/>
     <item android:id="@+id/esp_tx_menu_item" android:enabled="true" android:title="@string/esp_tx" />
     <item android:id="@+id/esp_rxrt_menu_item" android:enabled="true" android:title="@string/esp_rxrt"/>

@@ -23,18 +23,22 @@ public class Command extends BaseEntity {
     @ColumnInfo(name = "time2")
     private Float time2;
 
+    @ColumnInfo(name = "activated")
+    private Integer activated;
+
     @ColumnInfo(name = "thresholds")
     @TypeConverters(CommandThresholdConverter.class)
     private List<CommandThreshold> thresholds;
 
 
-    public Command(String title, String commandCode, float time1, float time2, Integer displayOrder, List<CommandThreshold> thresholds) {
+    public Command(String title, String commandCode, float time1, float time2, Integer displayOrder, Integer activated, List<CommandThreshold> thresholds) {
         this.commandCode = commandCode;
         this.title = title;
         this.time1 = time1;
         this.time2 = time2;
         this.displayOrder = displayOrder;
         this.thresholds = thresholds;
+        this.activated = activated;
         this.createdAt = System.currentTimeMillis();
     }
 
@@ -68,6 +72,14 @@ public class Command extends BaseEntity {
 
     public void setTime2(Float time2) {
         this.time2 = time2;
+    }
+
+    public Integer getActivated() {
+        return activated;
+    }
+
+    public void setActivated(Integer activated) {
+        this.activated = activated;
     }
 
     public List<CommandThreshold> getThresholds() {

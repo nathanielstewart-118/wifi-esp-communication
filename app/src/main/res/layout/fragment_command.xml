@@ -1,27 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView  xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:gravity="center"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
     <LinearLayout
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:orientation="vertical"
-        android:gravity="center"
-        android:layout_marginVertical="20dp"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:weightSum="3"
+        android:layout_margin="30dp"
+        android:orientation="horizontal">
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="2"
             android:weightSum="3"
-            android:orientation="horizontal">
-
+            android:gravity="end"
+            >
             <AutoCompleteTextView
                 android:id="@+id/command_id_autocomplete"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:hint="Enter Command Setting Title"
+                android:backgroundTint="@color/bs_info"
                 android:layout_gravity="center_vertical"
                 android:focusable="true"
                 android:focusableInTouchMode="true"
@@ -47,10 +51,30 @@
                 android:layout_margin="16dp"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                 android:text="@string/load_btn" />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            >
+            <Spinner
+                android:id="@+id/command_esp_packet_spinner"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:inputType="text" />
 
         </LinearLayout>
+    </LinearLayout>
 
-
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -89,14 +113,6 @@
                         android:textStyle="bold"/>
 
                     <TextView
-                        android:text="@string/command_setting_threshold"
-                        android:textColor="@android:color/white"
-                        android:gravity="center"
-                        android:padding="8dp"
-                        android:layout_width="120dp"
-                        android:textStyle="bold"/>
-
-                    <TextView
                         android:text="Add"
                         android:textColor="@android:color/white"
                         android:gravity="center"
@@ -111,6 +127,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
+                        android:backgroundTint="@color/bs_info"
                         android:hint="@string/enter_ox_numbers"
                         android:padding="8dp" />
                     <EditText
@@ -118,6 +135,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="@string/enter_the_number"
+                        android:backgroundTint="@color/bs_info"
                         android:inputType="numberDecimal"
                         android:layout_gravity="center_vertical"
                         android:padding="8dp" />
@@ -126,18 +144,10 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
+                        android:backgroundTint="@color/bs_info"
                         android:inputType="numberDecimal"
                         android:hint="@string/enter_the_number"
                         android:padding="8dp" />
-                    <Button
-                        android:id="@+id/command_open_threshold_modal_btn"
-                        android:layout_width="150dp"
-                        android:backgroundTint="@color/bs_info"
-                        android:textColor="@color/basic_button_text_color"
-                        android:layout_height="wrap_content"
-                        android:text="@string/threshold"
-                        android:padding="2dp" />
-
 
                     <Button
                         android:id="@+id/command_add_btn"
@@ -163,95 +173,102 @@
             android:layout_height="wrap_content"
             android:layout_marginVertical="20dp"
             android:orientation="horizontal">
-            <ScrollView
+
+            <TableLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
-                <TableLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:id="@+id/command_view_table"
-                    android:stretchColumns="*"
-                    android:gravity="center"
-                    android:padding="16dp">
-                    <TableRow
-                        android:background="@color/bs_primary"
-                        >
+                android:layout_height="wrap_content"
+                android:id="@+id/command_view_table"
+                android:stretchColumns="*"
+                android:gravity="center"
+                android:padding="16dp">
+                <TableRow
+                    android:background="@color/bs_primary"
+                    >
 
-                        <TextView
-                            android:text="@string/command_sequence_th"
-                            android:textColor="@android:color/white"
-                            android:gravity="center"
-                            android:padding="8dp"
-                            android:textStyle="bold"/>
+                    <TextView
+                        android:text="@string/command_sequence_th"
+                        android:textColor="@android:color/white"
+                        android:gravity="center"
+                        android:padding="8dp"
+                        android:textStyle="bold"/>
 
-                        <TextView
-                            android:text="@string/command_code_th"
-                            android:textColor="@android:color/white"
-                            android:gravity="center"
-                            android:padding="8dp"
-                            android:textStyle="bold"/>
+                    <TextView
+                        android:text="@string/command_code_th"
+                        android:textColor="@android:color/white"
+                        android:gravity="center"
+                        android:padding="8dp"
+                        android:textStyle="bold"/>
 
-                        <TextView
-                            android:text="@string/command_time_1_th"
-                            android:textColor="@android:color/white"
-                            android:gravity="center"
-                            android:padding="8dp"
-                            android:textStyle="bold"/>
+                    <TextView
+                        android:text="@string/command_time_1_th"
+                        android:textColor="@android:color/white"
+                        android:gravity="center"
+                        android:padding="8dp"
+                        android:textStyle="bold"/>
 
-                        <TextView
-                            android:text="@string/command_time_2_th"
-                            android:textColor="@android:color/white"
-                            android:gravity="center"
-                            android:padding="8dp"
-                            android:textStyle="bold"/>
+                    <TextView
+                        android:text="@string/command_time_2_th"
+                        android:textColor="@android:color/white"
+                        android:gravity="center"
+                        android:padding="8dp"
+                        android:textStyle="bold"/>
 
-                        <TextView
-                            android:text="@string/threshold"
-                            android:textColor="@android:color/white"
-                            android:padding="8dp"
-                            android:gravity="center"
-                            android:textStyle="bold"/>
+                    <TextView
+                        android:text="Actions"
+                        android:textColor="@android:color/white"
+                        android:gravity="center"
+                        android:padding="8dp"
+                        android:textStyle="bold"/>
+                </TableRow>
+                <TableRow>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_span="6"
+                        android:text="⚠️ There is no commands now."
+                        android:textColor="@android:color/black"
+                        android:gravity="center"
+                        android:padding="16dp"
+                        android:textSize="16sp"
+                        android:background="@drawable/table_border"
+                        android:textStyle="bold" />
+                </TableRow>
 
-                        <TextView
-                            android:text="Actions"
-                            android:textColor="@android:color/white"
-                            android:gravity="center"
-                            android:padding="8dp"
-                            android:textStyle="bold"/>
-                    </TableRow>
-                    <TableRow>
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_span="6"
-                            android:text="⚠️ There is no commands now."
-                            android:textColor="@android:color/black"
-                            android:gravity="center"
-                            android:padding="16dp"
-                            android:textSize="16sp"
-                            android:background="@drawable/table_border"
-                            android:textStyle="bold" />
-                    </TableRow>
-
-                </TableLayout>
-            </ScrollView>
+            </TableLayout>
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
+            android:layout_marginVertical="18dp"
             android:orientation="horizontal">
-            <Button
-                android:layout_width="wrap_content"
+            <TableLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/ripple_success_button"
-                android:id="@+id/command_send_btn"
-                android:paddingHorizontal="12dp"
-                android:textColor="@color/basic_button_text_color"
-                android:text="@string/command_send_command_esp" />
+                android:id="@+id/command_thresholds_list_tb"
+                android:stretchColumns="*"
+                android:gravity="center"
+                android:padding="16dp">
+            </TableLayout>
+        </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal">
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/ripple_success_button"
+                    android:id="@+id/command_send_btn"
+                    android:paddingHorizontal="12dp"
+                    android:textColor="@color/basic_button_text_color"
+                    android:text="@string/command_send_command_esp" />
+
+            </LinearLayout>
 
         </LinearLayout>
+    </ScrollView>
 
-    </LinearLayout>
-</ScrollView>
+
+</LinearLayout>

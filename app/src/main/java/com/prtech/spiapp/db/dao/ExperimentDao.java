@@ -22,15 +22,19 @@ public interface ExperimentDao {
     @Delete
     int delete(Experiment experiment);
 
-
-
     @Query("SELECT * FROM experiments")
     LiveData<List<Experiment>> getAllExperiments();
 
     @Query("SELECT * FROM experiments WHERE id = :id")
     Experiment getExperimentById(int id);
 
-    @Query("SELECT * FROM experiments WHERE experiment_id = :experimentId")
-    List<Experiment> getExperimentsByExperimentId(String experimentId);
+    @Query("SELECT * FROM experiments WHERE title = :title")
+    List<Experiment> getExperimentsByTitle(String title);
+
+    @Query("SELECT DISTINCT title FROM experiments")
+    List<String> getAllTitles();
+
+    @Query("DELETE FROM experiments WHERE title=:title")
+    void deleteByTitle(String title);
 
 }

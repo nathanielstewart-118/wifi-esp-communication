@@ -20,6 +20,7 @@
             android:hint="@string/enter_sensor_setting_title"
             android:layout_gravity="center_vertical"
             android:focusable="true"
+            android:backgroundTint="@color/bs_info"
             android:focusableInTouchMode="true"
             android:completionThreshold="2"
             android:inputType="text" />
@@ -117,17 +118,20 @@
                             android:id="@+id/variable_name_input"
                             android:layout_gravity="center_vertical"
                             android:layout_width="match_parent"
+                            android:backgroundTint="@color/bs_info"
                             android:layout_height="wrap_content"
                             android:padding="8dp" />
                         <Spinner
                             android:id="@+id/data_type_spinner"
                             android:layout_gravity="center_vertical"
+                            android:backgroundTint="@color/bs_info"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content" />
 
                         <EditText
                             android:id="@+id/number_of_channels_input"
                             android:layout_gravity="center_vertical"
+                            android:backgroundTint="@color/bs_info"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:inputType="number"
@@ -140,6 +144,7 @@
                                 android:id="@+id/monitoring_esp_tx_checkbox"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
+                                app:buttonTint="@color/bs_info"
                                 android:checked="false" />
                         </LinearLayout>
                         <LinearLayout
@@ -150,6 +155,7 @@
                                 android:id="@+id/real_time_control_checkbox"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
+                                app:buttonTint="@color/bs_info"
                                 android:textAlignment="center"
                                 android:checked="false" />
                         </LinearLayout>

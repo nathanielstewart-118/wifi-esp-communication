@@ -35,7 +35,7 @@ import com.prtech.spiapp.db.entity.ESPPacket;
 import com.prtech.spiapp.db.entity.ESPTX;
 import com.prtech.spiapp.db.entity.ESPOutlier;
 import com.prtech.spiapp.db.viewmodel.ESPTXViewModel;
-import com.prtech.spiapp.db.viewmodel.SensorActuatorViewModel;
+import com.prtech.spiapp.db.viewmodel.ESPPacketViewModel;
 import com.prtech.spiapp.utils.Constants;
 import com.google.gson.Gson;
 
@@ -61,7 +61,7 @@ public class ESPTXSetting extends Fragment {
 
 
     private ESPTXViewModel espTXViewModel;
-    private SensorActuatorViewModel sensorActuatorViewModel;
+    private ESPPacketViewModel espPacketViewModel;
 
 
     List<ESPTX> esptxes = new ArrayList<>();
@@ -83,8 +83,8 @@ public class ESPTXSetting extends Fragment {
         espTXViewModel = new ViewModelProvider(
                 requireActivity()
         ).get(ESPTXViewModel.class);
-        sensorActuatorViewModel = new ViewModelProvider(requireActivity()).get(SensorActuatorViewModel.class);
-        sensorActuatorViewModel.getAllSensorActuators().observe(getViewLifecycleOwner(), data -> {
+        espPacketViewModel = new ViewModelProvider(requireActivity()).get(ESPPacketViewModel.class);
+        espPacketViewModel.getAllSensorActuators().observe(getViewLifecycleOwner(), data -> {
             sensorsAndActuators.clear();
             sensorsAndActuators.addAll(data);
         });

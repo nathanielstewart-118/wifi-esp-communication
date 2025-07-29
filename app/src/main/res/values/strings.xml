@@ -151,6 +151,11 @@
     <string name="unexpected_error_occurred_please_load_and_check">Unexpected error occurred. Please load and check.</string>
     <string name="an_error_occurred_while_saving_please_load_and_check">An error occurred while saving. Please load and check.</string>
     <string name="esp_packet">» ESP Packet</string>
+    <string name="set_data_saved_successfully">Set Data saved successfully.</string>
+    <string name="updated_data_successfully">Updated data successfully.</string>
+    <string name="failed_to_update_data">Failed to update data.</string>
+    <string name="saved_data_successfully">Saved data successfully.</string>
+    <string name="failed_to_save_data">Failed to save data.</string>
     <string-array name="my_array_items">
         <item>en</item>
         <item>cn</item>

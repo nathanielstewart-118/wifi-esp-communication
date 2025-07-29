@@ -7,8 +7,6 @@
     <item android:id="@+id/wifi_menu_item" android:enabled="true" android:title="@string/wifi" />
     <item android:id="@+id/sensor_menu_item" android:enabled="true" android:title="@string/esp_packet"/>
     <item android:id="@+id/command_menu_item" android:enabled="true" android:title="@string/command"/>
-    <item android:id="@+id/esp_tx_menu_item" android:enabled="true" android:title="@string/esp_tx" />
-    <item android:id="@+id/esp_rxrt_menu_item" android:enabled="true" android:title="@string/esp_rxrt"/>
     <item android:id="@+id/experiment_menu_item" android:enabled="true" android:title="@string/experiment"/>
     <item android:id="@+id/visualization_menu_item" android:enabled="true" android:title="@string/visualization"/>
     <item android:id="@+id/monitoring_menu_item" android:enabled="true" android:title="@string/monitoring"/>

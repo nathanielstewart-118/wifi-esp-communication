@@ -38,4 +38,20 @@ public class CommonUtils {
         }
         return bytes;
     }
+
+    public static Integer string2Int(String input, Integer defaultValue) {
+        try {
+            return Integer.parseInt(input);
+        } catch (NumberFormatException e) {
+            return defaultValue;
+        }
+    }
+
+    public static Float string2Float(String input, Float defaultValue) {
+        try {
+            return Float.parseFloat(input);
+        } catch (NumberFormatException e) {
+            return defaultValue;
+        }
+    }
 }

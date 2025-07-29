@@ -14,15 +14,15 @@ public class Experiment {
     @PrimaryKey(autoGenerate = true)
     public Long id;
 
-    @ColumnInfo(name="experiment_id")
-    public String experimentId;
+    @ColumnInfo(name="title")
+    public String title;
 
     @ColumnInfo(name="commands")
     @TypeConverters(ExperimentCommandsConverter.class)
     public List<String> commands;
 
-    @ColumnInfo(name="experiment_set")
-    public String experimentSet;
+    @ColumnInfo(name="set_id")
+    public Integer experimentSet;
 
     @ColumnInfo(name="number_of_trials")
     public Integer numberOfTrials;
@@ -42,8 +42,10 @@ public class Experiment {
     @ColumnInfo(name="rest_random")
     public Float restRandom;
 
-    public Experiment(String experimentId, String experimentSet, List<String> commands, Integer numberOfTrials, Float preRun, Float postRun, Float rest, Float restRandom) {
-        this.experimentId = experimentId;
+    public Experiment(String title, List<String> commands, Integer experimentSet, Integer numberOfTrials, Float command, Float preRun, Float postRun, Float rest, Float restRandom) {
+        this.title = title;
+        this.experimentSet = experimentSet;
+        this.command = command;
         this.commands = commands;
         this.numberOfTrials = numberOfTrials;
         this.preRun = preRun;
@@ -54,7 +56,7 @@ public class Experiment {
 
     public void copyFrom(Experiment other) {
         this.id = other.getId();
-        this.experimentId = other.getExperimentId();
+        this.title = other.getTitle();
         this.experimentSet = other.getExperimentSet();
         this.commands = other.getCommands();
         this.numberOfTrials = other.getNumberOfTrials();
@@ -73,19 +75,19 @@ public class Experiment {
         this.id = id;
     }
 
-    public String getExperimentId() {
-        return experimentId;
+    public String getTitle() {
+        return title;
     }
 
-    public void setExperimentId(String experimentId) {
-        this.experimentId = experimentId;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
-    public String getExperimentSet() {
+    public Integer getExperimentSet() {
         return experimentSet;
     }
 
-    public void setExperimentSet(String experimentSet) {
+    public void setExperimentSet(Integer experimentSet) {
         this.experimentSet = experimentSet;
     }
 

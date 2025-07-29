@@ -37,7 +37,7 @@ import com.prtech.spiapp.db.entity.ESPPacket;
 import com.prtech.spiapp.db.entity.ESPRXRT;
 import com.prtech.spiapp.db.entity.ESPThreshold;
 import com.prtech.spiapp.db.viewmodel.ESPRXRTViewModel;
-import com.prtech.spiapp.db.viewmodel.SensorActuatorViewModel;
+import com.prtech.spiapp.db.viewmodel.ESPPacketViewModel;
 import com.prtech.spiapp.utils.Constants;
 import com.google.gson.Gson;
 
@@ -69,7 +69,7 @@ public class ESPRXRTSetting extends Fragment {
     private EditText numberOfChannelsEdit;
 
     private ESPRXRTViewModel esprxrtViewModel;
-    private SensorActuatorViewModel sensorActuatorViewModel;
+    private ESPPacketViewModel espPacketViewModel;
 
     private List<ESPRXRT> esprxrts = new ArrayList<>();
     private List<ESPPacket> espPackets = new ArrayList<>();
@@ -106,8 +106,8 @@ public class ESPRXRTSetting extends Fragment {
             displayESPRXRTTable();
         });
 
-        sensorActuatorViewModel = new ViewModelProvider(requireActivity()).get(SensorActuatorViewModel.class);
-        sensorActuatorViewModel.getAllSensorActuators().observe(getViewLifecycleOwner(), data -> {
+        espPacketViewModel = new ViewModelProvider(requireActivity()).get(ESPPacketViewModel.class);
+        espPacketViewModel.getAllSensorActuators().observe(getViewLifecycleOwner(), data -> {
            espPackets.clear();
            espPackets.addAll(data);
         });

@@ -13,6 +13,7 @@ import com.prtech.spiapp.db.AppDatabase;
 import com.prtech.spiapp.db.dao.ExperimentDao;
 import com.prtech.spiapp.db.entity.Experiment;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -46,6 +47,19 @@ public class ExperimentViewModel extends AndroidViewModel {
         });
     }
 
+    public void insertBatch(List<Experiment> experiments, Consumer<List<Long>> callback) {
+        executorService.execute(() -> {
+            List<Long> results = new ArrayList<>();
+            for (Experiment experiment: experiments) {
+                long result = experimentDao.insert(experiment);
+                results.add(result);
+            }
+            new Handler(Looper.getMainLooper()).post(() -> {
+               callback.accept(results);
+            });
+        });
+    }
+
     public LiveData<Long> getInsertResult() {
         return insertResult;
     }
@@ -74,9 +88,36 @@ public class ExperimentViewModel extends AndroidViewModel {
         return deleteResult;
     }
 
-    public void findExperimentsByExperimentId(String id, Consumer<List<Experiment>> callback) {
+    public void getAllTitles(Consumer<List<String>> callback) {
         executorService.execute(() -> {
-            List<Experiment> results = experimentDao.getExperimentsByExperimentId(id);
+            List<String> results = experimentDao.getAllTitles();
+            new Handler(Looper.getMainLooper()).post(() -> {
+               callback.accept(results);
+            });
+        });
+    }
+
+    public void findExperimentsByTitle(String title, Consumer<List<Experiment>> callback) {
+        executorService.execute(() -> {
+            List<Experiment> results = experimentDao.getExperimentsByTitle(title);
+            new Handler(Looper.getMainLooper()).post(() -> {
+                callback.accept(results);
+            });
+        });
+    }
+
+    public void updateBatch(List<Experiment> experiments, Consumer<List<Long>> callback) {
+        if(experiments.isEmpty()) {
+            callback.accept(new ArrayList<>());
+        }
+        executorService.execute(() -> {
+            String title = experiments.get(0).getTitle();
+            experimentDao.deleteByTitle(title);
+            List<Long> results = new ArrayList<>();
+            for (Experiment exp: experiments) {
+                Long result = experimentDao.insert(exp);
+                results.add(result);
+            }
             new Handler(Looper.getMainLooper()).post(() -> {
                 callback.accept(results);
             });

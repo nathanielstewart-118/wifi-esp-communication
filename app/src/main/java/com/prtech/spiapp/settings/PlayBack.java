@@ -28,7 +28,7 @@ import com.prtech.spiapp.db.entity.RangeDTO;
 import com.prtech.spiapp.db.entity.Visualization;
 import com.prtech.spiapp.db.entity.VisualizationRange;
 import com.prtech.spiapp.db.viewmodel.MonitoringViewModel;
-import com.prtech.spiapp.db.viewmodel.SensorActuatorViewModel;
+import com.prtech.spiapp.db.viewmodel.ESPPacketViewModel;
 import com.prtech.spiapp.db.viewmodel.VisualizationViewModel;
 import com.prtech.spiapp.utils.CommonUtils;
 import com.prtech.spiapp.utils.Constants;
@@ -55,7 +55,7 @@ public class PlayBack extends Fragment {
     private VisualizationViewModel visualizationViewModel;
     private MonitoringDao monitoringDao;
     private Visualization currentVisualization;
-    private SensorActuatorViewModel sensorActuatorViewModel;
+    private ESPPacketViewModel espPacketViewModel;
     private List<RangeDTO> rangeDTOs;
     private Map<Long, Object> chartsMap = new HashMap<>();
     private Boolean isPlaying = true;
@@ -72,7 +72,7 @@ public class PlayBack extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_reproduction, container, false);
         AppDatabase db = AppDatabase.getInstance(requireContext());
-        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(Constants.TITLES[9]);
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(Constants.TITLES[6]);
 
         monitoringDao = db.monitoringDao();
 
@@ -99,7 +99,7 @@ public class PlayBack extends Fragment {
 
         });
 
-        sensorActuatorViewModel = new ViewModelProvider(requireActivity()).get(SensorActuatorViewModel.class);
+        espPacketViewModel = new ViewModelProvider(requireActivity()).get(ESPPacketViewModel.class);
 
         return view;
     }
@@ -107,7 +107,7 @@ public class PlayBack extends Fragment {
 
     private void addAccordionSection(VisualizationRange visualizationRange) {
 
-        sensorActuatorViewModel.getById(visualizationRange.getSensorActuatorId(), result -> {
+        espPacketViewModel.getById(visualizationRange.getSensorActuatorId(), result -> {
             // Header
             TextView header = new TextView(requireContext());
             header.setLayoutParams(new LinearLayout.LayoutParams(

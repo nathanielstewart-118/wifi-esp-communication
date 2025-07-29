@@ -23,6 +23,7 @@
                 android:layout_gravity="center_vertical"
                 android:focusable="true"
                 android:focusableInTouchMode="true"
+                android:backgroundTint="@color/bs_info"
                 android:completionThreshold="2"
                 android:inputType="text" />
 
@@ -82,17 +83,20 @@
                 android:layout_weight="1">
                 <EditText
                     android:id="@+id/visualization_sample_rate_text"
+                    android:backgroundTint="@color/bs_info"
                     android:layout_width="match_parent"
                     android:hint="SPS Unit"
                     android:layout_height="wrap_content" />
                 <EditText
                     android:id="@+id/visualization_block_size_text"
                     android:layout_width="match_parent"
+                    android:backgroundTint="@color/bs_info"
                     android:hint="Int unit"
                     android:layout_height="wrap_content" />
                 <EditText
                     android:id="@+id/visualization_buffer_size_text"
                     android:hint="Int unit"
+                    android:backgroundTint="@color/bs_info"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
 
@@ -139,11 +143,13 @@
                 <EditText
                     android:id="@+id/visualization_ms_block_size_text"
                     android:hint="ms unit notation"
+                    android:backgroundTint="@color/bs_info"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
                 <EditText
                     android:id="@+id/visualization_sec_buffer_size_text"
                     android:hint="Sec unit notation"
+                    android:backgroundTint="@color/bs_info"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
 

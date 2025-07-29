@@ -25,6 +25,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:hint="Enter Experiment Setting Title"
+                android:backgroundTint="@color/bs_info"
                 android:layout_gravity="center_vertical"
                 android:focusable="true"
                 android:focusableInTouchMode="true"
@@ -66,46 +67,51 @@
             android:weightSum="4"
             android:padding="8dp">
 
-            <Button
+            <ToggleButton
                 android:id="@+id/experiment_set1_btn"
                 android:layout_width="90dp"
+                android:checked="true"
                 android:layout_height="30dp"
-                android:text="@string/set1"
+                android:textOn="@string/set1"
+                android:textOff="@string/set1"
                 android:textSize="18sp"
                 android:layout_margin="4dp"
                 android:textColor="@color/basic_button_text_color"
-                android:background="@drawable/ripple_info_button" />
+                android:background="@drawable/toggle_selector" />
 
-            <Button
+            <ToggleButton
                 android:id="@+id/experiment_set2_btn"
                 android:layout_width="90dp"
                 android:layout_height="30dp"
-                android:text="@string/set2"
+                android:textOn="@string/set2"
+                android:textOff="@string/set2"
                 android:textSize="18sp"
                 android:layout_margin="4dp"
                 android:textColor="@color/basic_button_text_color"
-                android:background="@drawable/ripple_info_button" />
+                android:background="@drawable/toggle_selector" />
 
-            <Button
+            <ToggleButton
                 android:id="@+id/experiment_set3_btn"
                 android:layout_width="90dp"
                 android:layout_height="30dp"
-                android:text="@string/set3"
+                android:textOn="@string/set3"
+                android:textOff="@string/set3"
                 android:textSize="18sp"
                 android:layout_margin="4dp"
                 android:textColor="@color/basic_button_text_color"
-                android:background="@drawable/ripple_info_button" />
+                android:background="@drawable/toggle_selector" />
 
-            <Button
+            <ToggleButton
                 android:id="@+id/experiment_set4_btn"
                 android:layout_width="90dp"
                 android:layout_height="30dp"
-                android:text="@string/set4"
+                android:textOn="@string/set4"
+                android:textOff="@string/set4"
                 android:textSize="18sp"
                 android:layout_margin="4dp"
                 android:paddingVertical="0dp"
                 android:textColor="@color/basic_button_text_color"
-                android:background="@drawable/ripple_info_button" />
+                android:background="@drawable/toggle_selector" />
         </LinearLayout>
 
         <!-- Divider -->
@@ -165,6 +171,7 @@
                 >
                 <TextView
                     android:padding="8dp"
+                    android:textSize="12sp"
                     android:textStyle="bold"
                     android:gravity="center"
                     android:text="Command Selection" />
@@ -175,6 +182,7 @@
                     android:layout_height="wrap_content"
                     android:divider="@android:color/darker_gray"
                     android:focusable="false"
+                    android:backgroundTint="@color/bs_info"
                     android:clickable="true"
                     android:dividerHeight="1dp"/>
 
@@ -194,11 +202,13 @@
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
                     android:text="N Trials"
+                    android:textSize="12sp"
                     android:gravity="center"
                     android:padding="4dp" />
                 <EditText
                     android:id="@+id/experiment_n_trials_text"
                     android:layout_width="50dp"
+                    android:backgroundTint="@color/bs_info"
                     android:layout_height="40dp"
                     android:layout_gravity="center_vertical"
                     android:hint="@string/enter_the_total_number_of_commands"
@@ -219,14 +229,15 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/command"
+                    android:text="Command"
                     android:gravity="center"
-                    android:textSize="18sp"
+                    android:textSize="12sp"
                     android:paddingVertical="6dp" />
                 <EditText
                     android:id="@+id/experiment_command_text"
                     android:layout_width="50dp"
                     android:layout_height="40dp"
+                    android:backgroundTint="@color/bs_info"
                     android:hint="@string/enter_command_time_in_0_1_degree_increments"
                     android:inputType="numberDecimal" />
 
@@ -248,12 +259,13 @@
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:text="@string/rest"
-                    android:textSize="18sp"
+                    android:textSize="12sp"
                     android:paddingVertical="8dp" />
                 <EditText
                     android:id="@+id/experiment_rest_text"
                     android:layout_width="50dp"
                     android:layout_height="40dp"
+                    android:backgroundTint="@color/bs_info"
                     android:hint="@string/enter_rest_time_in_0_1_degree_increments"
                     android:inputType="numberDecimal" />
                 <TextView
@@ -272,12 +284,13 @@
                     android:layout_height="wrap_content"
                     android:text="@string/rest_random"
                     android:gravity="center"
-                    android:textSize="18sp"
+                    android:textSize="12sp"
                     android:paddingVertical="8dp" />
                 <EditText
                     android:id="@+id/experiment_rest_random_text"
                     android:layout_width="50dp"
                     android:layout_height="40dp"
+                    android:backgroundTint="@color/bs_info"
                     android:hint="@string/enter_rest_random_time_in_0_1_degree_increments"
                     android:inputType="numberDecimal" />
                 <TextView
@@ -298,12 +311,13 @@
                     android:layout_height="wrap_content"
                     android:text="@string/pre_run"
                     android:gravity="center"
-                    android:textSize="18sp"
+                    android:textSize="12sp"
                     android:paddingVertical="8dp" />
                 <EditText
                     android:id="@+id/experiment_pre_run_text"
                     android:layout_width="50dp"
                     android:layout_height="40dp"
+                    android:backgroundTint="@color/bs_info"
                     android:hint="@string/enter_time_in_0_1_degree_increments"
                     android:inputType="numberDecimal" />
 
@@ -324,12 +338,13 @@
                     android:layout_height="wrap_content"
                     android:text="@string/post_run"
                     android:gravity="center"
-                    android:textSize="18sp"
+                    android:textSize="12sp"
                     android:paddingVertical="8dp" />
                 <EditText
                     android:id="@+id/experiment_post_run_text"
                     android:layout_width="50dp"
                     android:layout_height="40dp"
+                    android:backgroundTint="@color/bs_info"
                     android:hint="@string/enter_time_in_0_1_degree_increments"
                     android:inputType="numberDecimal" />
                 <TextView
@@ -348,7 +363,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/run_time"
                     android:gravity="center"
-                    android:textSize="18sp"
+                    android:textSize="12sp"
                     android:paddingVertical="8dp" />
                 <TextView
                     android:id="@+id/experiment_run_time_view"
@@ -371,10 +386,20 @@
                 android:layout_marginHorizontal="20dp"
                 >
                 <Button
+                    android:id="@+id/experiment_set_save_btn"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Save Set Data"
+                    android:textSize="18sp"
+                    android:textColor="@color/basic_button_text_color"
+                    android:background="@drawable/ripple_info_button" />
+
+                <Button
                     android:id="@+id/experiment_reload_btn"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Reload"
+                    android:layout_marginVertical="12dp"
                     android:textSize="18sp"
                     android:textColor="@color/basic_button_text_color"
                     android:background="@drawable/ripple_info_button" />
@@ -384,7 +409,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/update"
-                    android:layout_marginVertical="12dp"
                     android:textSize="18sp"
                     android:textColor="@color/basic_button_text_color"
                     android:background="@drawable/ripple_primary_button" />

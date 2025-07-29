@@ -32,14 +32,13 @@ import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.material.tabs.TabLayout;
 import com.prtech.spiapp.R;
 import com.prtech.spiapp.db.AppDatabase;
 import com.prtech.spiapp.db.entity.ESPPacket;
-import com.prtech.spiapp.db.entity.ESPRXRT;
 import com.prtech.spiapp.db.entity.ESPThreshold;
-import com.prtech.spiapp.db.viewmodel.SensorActuatorViewModel;
+import com.prtech.spiapp.db.viewmodel.ESPPacketViewModel;
 import com.prtech.spiapp.utils.Constants;
+import com.prtech.spiapp.utils.DNDHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,11 +53,10 @@ public class ESPPacketSetting extends Fragment {
     private Button addButton;
     private Button saveBtn;
     private Button loadBtn;
-
     private TableLayout espPacketListTable;
     private TableLayout thresholdListTable;
     private final List<ESPPacket> currentESPPackets = new ArrayList<>();
-    private SensorActuatorViewModel sensorActuatorViewModel;
+    private ESPPacketViewModel espPacketViewModel;
     private AppDatabase db;
     private AutoCompleteTextView idAutocomplete;
     private Boolean delegated = false;
@@ -74,10 +72,10 @@ public class ESPPacketSetting extends Fragment {
         ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(Constants.TITLES[1]);
         db = AppDatabase.getInstance(requireContext());
         View view = inflater.inflate(R.layout.fragment_esp_packet, container, false);
-        sensorActuatorViewModel = new ViewModelProvider(
+        espPacketViewModel = new ViewModelProvider(
                 requireActivity()
-        ).get(SensorActuatorViewModel.class);
-        sensorActuatorViewModel.getAllSensors().observe(getViewLifecycleOwner(), data -> {
+        ).get(ESPPacketViewModel.class);
+        espPacketViewModel.getAllSensors().observe(getViewLifecycleOwner(), data -> {
 //            this.displayTable(data);
 //            sensors.addAll(data);
             if (delegated) {
@@ -86,7 +84,9 @@ public class ESPPacketSetting extends Fragment {
             }
         });
 
-        sensorActuatorViewModel.getAllTitles(0).observe(getViewLifecycleOwner(), results -> {
+
+
+        espPacketViewModel.getAllTitles().observe(getViewLifecycleOwner(), results -> {
             initAutoCompleteWithSuggestionList(idAutocomplete, results, requireContext());
             allTitles = results;
         });
@@ -110,7 +110,7 @@ public class ESPPacketSetting extends Fragment {
         String[] options = { "uint8", "int8", "uint16", "int16", "uint24", "int24", "uint32", "int32", "float", "double"};
         ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, options);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        dataTypeSpinner.setAdapter((adapter));
+        dataTypeSpinner.setAdapter(adapter);
 
 
 
@@ -168,6 +168,7 @@ public class ESPPacketSetting extends Fragment {
             String variableName = variableNameEdit.getText().toString();
             String dataType = dataTypeSpinner.getSelectedItem().toString();
             String numberOfChannels = numberOfChannelsEdit.getText().toString();
+
             Integer monitoring = monitoringCheckbox.isChecked() ? 1 : 0;
             Integer realTimeControl = realTimeControlCheckbox.isChecked() ? 1 : 0;
 
@@ -257,7 +258,7 @@ public class ESPPacketSetting extends Fragment {
                         espPacket.setThresholds(espThresholds);
                     }
                     if (!allTitles.contains(sensorSetTitle)) {
-                        sensorActuatorViewModel.insertBatch(results, insertResults -> {
+                        espPacketViewModel.insertBatch(results, insertResults -> {
                             if (results.size() == insertResults.size()) {
                                 Toast.makeText(requireContext(), R.string.sensor_setting_saved_successfully, Toast.LENGTH_SHORT).show();
                                 initEditControls();
@@ -270,7 +271,7 @@ public class ESPPacketSetting extends Fragment {
                         });
                     }
                     else {
-                        sensorActuatorViewModel.updateBatch(results, updateResults -> {
+                        espPacketViewModel.updateBatch(results, updateResults -> {
                             if (results.size() == updateResults.size()) {
                                 Toast.makeText(requireContext(), "Sensor Setting updated successfully!", Toast.LENGTH_SHORT).show();
                                 initEditControls();
@@ -330,9 +331,11 @@ public class ESPPacketSetting extends Fragment {
             Toast.makeText(requireContext(), "Please enter Sensor Setting title.", Toast.LENGTH_SHORT).show();
             return;
         }
-        sensorActuatorViewModel.getByTitle(title, 0, results -> {
+        espPacketViewModel.getByTitle(title, results -> {
             if (results.isEmpty()) {
                 Toast.makeText(requireContext(), "There is no records with that title", Toast.LENGTH_SHORT).show();
+                espPacketListTable.removeViews(1, espPacketListTable.getChildCount() - 1);
+                thresholdListTable.removeViews(2, thresholdListTable.getChildCount() - 2);
                 initEditControls();
                 return;
             }
@@ -423,18 +426,19 @@ public class ESPPacketSetting extends Fragment {
     }
 
     public void addTableRow(ESPPacket data, int index) {
-
-        TableRow tableRow;
-        tableRow = new TableRow(requireContext());
+        TableRow tableRow = new TableRow(requireContext());
         tableRow.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.table_border));
         tableRow.setTag(data.getId());
         tableRow.setVerticalGravity(Gravity.CENTER);
+
         TextView orderText = new TextView(requireContext());
         orderText.setText(String.valueOf(index));
         orderText.setGravity(Gravity.CENTER);
+
         TextView nameText = new TextView(requireContext());
         nameText.setText(data.getVariableName());
         nameText.setGravity(Gravity.CENTER);
+
         TextView numberOfChannelsText = new TextView(requireContext());
         numberOfChannelsText.setText(String.valueOf(data.getNumberOfChannels()));
         numberOfChannelsText.setGravity(Gravity.CENTER);
@@ -446,9 +450,11 @@ public class ESPPacketSetting extends Fragment {
         TextView dataTypeText = new TextView(requireContext());
         dataTypeText.setText(data.getDataType());
         dataTypeText.setGravity(Gravity.CENTER);
+
         TextView monitoringText = new TextView(requireContext());
         monitoringText.setText(data.getMonitoring() == 1 ? "Yes": "No");
         monitoringText.setGravity(Gravity.CENTER);
+
         TextView realTimeControlText = new TextView(requireContext());
         realTimeControlText.setText(data.getRealTimeControl() == 1 ? "Yes" : "No");
         realTimeControlText.setGravity(Gravity.CENTER);
@@ -492,6 +498,9 @@ public class ESPPacketSetting extends Fragment {
         btnLayout.addView(changeValueBtn);
         btnLayout.addView(changeOrderBtn);
         btnLayout.addView(deleteBtn);
+
+        DNDHelper.enableRowDragAndDrop(changeOrderBtn, tableRow, espPacketListTable, currentESPPackets, result -> {
+        });
 
         tableRow.addView(btnLayout);
         espPacketListTable.addView(tableRow);
@@ -592,3 +601,4 @@ public class ESPPacketSetting extends Fragment {
     }
 
 }
+

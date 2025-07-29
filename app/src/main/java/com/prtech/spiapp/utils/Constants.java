@@ -35,8 +35,6 @@ public class Constants {
             "WiFi Access and Connection",
             "ESP Packet Settings",
             "Command Settings",
-            "ESP TX Basic Settings",
-            "ESP RXRT Basic Settings",
             "Experiment Settings",
             "Visualization Settings",
             "Monitoring",

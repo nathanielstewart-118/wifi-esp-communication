@@ -25,7 +25,7 @@ import com.prtech.spiapp.db.entity.RangeDTO;
 import com.prtech.spiapp.db.entity.Visualization;
 import com.prtech.spiapp.db.entity.VisualizationRange;
 import com.prtech.spiapp.db.viewmodel.MonitoringViewModel;
-import com.prtech.spiapp.db.viewmodel.SensorActuatorViewModel;
+import com.prtech.spiapp.db.viewmodel.ESPPacketViewModel;
 import com.prtech.spiapp.db.viewmodel.TCPUDPReceiveViewModel;
 import com.prtech.spiapp.db.viewmodel.VisualizationViewModel;
 import com.prtech.spiapp.utils.Constants;
@@ -60,7 +60,7 @@ public class MonitoringSetting extends Fragment {
     private final Map<Long, Object> chartsMap = new HashMap<>();
     private final Gson gson = new Gson();
 
-    private SensorActuatorViewModel sensorActuatorViewModel;
+    private ESPPacketViewModel espPacketViewModel;
     private TCPUDPReceiveViewModel receiveViewModel;
     private MonitoringViewModel monitoringViewModel;
     private VisualizationViewModel visualizationViewModel;
@@ -82,7 +82,7 @@ public class MonitoringSetting extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_monitoring, container, false);
-        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(Constants.TITLES[8]);
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(Constants.TITLES[5]);
         accordionContainer = view.findViewById(R.id.monitoring_accordion_container);
         receiveViewModel = new ViewModelProvider(requireActivity()).get(TCPUDPReceiveViewModel.class);
         receiveViewModel.getData().observe(getViewLifecycleOwner(), data -> {
@@ -97,8 +97,8 @@ public class MonitoringSetting extends Fragment {
 
         });
 
-        sensorActuatorViewModel = new ViewModelProvider(requireActivity()).get(SensorActuatorViewModel.class);
-        sensorActuatorViewModel.getAllSensorActuators().observe(getViewLifecycleOwner(), data -> {
+        espPacketViewModel = new ViewModelProvider(requireActivity()).get(ESPPacketViewModel.class);
+        espPacketViewModel.getAllSensorActuators().observe(getViewLifecycleOwner(), data -> {
             List<ESPPacket> actuators = (List<ESPPacket>) data;
             espPackets.clear();
             espPackets.addAll(actuators);
@@ -230,7 +230,7 @@ public class MonitoringSetting extends Fragment {
     }
     private void addAccordionSection(VisualizationRange visualizationRange) {
 
-        sensorActuatorViewModel.getById(visualizationRange.getSensorActuatorId(), result -> {
+        espPacketViewModel.getById(visualizationRange.getSensorActuatorId(), result -> {
             // Header
             TextView header = new TextView(requireContext());
             header.setLayoutParams(new LinearLayout.LayoutParams(

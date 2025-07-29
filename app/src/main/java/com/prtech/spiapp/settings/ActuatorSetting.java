@@ -34,7 +34,7 @@ import android.widget.Toast;
 import com.prtech.spiapp.R;
 import com.prtech.spiapp.db.AppDatabase;
 import com.prtech.spiapp.db.entity.ESPPacket;
-import com.prtech.spiapp.db.viewmodel.SensorActuatorViewModel;
+import com.prtech.spiapp.db.viewmodel.ESPPacketViewModel;
 import com.prtech.spiapp.utils.Constants;
 
 import java.util.ArrayList;
@@ -54,7 +54,7 @@ public class ActuatorSetting extends Fragment {
     private Button addButton;
     private TableLayout actuatorListTable;
     private List<ESPPacket> actuators = new ArrayList<>();
-    private SensorActuatorViewModel sensorActuatorViewModel;
+    private ESPPacketViewModel espPacketViewModel;
     private AppDatabase db;
     private AutoCompleteTextView idAutocomplete;
     private Boolean delegated = false;
@@ -72,10 +72,10 @@ public class ActuatorSetting extends Fragment {
         ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(Constants.TITLES[2]);
         View view = inflater.inflate(R.layout.fragment_actuator, container, false);
         db = AppDatabase.getInstance(requireContext());
-        sensorActuatorViewModel = new ViewModelProvider(
+        espPacketViewModel = new ViewModelProvider(
                 requireActivity()
-        ).get(SensorActuatorViewModel.class);
-        sensorActuatorViewModel.getAllActuators().observe(getViewLifecycleOwner(), data -> {
+        ).get(ESPPacketViewModel.class);
+        espPacketViewModel.getAllActuators().observe(getViewLifecycleOwner(), data -> {
 //            this.displayTable(data);
 //            actuators.addAll(data);
             if(delegated) {
@@ -84,7 +84,7 @@ public class ActuatorSetting extends Fragment {
             }
         });
 
-        sensorActuatorViewModel.getAllTitles(1).observe(getViewLifecycleOwner(), results -> {
+        espPacketViewModel.getAllTitles().observe(getViewLifecycleOwner(), results -> {
             initAutoCompleteWithSuggestionList(idAutocomplete, results, requireContext());
             allTitles = results;
         });
@@ -299,7 +299,7 @@ public class ActuatorSetting extends Fragment {
                     try {
 
                         if (!allTitles.contains(sensorSetTitle)) {
-                            sensorActuatorViewModel.insertBatch(results, insertResults -> {
+                            espPacketViewModel.insertBatch(results, insertResults -> {
                                 if (results.size() == insertResults.size()) {
                                     Toast.makeText(requireContext(), "Actuator Setting saved successfully.", Toast.LENGTH_SHORT).show();
                                     initEditControls();
@@ -311,7 +311,7 @@ public class ActuatorSetting extends Fragment {
                             });
                         }
                         else {
-                            sensorActuatorViewModel.updateBatch(results, updateResults -> {
+                            espPacketViewModel.updateBatch(results, updateResults -> {
                                 if (results.size() == updateResults.size()) {
                                     Toast.makeText(requireContext(), "Sensor Setting updated successfully!", Toast.LENGTH_SHORT).show();
                                     initEditControls();
@@ -370,7 +370,7 @@ public class ActuatorSetting extends Fragment {
             Toast.makeText(requireContext(), "Please enter Sensor Setting title.", Toast.LENGTH_SHORT).show();
             return;
         }
-        sensorActuatorViewModel.getByTitle(title, 1,  results -> {
+        espPacketViewModel.getByTitle(title, results -> {
             if (results.isEmpty()) {
                 Toast.makeText(requireContext(), "There is no records with that title", Toast.LENGTH_SHORT).show();
                 initEditControls();

@@ -1,5 +1,8 @@
 package com.prtech.spiapp.settings;
 
+import static com.prtech.spiapp.utils.CommonUtils.string2Float;
+import static com.prtech.spiapp.utils.CommonUtils.string2Int;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
@@ -17,8 +20,10 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import com.prtech.spiapp.R;
 import com.prtech.spiapp.db.entity.Command;
@@ -27,8 +32,12 @@ import com.prtech.spiapp.db.viewmodel.CommandViewModel;
 import com.prtech.spiapp.db.viewmodel.ExperimentViewModel;
 import com.prtech.spiapp.utils.Constants;
 
+import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ExperimentSetting extends Fragment {
 
@@ -39,10 +48,7 @@ public class ExperimentSetting extends Fragment {
     private Button loadBtn;
     private Button reloadBtn;
     private Button updateBtn;
-    private Button set1Btn;
-    private Button set2Btn;
-    private Button set3Btn;
-    private Button set4Btn;
+    private Button setSaveBtn;
     private EditText nTrialsEdit;
     private EditText commandEdit;
     private EditText restEdit;
@@ -59,9 +65,10 @@ public class ExperimentSetting extends Fragment {
     private TextView preRunView;
     private TextView postRunView;
     private TextView runTimeView;
-
-
-    private Experiment currentExperiment;
+    private Integer currentSetId = 0;
+    private List<String> allTitles = new ArrayList<>();
+    private List<ToggleButton> toggleButtons = new ArrayList<>();
+    private List<Experiment> currentExperiments = new ArrayList<>();
     public ExperimentSetting() {
 
     }
@@ -69,7 +76,7 @@ public class ExperimentSetting extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_experiment, container, false);
-        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(Constants.TITLES[6]);
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(Constants.TITLES[3]);
         idAutocomplete = (AutoCompleteTextView) view.findViewById(R.id.id_autocomplete);
         nTrialsEdit = view.findViewById(R.id.experiment_n_trials_text);
         nTrialsView = view.findViewById(R.id.experiment_n_trials_view);
@@ -85,31 +92,28 @@ public class ExperimentSetting extends Fragment {
         postRunView = view.findViewById(R.id.experiment_post_run_view);
         runTimeView = view.findViewById(R.id.experiment_run_time_view);
 
+        setSaveBtn = view.findViewById(R.id.experiment_set_save_btn);
+        setSaveBtn.setOnClickListener(v -> handleClickSetSaveBtn());
 
-        currentExperiment = new Experiment("", "", new ArrayList<>(), 0, 0F, 0F, 0F, 0F);
+        Experiment exp = new Experiment(null, null, null, null, null, null, null, null, null);
+        currentExperiments = new ArrayList<>(Arrays.asList(exp, exp, exp, exp));
         experimentViewModel = new ViewModelProvider(requireActivity()).get(ExperimentViewModel.class);
-        experimentViewModel.getAllExperiments().observe(getViewLifecycleOwner(), data -> {
-            List<Experiment> dataArray = (List<Experiment>) data;
-            int cnt = dataArray.size();
-            String[] candidates = new String[cnt];
-            for (int i = 0; i < cnt; i ++) {
-                candidates[i] = dataArray.get(i).getExperimentId();
-            }
-
+        experimentViewModel.getAllTitles(data -> {
+            Collections.sort(data);
+            allTitles.addAll(data);
             ArrayAdapter<String> adapter = new ArrayAdapter<>(
                     requireContext(), // or getContext() if in Fragment
                     android.R.layout.simple_dropdown_item_1line,
-                    candidates
+                    data
             );
-
             idAutocomplete.setAdapter(adapter);
         });
 
         commandList = view.findViewById(R.id.experiment_commands_select);
         commandViewModel = new ViewModelProvider((requireActivity())).get(CommandViewModel.class);
         commandViewModel.getAllCommands().observe(getViewLifecycleOwner(), data -> {
-           List<Command> dataArray = (List<Command>) data;
-           int cnt = dataArray.size();
+            List<Command> dataArray = (List<Command>) data;
+            int cnt = dataArray.size();
             String[] candidates = new String[cnt];
             boolean[] checkedItems = new boolean[cnt];
             for (int i = 0; i < cnt; i ++) {
@@ -136,8 +140,10 @@ public class ExperimentSetting extends Fragment {
                                 commandListString += candidates[i] + ", ";
                             }
                         }
-                        commandList.setText(commandListString.substring(0, commandListString.length() - 2));
-                        currentExperiment.setCommands(selected);
+                        if(!commandListString.isEmpty()) commandList.setText(commandListString.substring(0, commandListString.length() - 2));
+                    })
+                    .setOnDismissListener(dialog -> {
+
                     })
                     .show();
             });
@@ -155,25 +161,21 @@ public class ExperimentSetting extends Fragment {
         updateBtn = (Button) view.findViewById(R.id.experiment_update_btn);
         updateBtn.setOnClickListener(v -> handleClickUpdateBtn());
 
-        set1Btn = (Button) view.findViewById(R.id.experiment_set1_btn);
-        set1Btn.setOnClickListener(v -> {
-            currentExperiment.setExperimentSet("Set1");
-        });
+        toggleButtons.add((ToggleButton) view.findViewById(R.id.experiment_set1_btn));
+        toggleButtons.add((ToggleButton) view.findViewById(R.id.experiment_set2_btn));
+        toggleButtons.add((ToggleButton) view.findViewById(R.id.experiment_set3_btn));
+        toggleButtons.add((ToggleButton) view.findViewById(R.id.experiment_set4_btn));
 
-        set2Btn = (Button) view.findViewById(R.id.experiment_set2_btn);
-        set2Btn.setOnClickListener(v -> {
-            currentExperiment.setExperimentSet("Set2");
-        });
-
-        set3Btn = (Button) view.findViewById(R.id.experiment_set3_btn);
-        set3Btn.setOnClickListener(v -> {
-            currentExperiment.setExperimentSet("Set3");
-        });
-
-        set4Btn = (Button) view.findViewById(R.id.experiment_set4_btn);
-        set4Btn.setOnClickListener(v -> {
-            currentExperiment.setExperimentSet("Set4");
-        });
+        for (ToggleButton toggle: toggleButtons) {
+            toggle.setOnCheckedChangeListener(((buttonView, isChecked) -> {
+                if (isChecked) {
+                    LinearLayout linearLayout = (LinearLayout) buttonView.getParent();
+                    currentSetId = linearLayout.indexOfChild(buttonView);
+                    uncheckOtherToggles((ToggleButton) buttonView);
+                    setValuesIntoUIs(currentExperiments.get(currentSetId));
+                }
+            }));
+        }
 
         return view;
     }
@@ -184,56 +186,50 @@ public class ExperimentSetting extends Fragment {
     }
 
     public void handleClickSaveBtn() {
-        String experimentId = idAutocomplete.getText().toString();
-        if (experimentId.isEmpty()) {
+        String title = idAutocomplete.getText().toString();
+        if (title.isEmpty()) {
             Toast.makeText(requireContext(), R.string.please_enter_the_experiment_title, Toast.LENGTH_SHORT).show();
             return;
         }
+        String msg = "";
+        if (allTitles.contains(title)) msg = "Records with the same title already exist. Are you sure you want to update this Sensor Setting Data?";
+        else msg = "Are you sure you want to save this Sensor Setting Data?";
         new AlertDialog.Builder(requireContext())
-            .setTitle(R.string.confirm)
-            .setMessage(R.string.are_you_sure_you_want_to_save_this_data)
-            .setPositiveButton(R.string.yes, (dialog, which) -> {
-                // Handle Yes button click
-                int nTrials = Integer.parseInt(nTrialsEdit.getText().toString());
-                float command = Float.parseFloat(commandEdit.getText().toString());
-                float rest = Float.parseFloat(restEdit.getText().toString());
-                float rest_random = Float.parseFloat(restRandomEdit.getText().toString());
-                float pre_run = Float.parseFloat(restRandomEdit.getText().toString());
-                float post_run = Float.parseFloat(postRunEdit.getText().toString());
+                .setTitle("Confirm")
+                .setMessage(msg)
+                .setPositiveButton("Yes", (dialog, which) -> {
 
-                currentExperiment.setExperimentId(experimentId);
-                currentExperiment.setNumberOfTrials(nTrials);
-                currentExperiment.setCommand(command);
-                currentExperiment.setRest(rest);
-                currentExperiment.setRestRandom(rest_random);
-                currentExperiment.setPreRun(pre_run);
-                currentExperiment.setPostRun(post_run);
-
-                experimentViewModel.findExperimentsByExperimentId(experimentId, data -> {
-                    if (data.isEmpty()) {
-                        currentExperiment.setId(null);
-                        experimentViewModel.insert(currentExperiment);
-                        experimentViewModel.getInsertResult().observe(getViewLifecycleOwner(), id -> {
-                            if (id != null && id > 0) {
-                                Toast.makeText(getContext(), R.string.insert_success, Toast.LENGTH_SHORT).show();
-                                currentExperiment.setId(-1L);
+                    Experiment experiment = getValuesFromUI();
+                    currentExperiments.set(currentSetId, experiment);
+                    currentExperiments = currentExperiments
+                            .stream()
+                            .map(exp -> {
+                                exp.setTitle(title);
+                                return exp;
+                            })
+                            .collect(Collectors.toList());
+                    // Handle Yes button click
+                    if(allTitles.contains(title)) {
+                        experimentViewModel.updateBatch(currentExperiments, results -> {
+                            if(currentExperiments.size() == results.size()) {
+                                Toast.makeText(requireContext(), R.string.updated_data_successfully, Toast.LENGTH_SHORT).show();
                                 initUIValues(0);
-                            } else {
-                                Toast.makeText(getContext(), R.string.insert_failed, Toast.LENGTH_SHORT).show();
+                            }
+                            else {
+                                Toast.makeText(requireContext(), R.string.failed_to_update_data, Toast.LENGTH_SHORT).show();
                             }
                         });
                     }
                     else {
-                        experimentViewModel.update(currentExperiment);
-                        experimentViewModel.getUpdateResult().observe(getViewLifecycleOwner(), id -> {
-                            if (id != null && id > 0) {
-                                Toast.makeText(getContext(), R.string.update_success, Toast.LENGTH_SHORT).show();
+                        experimentViewModel.insertBatch(currentExperiments, results -> {
+                            if (currentExperiments.size() == results.size()) {
+                                Toast.makeText(requireContext(), R.string.saved_data_successfully, Toast.LENGTH_SHORT).show();
+                                initUIValues(0);
                             } else {
-                                Toast.makeText(getContext(), R.string.update_failed, Toast.LENGTH_SHORT).show();
+                                Toast.makeText(requireContext(), R.string.failed_to_save_data, Toast.LENGTH_SHORT).show();
                             }
                         });
                     }
-                });
             })
             .setNegativeButton(R.string.no, (dialog, which) -> {
                 // Handle No button click (optional)
@@ -244,15 +240,15 @@ public class ExperimentSetting extends Fragment {
     }
 
     public void handleClickLoadBtn() {
-        String experimentId = idAutocomplete.getText().toString();
-        experimentViewModel.findExperimentsByExperimentId(experimentId, data -> {
+        String title = idAutocomplete.getText().toString();
+        experimentViewModel.findExperimentsByTitle(title, data -> {
             if (data.isEmpty()) {
                 Toast.makeText(requireContext(), R.string.can_t_find_the_corresponding_experiment_data, Toast.LENGTH_SHORT).show();
                 return;
             }
-            List<Experiment> results = (List<Experiment>) data;
-            currentExperiment.copyFrom(results.get(0));
-            setValuesIntoUIs(currentExperiment);
+            currentExperiments.clear();
+            currentExperiments.addAll(data);
+            setValuesIntoUIs(currentExperiments.get(currentSetId));
             Toast.makeText(requireContext(), R.string.loaded_experiment_data_successfully, Toast.LENGTH_SHORT).show();
         });
     }
@@ -265,16 +261,37 @@ public class ExperimentSetting extends Fragment {
 
     }
 
+    public void uncheckOtherToggles(ToggleButton selectedToggle) {
+        for (ToggleButton toggle: toggleButtons) {
+            if (toggle != selectedToggle) {
+                toggle.setChecked(false);
+            }
+        }
+    }
+
     @SuppressLint("SetTextI18n")
     public void setValuesIntoUIs(Experiment experiment) {
-        idAutocomplete.setText(experiment.getExperimentId());
-        nTrialsView.setText(String.valueOf(experiment.getNumberOfTrials()));
-        commandView.setText(String.valueOf(experiment.getCommand()));
-        restView.setText(String.valueOf(experiment.getRest()));
-        restRandomView.setText(String.valueOf(experiment.getRestRandom()));
-        preRunView.setText(String.valueOf(experiment.getPreRun()));
-        postRunView.setText(String.valueOf(experiment.getPostRun()));
-    }
+
+//        idAutocomplete.setText(experiment.getTitle() == null ? "" : experiment.getTitle());
+        nTrialsView.setText(experiment.getNumberOfTrials() == null ? "" : String.valueOf(experiment.getNumberOfTrials()));
+        nTrialsEdit.setText(experiment.getNumberOfTrials() == null ? "" : String.valueOf(experiment.getNumberOfTrials()));
+        commandView.setText(experiment.getCommand() == null ? "" : String.valueOf(experiment.getCommand()));
+        commandEdit.setText(experiment.getCommand() == null ? "" : String.valueOf(experiment.getCommand()));
+        restView.setText(experiment.getRest() == null ? "" : String.valueOf(experiment.getRest()));
+        restEdit.setText(experiment.getRest() == null ? "" : String.valueOf(experiment.getRest()));
+        restRandomView.setText(experiment.getRestRandom() == null ? "" : String.valueOf(experiment.getRestRandom()));
+        restRandomEdit.setText(experiment.getRestRandom() == null ? "" : String.valueOf(experiment.getRestRandom()));
+        preRunView.setText(experiment.getPreRun() == null ? "" : String.valueOf(experiment.getPreRun()));
+        preRunEdit.setText(experiment.getPreRun() == null ? "" : String.valueOf(experiment.getPreRun()));
+        postRunView.setText(experiment.getPostRun() == null ? "" : String.valueOf(experiment.getPostRun()));
+        postRunEdit.setText(experiment.getPostRun() == null ? "" : String.valueOf(experiment.getPostRun()));
+        commandList.setText(experiment.getCommands() == null ? "" : String.join(", ", experiment.getCommands()));
+
+        Float runTime = ((experiment.getPreRun() == null ? 0 : experiment.getPreRun()) +
+                (experiment.getCommand() == null ? 0 : experiment.getCommand()) +
+                (experiment.getRest() == null ? 0 : experiment.getRest())) * (experiment.getNumberOfTrials() == null ? 0 : experiment.getNumberOfTrials());
+        runTimeView.setText(String.valueOf(runTime));
+     }
 
     public void initUIValues(int mode) {
         if (mode == 0) {
@@ -297,5 +314,34 @@ public class ExperimentSetting extends Fragment {
         commandList.setText("");
     }
 
+    public void handleClickSetSaveBtn() {
+        Experiment experiment = getValuesFromUI();
+        currentExperiments.set(currentSetId, experiment);
+        Toast.makeText(requireContext(), R.string.set_data_saved_successfully, Toast.LENGTH_SHORT).show();
+    }
+
+    public Experiment getValuesFromUI() {
+        String title = idAutocomplete.getText().toString().trim();
+        Integer nTrials = null;
+        Float command = null;
+        Float rest = null;
+        Float rest_random = null;
+        Float pre_run = null;
+        Float post_run = null;
+        List<String> commands = new ArrayList<>();
+
+        try {
+            nTrials = string2Int(nTrialsEdit.getText().toString().trim(), null);
+            command = string2Float(commandEdit.getText().toString().trim(), null);
+            rest = string2Float(restEdit.getText().toString().trim(), null);
+            rest_random = string2Float(restRandomEdit.getText().toString().trim(), null);
+            pre_run = string2Float(preRunEdit.getText().toString().trim(), null);
+            post_run = string2Float(postRunEdit.getText().toString().trim(), null);
+            commands = Arrays.asList(commandList.getText().toString().trim().split(","));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return new Experiment(title, commands, currentSetId, nTrials, command, pre_run, post_run, rest, rest_random);
+    }
 
 }

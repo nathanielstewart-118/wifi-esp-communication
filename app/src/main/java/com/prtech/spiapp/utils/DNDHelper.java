@@ -61,6 +61,10 @@ public class DNDHelper {
                         if (draggedRow != null) {
                             TableRow target = (TableRow) v;
                             int targetIndex = tableLayout.indexOfChild(target);
+                            int srcIndex = tableLayout.indexOfChild(draggedRow);
+                            T item = rowItem.get(srcIndex - 1);
+                            rowItem.remove(srcIndex - 1);
+                            rowItem.add(targetIndex - 1, item);
                             tableLayout.removeView(draggedRow);
                             tableLayout.addView(draggedRow, targetIndex);
 
@@ -69,16 +73,6 @@ public class DNDHelper {
                             for (int i = 1; i < tableLayout.getChildCount(); i++) {
                                 TableRow r = (TableRow) tableLayout.getChildAt(i);
                                 TextView orderView = (TextView) r.getChildAt(0);
-                                List<T> filtered = rowItem
-                                    .stream()
-                                    .filter(one -> {
-                                        BaseEntity baseEntity = (BaseEntity) one;
-                                        return baseEntity.getId() == Long.parseLong(orderView.getText().toString().trim());
-                                    })
-                                    .collect(Collectors.toList());
-                                if (!filtered.isEmpty()) {
-                                    newOrder.add(i, filtered.get(0));
-                                }
                                 orderView.setText(String.valueOf(i));
                             }
                             onOrderChanged.onOrderChanged(newOrder);

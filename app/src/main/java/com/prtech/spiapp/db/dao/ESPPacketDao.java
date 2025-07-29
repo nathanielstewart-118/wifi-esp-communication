@@ -12,7 +12,7 @@ import com.prtech.spiapp.db.entity.ESPPacket;
 import java.util.List;
 
 @Dao
-public interface SensorActuatorDao {
+public interface ESPPacketDao {
 
     @Insert
     long insert(ESPPacket sa);
@@ -39,8 +39,8 @@ public interface SensorActuatorDao {
     @Query("SELECT * FROM esp_packets WHERE id = :id")
     ESPPacket getSensorActuatorById(Long id);
 
-    @Query("SELECT * FROM esp_packets WHERE title = :title and sensor_or_actuator = :sensorOrActuator")
-    List<ESPPacket> getByTitle(String title, int sensorOrActuator);
+    @Query("SELECT * FROM esp_packets WHERE title = :title")
+    List<ESPPacket> getByTitle(String title);
 
     @Query("INSERT into esp_packets('variable_name', 'data_type', 'number_of_channels', 'monitoring', 'real_time_control') values('a', 'uint8', 3, 0, 0)")
     void insertByRaw();
@@ -48,7 +48,7 @@ public interface SensorActuatorDao {
     @Query("SELECT * FROM esp_packets WHERE id IN (:ids)")
     List<ESPPacket> getByIds(List<Long> ids);
 
-    @Query("SELECT DISTINCT title FROM esp_packets WHERE sensor_or_actuator = :sensorOrActuator")
-    LiveData<List<String>> getAllTitles(int sensorOrActuator);
+    @Query("SELECT DISTINCT title FROM esp_packets")
+    LiveData<List<String>> getAllTitles();
 
 }

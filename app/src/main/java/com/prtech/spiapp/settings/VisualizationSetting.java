@@ -31,7 +31,7 @@ import com.prtech.spiapp.R;
 import com.prtech.spiapp.db.entity.ESPPacket;
 import com.prtech.spiapp.db.entity.Visualization;
 import com.prtech.spiapp.db.entity.VisualizationRange;
-import com.prtech.spiapp.db.viewmodel.SensorActuatorViewModel;
+import com.prtech.spiapp.db.viewmodel.ESPPacketViewModel;
 import com.prtech.spiapp.db.viewmodel.VisualizationViewModel;
 import com.prtech.spiapp.utils.Constants;
 import com.prtech.spiapp.utils.LogHelper;
@@ -62,7 +62,7 @@ public class VisualizationSetting extends Fragment {
     private EditText savePathEdit;
     private RadioGroup saveFormatRadio;
 
-    private SensorActuatorViewModel sensorActuatorViewModel;
+    private ESPPacketViewModel espPacketViewModel;
     private VisualizationViewModel  visualizationViewModel;
     private MainActivity mainActivity;
     private List<Visualization> visualizations = new ArrayList<>();
@@ -80,7 +80,7 @@ public class VisualizationSetting extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_visualization, container, false);
-        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(Constants.TITLES[7]);
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(Constants.TITLES[4]);
         mainActivity = (MainActivity) getActivity();
         idAutocomplete = (AutoCompleteTextView) view.findViewById(R.id.visualization_id_autocomplete);
 
@@ -105,8 +105,8 @@ public class VisualizationSetting extends Fragment {
         loadSensorActuatorBtn.setOnClickListener(v -> handleClickLoadSensorActuator());
         setupCompleteBtn.setOnClickListener(v -> handleClickSetupComplete());
 
-        sensorActuatorViewModel = new ViewModelProvider(requireActivity()).get(SensorActuatorViewModel.class);
-        sensorActuatorViewModel.getAllSensorActuators().observe(getViewLifecycleOwner(), data -> {
+        espPacketViewModel = new ViewModelProvider(requireActivity()).get(ESPPacketViewModel.class);
+        espPacketViewModel.getAllSensorActuators().observe(getViewLifecycleOwner(), data -> {
             espPackets.clear();
             espPackets.addAll(data);
         });

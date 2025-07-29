@@ -4,23 +4,27 @@ import java.util.List;
 
 public class CommandThreshold {
 
-    private Long sensorActuatorId;
-    private List<Double> thresholds;
+    private Long espPacketId;
+    private List<Integer> thresholds;
 
-    public Long getSensorActuatorId() {
-        return sensorActuatorId;
-    }
-
-    public void setSensorActuatorId(Long sensorActuatorId) {
-        this.sensorActuatorId = sensorActuatorId;
-    }
-
-    public List<Double> getThresholds() {
-        return thresholds;
-    }
-
-    public void setThresholds(List<Double> thresholds) {
+    public CommandThreshold(Long espPacketId, List<Integer> thresholds) {
+        this.espPacketId = espPacketId;
         this.thresholds = thresholds;
     }
 
+    public Long getEspPacketId() {
+        return espPacketId;
+    }
+
+    public void setEspPacketId(Long espPacketId) {
+        this.espPacketId = espPacketId;
+    }
+
+    public List<Integer> getThresholds() {
+        return thresholds;
+    }
+
+    public void setThresholds(List<Integer> thresholds) {
+        this.thresholds = thresholds;
+    }
 }

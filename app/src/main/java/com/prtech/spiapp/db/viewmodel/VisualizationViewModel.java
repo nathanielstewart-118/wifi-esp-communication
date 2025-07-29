@@ -10,7 +10,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.prtech.spiapp.db.AppDatabase;
-import com.prtech.spiapp.db.dao.SensorActuatorDao;
+import com.prtech.spiapp.db.dao.ESPPacketDao;
 import com.prtech.spiapp.db.dao.VisualizationDao;
 import com.prtech.spiapp.db.entity.ESPPacket;
 import com.prtech.spiapp.db.entity.RangeDTO;
@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 public class VisualizationViewModel extends AndroidViewModel {
     private final VisualizationDao visualizationDao;
     private final ExecutorService executorService;
-    private final SensorActuatorDao sensorActuatorDao;
+    private final ESPPacketDao espPacketDao;
 
     private final MutableLiveData<Long> insertResult = new MutableLiveData<>();
     private final MutableLiveData<Integer> updateResult = new MutableLiveData<>();
@@ -35,7 +35,7 @@ public class VisualizationViewModel extends AndroidViewModel {
         super(application);
         AppDatabase db = AppDatabase.getInstance(application);
         this.visualizationDao = db.visualizationDao();
-        this.sensorActuatorDao = db.sensorActuatorDao();
+        this.espPacketDao = db.espPacketDao();
         this.executorService = Executors.newSingleThreadExecutor();
     }
 
@@ -111,7 +111,7 @@ public class VisualizationViewModel extends AndroidViewModel {
             List<RangeDTO> results = v.getRanges()
                 .stream()
                 .map(r -> {
-                    ESPPacket s = sensorActuatorDao.getSensorActuatorById(r.getSensorActuatorId());
+                    ESPPacket s = espPacketDao.getSensorActuatorById(r.getSensorActuatorId());
                     return new RangeDTO(id, s.getId(), s.getVariableName(), s.getDataType(), s.getNumberOfChannels(), r.getVisualizationType(), r.getyAxisRange(), r.getUpperLimit(), r.getLowerLimit());
                 })
                 .collect(Collectors.toList());

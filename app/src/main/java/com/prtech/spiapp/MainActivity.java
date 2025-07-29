@@ -118,10 +118,6 @@ public class MainActivity extends AppCompatActivity {
                     selectedFragment = new MonitoringSetting();
                 } else if (id == R.id.reproduction_menu_item) {
                     selectedFragment = new PlayBack();
-                } else if (id == R.id.esp_tx_menu_item) {
-                    selectedFragment = new ESPTXSetting();
-                } else if (id == R.id.esp_rxrt_menu_item) {
-                    selectedFragment = new ESPRXRTSetting();
                 }
 
                 if (selectedFragment != null) {

@@ -13,42 +13,46 @@ import java.util.List;
 public class Visualization {
 
     @PrimaryKey(autoGenerate = true)
-    public Long id;
+    private Long id;
 
-    @ColumnInfo(name="visualization_id")
-    public String visualizationId;
+    @ColumnInfo(name="title")
+    private String title;
+
+    @ColumnInfo(name="esp_title")
+    private String espTitle;
 
     @ColumnInfo(name="sample_rate")
-    public Integer sampleRate;
+    private Integer sampleRate;
 
     @ColumnInfo(name="block_size")
-    public Integer blockSize;
+    private Integer blockSize;
 
     @ColumnInfo(name="buffer_size")
-    public Integer bufferSize;
+    private Integer bufferSize;
 
     @ColumnInfo(name="ranges")
     @TypeConverters(VisualizationRangeConverter.class)
-    List<VisualizationRange> ranges;
+    private List<VisualizationRange> ranges;
 
     @ColumnInfo(name="save_format")
-    public Integer saveFormat; //
+    private Integer saveFormat; //
 
     @ColumnInfo(name="save_path")
     public String savePath;
 
     @ColumnInfo(name="activated")
-    public Integer activated;
+    private Integer activated;
 
     @ColumnInfo(name="created_at")
-    public Long created_at;
+    private Long createdAt;
 
     @ColumnInfo(name="updated_at")
-    public Long updated_at;
+    private Long updatedAt;
 
 
-    public Visualization(String visualizationId, Integer sampleRate, Integer blockSize, Integer bufferSize, List<VisualizationRange> ranges, Integer saveFormat, String savePath, Integer activated, Long created_at) {
-        this.visualizationId = visualizationId;
+    public Visualization(String title, String espTitle, Integer sampleRate, Integer blockSize, Integer bufferSize, List<VisualizationRange> ranges, Integer saveFormat, String savePath, Integer activated, Long createdAt) {
+        this.title = title;
+        this.espTitle = espTitle;
         this.sampleRate = sampleRate;
         this.blockSize = blockSize;
         this.bufferSize = bufferSize;
@@ -56,12 +60,13 @@ public class Visualization {
         this.saveFormat = saveFormat;
         this.savePath = savePath;
         this.activated = activated;
-        this.created_at = created_at;
+        this.createdAt = createdAt;
     }
 
     public void copyFrom(Visualization other) {
         this.id = other.getId();
-        this.visualizationId = other.getVisualizationId();
+        this.title = other.getTitle();
+        this.espTitle = other.getEspTitle();
         this.sampleRate = other.getSampleRate();
         this.blockSize = other.getBlockSize();
         this.bufferSize = other.getBufferSize();
@@ -69,6 +74,8 @@ public class Visualization {
         this.activated = other.getActivated();
         this.saveFormat = other.getSaveFormat();
         this.savePath = other.getSavePath();
+        this.createdAt = other.getCreatedAt();
+        this.updatedAt = other.getUpdatedAt();
     }
 
     public Long getId() {
@@ -79,12 +86,20 @@ public class Visualization {
         this.id = id;
     }
 
-    public String getVisualizationId() {
-        return visualizationId;
+    public String getTitle() {
+        return title;
     }
 
-    public void setVisualizationId(String visualizationId) {
-        this.visualizationId = visualizationId;
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getEspTitle() {
+        return espTitle;
+    }
+
+    public void setEspTitle(String espTitle) {
+        this.espTitle = espTitle;
     }
 
     public Integer getSampleRate() {
@@ -143,19 +158,19 @@ public class Visualization {
         this.activated = activated;
     }
 
-    public Long getCreated_at() {
-        return created_at;
+    public Long getCreatedAt() {
+        return createdAt;
     }
 
-    public void setCreated_at(Long created_at) {
-        this.created_at = created_at;
+    public void setCreatedAt(Long createdAt) {
+        this.createdAt = createdAt;
     }
 
-    public Long getUpdated_at() {
-        return updated_at;
+    public Long getUpdatedAt() {
+        return updatedAt;
     }
 
-    public void setUpdated_at(Long updated_at) {
-        this.updated_at = updated_at;
+    public void setUpdatedAt(Long updatedAt) {
+        this.updatedAt = updatedAt;
     }
 }

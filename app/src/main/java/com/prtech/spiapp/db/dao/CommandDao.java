@@ -35,6 +35,9 @@ public interface CommandDao {
     @Query("SELECT * FROM commands WHERE title=:title")
     List<Command> getByTitle(String title);
 
+    @Query("SELECT * FROM commands WHERE title IN (:titles)")
+    List<Command> getByTitles(List<String> titles);
+
     @Query(("DELETE FROM commands WHERE title = :title"))
     void deleteByTitle(String title);
 }

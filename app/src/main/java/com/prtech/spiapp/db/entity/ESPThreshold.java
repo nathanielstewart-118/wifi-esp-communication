@@ -5,16 +5,16 @@ import java.util.List;
 public class ESPThreshold {
 
     private Integer order;
-    private Integer initialValue;
-    private Integer upperLimit;
-    private Integer lowerLimit;
+    private Float initialValue;
+    private Float upperLimit;
+    private Float lowerLimit;
     private Integer thresholdsEnabled;
     private Integer outliersEnabled;
     private List<CommandThreshold> commandThresholds;
-    private Integer outlier;
+    private Float outlier;
     private String compare;
 
-    public ESPThreshold(int order, int initialValue, int upperLimit, int lowerLimit, int thresholdsEnabled, int outliersEnabled, List<CommandThreshold> commandThresholds, int outlier, String compare ) {
+    public ESPThreshold(Integer order, Float initialValue, Float upperLimit, Float lowerLimit, Integer thresholdsEnabled, Integer outliersEnabled, List<CommandThreshold> commandThresholds, Float outlier, String compare ) {
         this.order = order;
         this.initialValue = initialValue;
         this.upperLimit = upperLimit;
@@ -34,27 +34,27 @@ public class ESPThreshold {
         this.order = order;
     }
 
-    public Integer getInitialValue() {
+    public Float getInitialValue() {
         return initialValue;
     }
 
-    public void setInitialValue(Integer initialValue) {
+    public void setInitialValue(Float initialValue) {
         this.initialValue = initialValue;
     }
 
-    public Integer getUpperLimit() {
+    public Float getUpperLimit() {
         return upperLimit;
     }
 
-    public void setUpperLimit(Integer upperLimit) {
+    public void setUpperLimit(Float upperLimit) {
         this.upperLimit = upperLimit;
     }
 
-    public Integer getLowerLimit() {
+    public Float getLowerLimit() {
         return lowerLimit;
     }
 
-    public void setLowerLimit(Integer lowerLimit) {
+    public void setLowerLimit(Float lowerLimit) {
         this.lowerLimit = lowerLimit;
     }
 
@@ -82,11 +82,11 @@ public class ESPThreshold {
         this.commandThresholds = commandThresholds;
     }
 
-    public Integer getOutlier() {
+    public Float getOutlier() {
         return outlier;
     }
 
-    public void setOutlier(Integer outlier) {
+    public void setOutlier(Float outlier) {
         this.outlier = outlier;
     }
 

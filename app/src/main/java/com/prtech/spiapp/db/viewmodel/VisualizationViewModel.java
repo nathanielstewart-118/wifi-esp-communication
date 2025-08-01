@@ -75,9 +75,9 @@ public class VisualizationViewModel extends AndroidViewModel {
         return deleteResult;
     }
 
-    public void getByVisualizationId(String vId, Consumer<List<Visualization>> callback) {
+    public void getByTitle(String vId, Consumer<List<Visualization>> callback) {
         executorService.execute(() -> {
-            List<Visualization> results = visualizationDao.getByVisualizationId(vId);
+            List<Visualization> results = visualizationDao.getByTitle(vId);
             new Handler(Looper.getMainLooper()).post(() -> {
                callback.accept(results);
             });
@@ -111,10 +111,19 @@ public class VisualizationViewModel extends AndroidViewModel {
             List<RangeDTO> results = v.getRanges()
                 .stream()
                 .map(r -> {
-                    ESPPacket s = espPacketDao.getSensorActuatorById(r.getSensorActuatorId());
-                    return new RangeDTO(id, s.getId(), s.getVariableName(), s.getDataType(), s.getNumberOfChannels(), r.getVisualizationType(), r.getyAxisRange(), r.getUpperLimit(), r.getLowerLimit());
+                    ESPPacket s = espPacketDao.getSensorActuatorById(r.getEspPacketId());
+                    return new RangeDTO(s.getId(), s.getVariableName(), s.getDataType(), s.getNumberOfChannels(), r.getVisualizationType(), r.getyAxisRange(), r.getUpperLimit(), r.getLowerLimit());
                 })
                 .collect(Collectors.toList());
+            new Handler(Looper.getMainLooper()).post(() -> {
+               callback.accept(results);
+            });
+        });
+    }
+
+    public void getByESPPacketTitle(String title, Consumer<List<Visualization>> callback) {
+        executorService.execute(() -> {
+            List<Visualization> results = visualizationDao.getByESPPacketTitle(title);
             new Handler(Looper.getMainLooper()).post(() -> {
                callback.accept(results);
             });

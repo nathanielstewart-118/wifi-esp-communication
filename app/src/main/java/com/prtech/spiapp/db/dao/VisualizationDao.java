@@ -30,8 +30,8 @@ public interface VisualizationDao {
     @Query("SELECT * FROM visualizations WHERE id = :id")
     Visualization getVisualizationById(Long id);
 
-    @Query("SELECT * FROM visualizations WHERE visualization_id = :vId")
-    List<Visualization> getByVisualizationId(String vId);
+    @Query("SELECT * FROM visualizations WHERE title = :title")
+    List<Visualization> getByTitle(String title);
 
     @Query("SELECT * FROM visualizations WHERE activated = 1")
     List<Visualization> getActivatedVisualization();
@@ -44,6 +44,9 @@ public interface VisualizationDao {
 
     @Query("SELECT * FROM visualizations WHERE id IN (:ids)")
     List<Visualization> getByIds(List<Long> ids);
+
+    @Query("SELECT * FROM visualizations WHERE esp_title = :espPacketTitle")
+    List<Visualization> getByESPPacketTitle(String espPacketTitle);
 
     @Transaction()
     default void setActivated(Long id) {

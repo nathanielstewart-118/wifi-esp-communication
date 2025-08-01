@@ -32,9 +32,12 @@ public interface ExperimentDao {
     List<Experiment> getExperimentsByTitle(String title);
 
     @Query("SELECT DISTINCT title FROM experiments")
-    List<String> getAllTitles();
+    LiveData<List<String>> getAllTitles();
 
     @Query("DELETE FROM experiments WHERE title=:title")
     void deleteByTitle(String title);
+
+    @Query("SELECT * FROM experiments WHERE title=:title")
+    List<Experiment> getByTitle(String title);
 
 }

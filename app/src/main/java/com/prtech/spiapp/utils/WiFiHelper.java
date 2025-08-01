@@ -38,7 +38,7 @@ public class WiFiHelper {
 
 
 
-    public void scanWifiNetworks(Consumer<List<ScanResult>> callback) {
+    public void scanWifiNetworks(Consumer<String[][]> callback) {
         new Thread(() -> {
             try {
                 // Check if wifiManager is null
@@ -106,8 +106,21 @@ public class WiFiHelper {
                                 "Trying to call callback function with the scanned results",
                                 Constants.LOGGING_BEARER_TOKEN
                             );
+                            int cnt = results.size();
+                            String[][] wifiLists = new String[cnt][4];
+                            for (int i = 0; i < cnt; i ++) {
+                                ScanResult scanResult = results.get(i);
+                                String ssid = scanResult.SSID;
+                                int level = WifiManager.calculateSignalLevel(scanResult.level, 5);
+                                wifiLists[i][0] = ssid;
+                                wifiLists[i][1] = String.valueOf(level);
+                                wifiLists[i][2] = "";
+                                String capabilities = scanResult.capabilities;
+
+                                wifiLists[i][3] = getSecurityType(capabilities);
+                            }
+                            callback.accept(wifiLists);
                             Log.d("Info", "Trying to call callback function with the scanned results");
-                            callback.accept(results);
                         } catch (Exception e) {
                             Log.e("Exception", "Error in BroadcastReceiver: " + e.getMessage(), e);
                             LogHelper.sendLog(
@@ -251,4 +264,19 @@ public class WiFiHelper {
             wm.removeNetwork(conf.networkId);
         }
     }
+
+    private String getSecurityType(String capabilities) {
+        if (capabilities.contains("WPA3")) {
+            return "WPA3";
+        } else if (capabilities.contains("WPA2")) {
+            return "WPA2";
+        } else if (capabilities.contains("WPA")) {
+            return "WPA";
+        } else if (capabilities.contains("WEP")) {
+            return "WEP";
+        } else {
+            return "Open";
+        }
+    }
+
 }

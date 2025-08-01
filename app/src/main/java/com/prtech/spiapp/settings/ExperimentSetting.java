@@ -95,33 +95,31 @@ public class ExperimentSetting extends Fragment {
         setSaveBtn = view.findViewById(R.id.experiment_set_save_btn);
         setSaveBtn.setOnClickListener(v -> handleClickSetSaveBtn());
 
-        Experiment exp = new Experiment(null, null, null, null, null, null, null, null, null);
-        currentExperiments = new ArrayList<>(Arrays.asList(exp, exp, exp, exp));
+        initCurrentExperiments();
         experimentViewModel = new ViewModelProvider(requireActivity()).get(ExperimentViewModel.class);
-        experimentViewModel.getAllTitles(data -> {
+        experimentViewModel.getAllTitles().observe(getViewLifecycleOwner(), data -> {
             Collections.sort(data);
+            allTitles.clear();
             allTitles.addAll(data);
             ArrayAdapter<String> adapter = new ArrayAdapter<>(
                     requireContext(), // or getContext() if in Fragment
                     android.R.layout.simple_dropdown_item_1line,
-                    data
+                    allTitles
             );
             idAutocomplete.setAdapter(adapter);
         });
 
         commandList = view.findViewById(R.id.experiment_commands_select);
         commandViewModel = new ViewModelProvider((requireActivity())).get(CommandViewModel.class);
-        commandViewModel.getAllCommands().observe(getViewLifecycleOwner(), data -> {
-            List<Command> dataArray = (List<Command>) data;
-            int cnt = dataArray.size();
-            String[] candidates = new String[cnt];
+        commandViewModel.getAllTitles().observe(getViewLifecycleOwner(), data -> {
+            int cnt = data.size();
             boolean[] checkedItems = new boolean[cnt];
             for (int i = 0; i < cnt; i ++) {
-                candidates[i] = dataArray.get(i).getCommandCode();
                 checkedItems[i] = false;
             }
+            String[] candidates = data.toArray(new String[0]);
             commandList.setOnClickListener(v -> {
-                if (candidates.length == 0) {
+                if (data.isEmpty()) {
                     Toast.makeText(requireContext(), R.string.no_commands_yet, Toast.LENGTH_SHORT).show();
                     return;
                 }
@@ -143,7 +141,6 @@ public class ExperimentSetting extends Fragment {
                         if(!commandListString.isEmpty()) commandList.setText(commandListString.substring(0, commandListString.length() - 2));
                     })
                     .setOnDismissListener(dialog -> {
-
                     })
                     .show();
             });
@@ -165,6 +162,9 @@ public class ExperimentSetting extends Fragment {
         toggleButtons.add((ToggleButton) view.findViewById(R.id.experiment_set2_btn));
         toggleButtons.add((ToggleButton) view.findViewById(R.id.experiment_set3_btn));
         toggleButtons.add((ToggleButton) view.findViewById(R.id.experiment_set4_btn));
+
+
+
 
         for (ToggleButton toggle: toggleButtons) {
             toggle.setOnCheckedChangeListener(((buttonView, isChecked) -> {
@@ -204,6 +204,7 @@ public class ExperimentSetting extends Fragment {
                     currentExperiments = currentExperiments
                             .stream()
                             .map(exp -> {
+                                exp.setId(null);
                                 exp.setTitle(title);
                                 return exp;
                             })
@@ -214,6 +215,7 @@ public class ExperimentSetting extends Fragment {
                             if(currentExperiments.size() == results.size()) {
                                 Toast.makeText(requireContext(), R.string.updated_data_successfully, Toast.LENGTH_SHORT).show();
                                 initUIValues(0);
+                                initCurrentExperiments();
                             }
                             else {
                                 Toast.makeText(requireContext(), R.string.failed_to_update_data, Toast.LENGTH_SHORT).show();
@@ -225,6 +227,7 @@ public class ExperimentSetting extends Fragment {
                             if (currentExperiments.size() == results.size()) {
                                 Toast.makeText(requireContext(), R.string.saved_data_successfully, Toast.LENGTH_SHORT).show();
                                 initUIValues(0);
+                                initCurrentExperiments();
                             } else {
                                 Toast.makeText(requireContext(), R.string.failed_to_save_data, Toast.LENGTH_SHORT).show();
                             }
@@ -236,7 +239,6 @@ public class ExperimentSetting extends Fragment {
                 dialog.dismiss();
             })
             .show();
-
     }
 
     public void handleClickLoadBtn() {
@@ -287,9 +289,11 @@ public class ExperimentSetting extends Fragment {
         postRunEdit.setText(experiment.getPostRun() == null ? "" : String.valueOf(experiment.getPostRun()));
         commandList.setText(experiment.getCommands() == null ? "" : String.join(", ", experiment.getCommands()));
 
-        Float runTime = ((experiment.getPreRun() == null ? 0 : experiment.getPreRun()) +
-                (experiment.getCommand() == null ? 0 : experiment.getCommand()) +
-                (experiment.getRest() == null ? 0 : experiment.getRest())) * (experiment.getNumberOfTrials() == null ? 0 : experiment.getNumberOfTrials());
+        Integer nTrials = experiment.getNumberOfTrials() == null ? 0 : experiment.getNumberOfTrials();
+        Float runTime = (experiment.getPreRun() == null ? 0 : experiment.getPreRun()) +
+                (experiment.getPostRun() == null ? 0 : experiment.getPostRun()) +
+                (experiment.getRest() == null ? 0 : experiment.getRest()) * (nTrials - 1) +
+                (experiment.getCommand() == null ? 0 : experiment.getCommand()) * nTrials;
         runTimeView.setText(String.valueOf(runTime));
      }
 
@@ -337,11 +341,18 @@ public class ExperimentSetting extends Fragment {
             rest_random = string2Float(restRandomEdit.getText().toString().trim(), null);
             pre_run = string2Float(preRunEdit.getText().toString().trim(), null);
             post_run = string2Float(postRunEdit.getText().toString().trim(), null);
-            commands = Arrays.asList(commandList.getText().toString().trim().split(","));
+            commands = Arrays.stream(commandList.getText().toString().trim().split(","))
+                    .map(c -> c.trim())
+                    .collect(Collectors.toList());
         } catch (Exception e) {
             e.printStackTrace();
         }
         return new Experiment(title, commands, currentSetId, nTrials, command, pre_run, post_run, rest, rest_random);
+    }
+
+    public void initCurrentExperiments() {
+        Experiment exp = new Experiment(null, null, null, null, null, null, null, null, null);
+        currentExperiments = new ArrayList<>(Arrays.asList(exp, exp, exp, exp));
     }
 
 }

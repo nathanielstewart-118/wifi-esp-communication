@@ -1,29 +1,52 @@
 package com.prtech.spiapp.settings;
 
 import static com.prtech.spiapp.utils.Constants.COLORS;
+import static com.prtech.spiapp.utils.UIUtils.initSpinnerWithSuggestionList;
+import static com.prtech.spiapp.utils.UIUtils.uncheckOtherToggles;
+import static com.prtech.spiapp.utils.communications.PacketParser.encodeCommand;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.core.view.ViewCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import android.app.AlertDialog;
+import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
+import com.prtech.spiapp.MainActivity;
 import com.prtech.spiapp.R;
+import com.prtech.spiapp.db.entity.Command;
+import com.prtech.spiapp.db.entity.CommandThreshold;
+import com.prtech.spiapp.db.entity.CommandThresholdWithDataType;
 import com.prtech.spiapp.db.entity.ESPPacket;
+import com.prtech.spiapp.db.entity.ESPSendData;
+import com.prtech.spiapp.db.entity.Experiment;
 import com.prtech.spiapp.db.entity.Monitoring;
 import com.prtech.spiapp.db.entity.RangeDTO;
 import com.prtech.spiapp.db.entity.Visualization;
 import com.prtech.spiapp.db.entity.VisualizationRange;
+import com.prtech.spiapp.db.viewmodel.CommandViewModel;
+import com.prtech.spiapp.db.viewmodel.ExperimentViewModel;
 import com.prtech.spiapp.db.viewmodel.MonitoringViewModel;
 import com.prtech.spiapp.db.viewmodel.ESPPacketViewModel;
 import com.prtech.spiapp.db.viewmodel.TCPUDPReceiveViewModel;
@@ -44,13 +67,17 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 
 import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.data.Entry;
+import com.prtech.spiapp.utils.components.CustomLoadingButton;
 
 
 public class MonitoringSetting extends Fragment {
@@ -58,21 +85,42 @@ public class MonitoringSetting extends Fragment {
     private LinearLayout accordionContainer;
     private final Map<Long, Object> accordionContentMap = new HashMap<>();
     private final Map<Long, Object> chartsMap = new HashMap<>();
+    private Spinner experimentSpinner;
     private final Gson gson = new Gson();
+    private List<ToggleButton> experimentToggleButtons = new ArrayList<>();
+    private List<CustomLoadingButton> commandToggleButtons = new ArrayList<>();
+    private Button startBtn;
+    private Button stopBtn;
+
+    private CustomLoadingButton loadingButton;
+    private LinearLayout commandSetBtnLayout;
+
+    private LinearLayout experimentSetBtnLayout;
+
 
     private ESPPacketViewModel espPacketViewModel;
     private TCPUDPReceiveViewModel receiveViewModel;
     private MonitoringViewModel monitoringViewModel;
     private VisualizationViewModel visualizationViewModel;
+    private CommandViewModel commandViewModel;
     private Visualization currentVisualization;
+    private ExperimentViewModel experimentViewModel;
+
     private List<RangeDTO> rangeDTOs;
     private List<ESPPacket> espPackets = new ArrayList<>();
     private ExecutorService executorService = Executors.newSingleThreadExecutor();
-
+    private List<String> experimentTitles = new ArrayList<>();
+    private List<Experiment> currentExperiments = new ArrayList<>();
+    private List<Command> currentCommands = new ArrayList<>();
+    private List<Command> allCommands = new ArrayList<>();
+    private List<Visualization> currentVisualizations = new ArrayList<>();
     private Boolean bDrawing = true;
-
+    private Integer currentExperimentSetId = 0;
+    private Integer currentCommandSetIndex = 0;
     private Map<Long, Float> currentWindowStartMap = new HashMap<>();
     private final float windowSize = 500f;
+    private MainActivity mainActivity;
+    private volatile Boolean bRunning = false;
 
 
     public MonitoringSetting() {
@@ -84,6 +132,45 @@ public class MonitoringSetting extends Fragment {
         View view = inflater.inflate(R.layout.fragment_monitoring, container, false);
         ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(Constants.TITLES[5]);
         accordionContainer = view.findViewById(R.id.monitoring_accordion_container);
+        commandSetBtnLayout = view.findViewById(R.id.monitoring_command_set_btns_wrapper_layout);
+        experimentSetBtnLayout = view.findViewById(R.id.monitoring_experiment_sets_wrapper_layout);
+        mainActivity = (MainActivity) getActivity();
+
+        experimentSpinner = (Spinner) view.findViewById(R.id.monitoring_experiment_select_spinner);
+        experimentSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String experimentTitle = experimentSpinner.getItemAtPosition(position).toString().trim();
+                experimentViewModel.getByTitle(experimentTitle, results -> {
+                    if(results.isEmpty()) return;
+                    currentExperiments.clear();
+                    currentExperiments.addAll(results);
+                    Set<String> titleSets = results
+                            .stream()
+                            .map(Experiment::getCommands)
+                            .filter(Objects::nonNull) // Skip null command lists
+                            .flatMap(List::stream)
+                            .collect(Collectors.toSet());
+                    commandViewModel.getByTitles(new ArrayList<>(titleSets), cmds -> {
+                        allCommands.clear();
+                        allCommands.addAll(cmds);
+                    });
+                    int rowNum = currentExperimentSetId / 2;
+                    int colNum = currentExperimentSetId % 2;
+                    LinearLayout layout = (LinearLayout) experimentSetBtnLayout.getChildAt(rowNum);
+                    ToggleButton button = (ToggleButton) layout.getChildAt(colNum);
+                    uncheckOtherToggles(null, experimentToggleButtons);
+                    button.performClick();
+                });
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
         receiveViewModel = new ViewModelProvider(requireActivity()).get(TCPUDPReceiveViewModel.class);
         receiveViewModel.getData().observe(getViewLifecycleOwner(), data -> {
             LogHelper.sendLog(
@@ -104,6 +191,13 @@ public class MonitoringSetting extends Fragment {
             espPackets.addAll(actuators);
         });
 
+        commandViewModel = new ViewModelProvider(requireActivity()).get(CommandViewModel.class);
+
+        experimentViewModel = new ViewModelProvider(requireActivity()).get(ExperimentViewModel.class);
+        experimentViewModel.getAllTitles().observe(getViewLifecycleOwner(), results -> {
+            results.add(0, "Experiment Set");
+            initSpinnerWithSuggestionList(experimentSpinner, results, requireContext(), android.R.layout.simple_spinner_item);
+        });
 
         monitoringViewModel = new ViewModelProvider(requireActivity()).get(MonitoringViewModel.class);
 
@@ -112,7 +206,7 @@ public class MonitoringSetting extends Fragment {
         // Test data
         visualizationViewModel.getActivatedVisualization(result -> {
             if (result == null) {
-                currentVisualization = new Visualization("", 0, 0, 0, new ArrayList<>(), 0, "", 0, System.currentTimeMillis());
+                currentVisualization = new Visualization("", "", 0, 0, 0, new ArrayList<>(), 0, "", 0, System.currentTimeMillis());
                 rangeDTOs = new ArrayList<>();
                 Toast.makeText(requireContext(), "There is no completed Visualization setting.", Toast.LENGTH_SHORT).show();
             }
@@ -120,6 +214,7 @@ public class MonitoringSetting extends Fragment {
                 currentVisualization = result;
                 displayAccordion(currentVisualization.getRanges());
 //                ByteBuffer buffer = ByteBuffer.allocate(4 * Constants.MAX_VARIABLE_NUMBER_IN_PACKET);
+                /*
                 visualizationViewModel.getCorrespondingSAs(currentVisualization.getId(), results -> {
                     rangeDTOs = results;
                     executorService.execute(() -> {
@@ -155,15 +250,7 @@ public class MonitoringSetting extends Fragment {
                                             break;
                                         }
 
-                                        case "uint24": {
-                                            int value = (int) randomBetween(low, high);
-                                            buffer.put(new byte[] {
-                                                    (byte) ((value >> 16) & 0xFF),
-                                                    (byte) ((value >> 8) & 0xFF),
-                                                    (byte) (value & 0xFF)
-                                            });
-                                            break;
-                                        }
+                                        case "uint24":
 
                                         case "int24": {
                                             int value = (int) randomBetween(low, high);
@@ -216,10 +303,40 @@ public class MonitoringSetting extends Fragment {
                     });
 
                 });
+                 */
+
             }
 
         });
 
+        experimentToggleButtons.add(view.findViewById(R.id.monitoring_experiment_set1_btn));
+        experimentToggleButtons.add(view.findViewById(R.id.monitoring_experiment_set2_btn));
+        experimentToggleButtons.add(view.findViewById(R.id.monitoring_experiment_set3_btn));
+        experimentToggleButtons.add(view.findViewById(R.id.monitoring_experiment_set4_btn));
+
+        for (ToggleButton toggle: experimentToggleButtons) {
+            toggle.setOnCheckedChangeListener(this.handleCheckedChangeListener);
+        }
+
+//        for (ToggleButton toggle: commandToggleButtons) {
+//            toggle.setOnCheckedChangeListener(((buttonView, isChecked) -> {
+//                if (isChecked) {
+//                    uncheckOtherToggles((ToggleButton) buttonView, commandToggleButtons);
+//                }
+//            }));
+//        }
+
+        startBtn = view.findViewById(R.id.monitoring_start_btn);
+        startBtn.setOnClickListener(v -> {
+            try {
+                handleClickStartBtn();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+        stopBtn = view.findViewById(R.id.monitoring_stop_btn);
+        stopBtn.setOnClickListener(v -> handleClickStopBtn());
         return view;
     }
 
@@ -230,20 +347,52 @@ public class MonitoringSetting extends Fragment {
     }
     private void addAccordionSection(VisualizationRange visualizationRange) {
 
-        espPacketViewModel.getById(visualizationRange.getSensorActuatorId(), result -> {
+        espPacketViewModel.getById(visualizationRange.getEspPacketId(), result -> {
             // Header
+            if (result == null) return;
+            LinearLayout headerLayout = new LinearLayout(requireContext());
+            headerLayout.setLayoutParams(new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+            ));
+            headerLayout.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.bs_primary));
+            headerLayout.setOrientation(LinearLayout.HORIZONTAL);
+
             TextView header = new TextView(requireContext());
             header.setLayoutParams(new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
             ));
+
+
             header.setText(result.getVariableName());
             header.setTextSize(18);
             header.setTypeface(null, Typeface.BOLD);
             header.setPadding(24, 24, 24, 24);
-            header.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.bs_primary));
-
             header.setTextColor(Color.WHITE);
+
+            View spaceView = new View(requireContext());
+            spaceView.setLayoutParams(new LinearLayout.LayoutParams(
+                    0,
+                    0,
+                    1
+            ));
+
+            Spinner visualizationSpinner = new Spinner(requireContext());
+            visualizationSpinner.setLayoutParams(new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+            ));
+            List<String> candidates = currentVisualizations
+                    .stream()
+                    .map(Visualization::getTitle)
+                    .collect(Collectors.toList());
+            int color = ContextCompat.getColor(requireContext(), R.color.white); // Replace with your color
+            ViewCompat.setBackgroundTintList(visualizationSpinner, ColorStateList.valueOf(color));
+            initSpinnerWithSuggestionList(visualizationSpinner, candidates, requireContext(), R.layout.white_spinner_item);
+
+
+
 
             // Content container
             LinearLayout contentLayout = new LinearLayout(requireContext());
@@ -254,8 +403,6 @@ public class MonitoringSetting extends Fragment {
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 500
             ));
-
-
 
 //        ArrayList<Entry> entries = new ArrayList<>();
 //        for (int i = 0; i <= 100; i += 10) {
@@ -303,8 +450,8 @@ public class MonitoringSetting extends Fragment {
             scatterChart.getAxisLeft().setAxisMaximum(Float.parseFloat(Constants.Y_AXIS_RANGES[visualizationRange.getyAxisRange()][2]));
             scatterChart.getXAxis().setDrawGridLines(false);
             scatterChart.getLegend().setForm(Legend.LegendForm.SQUARE);
-            chartsMap.put(visualizationRange.getSensorActuatorId(), scatterChart);
-            currentWindowStartMap.put(visualizationRange.getSensorActuatorId(), 0F);
+            chartsMap.put(visualizationRange.getEspPacketId(), scatterChart);
+            currentWindowStartMap.put(visualizationRange.getEspPacketId(), 0F);
             contentLayout.addView(scatterChart);
             contentLayout.setVisibility(View.VISIBLE);
             // Save reference for updates
@@ -316,14 +463,21 @@ public class MonitoringSetting extends Fragment {
                         contentLayout.getVisibility() == View.VISIBLE ? View.GONE : View.VISIBLE
                 );
             });
-
-            accordionContainer.addView(header);
+            headerLayout.addView(header);
+            headerLayout.addView(spaceView);
+            headerLayout.addView(visualizationSpinner);
+            accordionContainer.addView(headerLayout);
             accordionContainer.addView(contentLayout);
 
         });
     }
 
     public void displayAccordion(List<VisualizationRange> data) {
+
+        accordionContainer.removeAllViews();
+        accordionContentMap.clear();
+        chartsMap.clear();
+
         for (VisualizationRange vr: data) {
             addAccordionSection(vr);
         }
@@ -343,12 +497,12 @@ public class MonitoringSetting extends Fragment {
         Map<Long, Object> parsed = PacketParser.parse(rangeDTOs, data);
         final int[] updateCnt = {0};
         for (RangeDTO rangeDTO: rangeDTOs) {
-            List<Object> values = (List<Object>) parsed.get(rangeDTO.getSensorActuatorId());
-            ScatterChart scatterChart = (ScatterChart) chartsMap.get(rangeDTO.getSensorActuatorId());
+            List<Object> values = (List<Object>) parsed.get(rangeDTO.getEspPacketId());
+            ScatterChart scatterChart = (ScatterChart) chartsMap.get(rangeDTO.getEspPacketId());
             Runnable updater = new Runnable() {
                 @Override
                 public void run() {
-                    updateChartWithData(scatterChart, values, rangeDTO.getSensorActuatorId());
+                    updateChartWithData(scatterChart, values, rangeDTO.getEspPacketId());
                 }
             };
 
@@ -415,9 +569,285 @@ public class MonitoringSetting extends Fragment {
 
     }
 
-    private static double randomBetween(double low, double high) {
-        Random random = new Random();
-        return low + (high - low) * random.nextDouble();
+    public void handleClickStartBtn() throws InterruptedException {
+        bRunning = true;
+        enableOrDisableButtons(experimentToggleButtons, false);
+        executorService.execute(() -> {
+            List<String> commands = currentExperiments.get(currentExperimentSetId).getCommands();
+            int cnt = commands.size();
+
+            for (int i = 0; i < cnt; i ++ ) {
+                int finalI = i;
+                List<Command> filtered = allCommands
+                        .stream()
+                        .filter(c -> c.getTitle().equals(commands.get(finalI)))
+                        .collect(Collectors.toList());
+                if(!filtered.isEmpty()) {
+                    String espPacketTitle = filtered.get(0).getEspPacketTitle();
+                    visualizationViewModel.getByESPPacketTitle(espPacketTitle, results -> {
+                        currentVisualizations.clear();
+                        currentVisualizations.addAll(results);
+                        if (!results.isEmpty()) {
+                            displayAccordion(results.get(0).getRanges());
+                        }
+                    });
+                }
+                int rowNo = i / 2;
+                int colNo = i % 2;
+                LinearLayout linearLayout = (LinearLayout) commandSetBtnLayout.getChildAt(rowNo);
+                CustomLoadingButton button = (CustomLoadingButton) linearLayout.getChildAt(colNo);
+                requireActivity().runOnUiThread(() -> {
+
+                    button.setActive(true);
+                    button.showLoading();
+                });
+                try {
+                    runCommands(currentExperimentSetId, i);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+                requireActivity().runOnUiThread(() -> {
+                    button.setActive(false);
+                    button.hideLoading();
+                });
+
+
+            }
+            requireActivity().runOnUiThread(() -> {
+                Toast.makeText(requireContext(), "Running current Experiment set finished.", Toast.LENGTH_SHORT).show();
+                enableOrDisableButtons(experimentToggleButtons, true);
+            });
+        });
+
     }
 
+    public void handleClickStopBtn() {
+        bRunning = false;
+        enableOrDisableButtons(experimentToggleButtons, true);
+    }
+
+    public void displayCommandSetButtons(List<String> titles) {
+        commandSetBtnLayout.removeAllViews();
+        commandToggleButtons.clear();
+        if(titles == null || titles.isEmpty()) return;
+        int cnt = titles.size();
+
+        for (int i = 0; i < cnt; i += 2) {
+            LinearLayout wrapperLayout = new LinearLayout(requireContext());
+            wrapperLayout.setOrientation(LinearLayout.HORIZONTAL);
+            wrapperLayout.setGravity(Gravity.CENTER);
+            LinearLayout.LayoutParams wrapperLayoutParams = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+            );
+            wrapperLayout.setLayoutParams(wrapperLayoutParams);
+            for (int j = 0; j < 2; j ++) {
+                int index = i + j;
+                if (index >= cnt) break;
+                CustomLoadingButton loadButton = new CustomLoadingButton(requireContext());
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                        (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 90, getResources().getDisplayMetrics()),
+                        (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 40, getResources().getDisplayMetrics())
+                );
+                params.setMargins(
+                        (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 4, getResources().getDisplayMetrics()),
+                        (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 4, getResources().getDisplayMetrics()),
+                        (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 4, getResources().getDisplayMetrics()),
+                        (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 4, getResources().getDisplayMetrics())
+                );
+                loadButton.setLayoutParams(params);
+                loadButton.setEnabled(false);
+                loadButton.setText(titles.get(i + j));
+                // Set text and text size
+//                toggleButton.setTextOn(titles.get(i + j));
+//                toggleButton.setTextOff(titles.get(i + j));
+//                toggleButton.setTextOff("Set " + String.valueOf(i + j + 1));
+                loadButton.setTooltipText(titles.get(i + j));
+                loadButton.setTooltipText(titles.get(i + j));
+//                toggleButton.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+
+                // Set text color
+//                toggleButton.setTextColor(ContextCompat.getColor(requireContext(), R.color.basic_button_text_color));
+
+                // Set background drawable
+//                toggleButton.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.toggle_selector));
+                wrapperLayout.addView(loadButton);
+                commandToggleButtons.add(loadButton);
+            }
+            commandSetBtnLayout.addView(wrapperLayout);
+        }
+        /*
+        for (ToggleButton toggleButton: commandToggleButtons) {
+            toggleButton.setOnCheckedChangeListener(((buttonView, isChecked) ->  {
+                if (isChecked) {
+                    if(!bRunning) {
+                        requireActivity().runOnUiThread(() -> {
+                            Toast.makeText(requireContext(), "Please press START button first.", Toast.LENGTH_SHORT).show();
+                        });
+                        return;
+                    }
+                    LinearLayout parent = (LinearLayout) buttonView.getParent();
+                    LinearLayout uParent = (LinearLayout) parent.getParent();
+                    int colNo = parent.indexOfChild(buttonView);
+                    int rowNo = uParent.indexOfChild(parent);
+                    uncheckOtherToggles((ToggleButton) buttonView, commandToggleButtons);
+                    ToggleButton button =  (ToggleButton) buttonView;
+                    if(!mainActivity.tcpConnected) {
+                        requireActivity().runOnUiThread(() -> {
+                            Toast.makeText(requireContext(), "Please connect to ESP TCP server first!", Toast.LENGTH_SHORT).show();
+                        });
+                        LogHelper.sendLog(
+                                Constants.LOGGING_BASE_URL,
+                                Constants.LOGGING_REQUEST_METHOD,
+                                "Failed to transmit data to ESP TCP server due to disconnection",
+                                Constants.LOGGING_BEARER_TOKEN
+                        );
+                        Log.d("Monitoring Info", "Failed to transmit data to ESP TCP server due to disconnection");
+//                        return;
+                    }
+
+                    String title = button.getText().toString().trim();
+                    try {
+                        runCommands(title);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            }));
+        }
+        */
+    }
+
+    public void runCommands(int experimentSetIndex, int commandSetIndex) throws InterruptedException {
+            Experiment experiment = currentExperiments.get(experimentSetIndex);
+            List<String> titles = experiment.getCommands();
+            List<Command> commands = allCommands
+                    .stream()
+                    .filter(one -> titles.contains(one.getTitle()))
+                    .collect(Collectors.toList());
+
+            if(!commands.isEmpty()) {
+                try {
+                    float preRun = experiment.getPreRun();
+                    for (int j = 0; j < preRun; j++) {
+                        if (!bRunning) return;
+                        Thread.sleep(1000);
+                    }
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+                int cnt = commands.size();
+                for (int j = 0; j < cnt; j++) {
+                    Command command = commands.get(j);
+                    sendCommand(command);
+                    try {
+                        float runSec = experiment.getCommand() + experiment.getRest();
+                        for (int k = 0; k < runSec; k++) {
+                            if (!bRunning) return;
+                            Thread.sleep(1000);
+                        }
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+                try {
+                    float postRun = experiment.getPostRun();
+                    for (int i = 0; i < postRun; i++) {
+                        if (!bRunning) return;
+                        Thread.sleep(1000);
+                    }
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+
+                if (commandSetIndex + 1 < experiment.getCommands().size()) {
+                    try {
+                        runCommands(experimentSetIndex, commandSetIndex + 1);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
+    }
+
+    public void sendCommand(Command command) {
+        List<CommandThreshold> thresholds = command.getThresholds();
+        List<Long> espPacketIds = thresholds
+                .stream()
+                .map(t -> t.getEspPacketId())
+                .collect(Collectors.toList());
+
+        espPacketViewModel.getByIds(espPacketIds, results -> {
+            List<CommandThresholdWithDataType> dtos = new ArrayList<>();
+            ESPSendData espSendData = new ESPSendData(command.getCommandCode(), command.getTime1(), command.getTime2(), new ArrayList<>());
+            for (CommandThreshold threshold: thresholds) {
+                List<ESPPacket> correspondingESPPackets = results
+                        .stream()
+                        .filter(one -> Objects.equals(one.getId(), threshold.getEspPacketId()))
+                        .collect(Collectors.toList());
+                if (!correspondingESPPackets.isEmpty()) {
+
+                    CommandThresholdWithDataType commandThresholdWithDataType = new CommandThresholdWithDataType(threshold.getEspPacketId(), correspondingESPPackets.get(0).getDataType(), threshold.getThresholds());
+                    dtos.add(commandThresholdWithDataType);
+                }
+            }
+            espSendData.setThresholds(dtos);
+            byte[] bytesToTransmit = encodeCommand(espSendData);
+            if(!mainActivity.tcpConnected) {
+                if(isAdded()) {
+                    requireActivity().runOnUiThread(() -> {
+                        Toast.makeText(requireContext(), "Please connect to ESP TCP server first!", Toast.LENGTH_SHORT).show();
+                    });
+                }
+                LogHelper.sendLog(
+                        Constants.LOGGING_BASE_URL,
+                        Constants.LOGGING_REQUEST_METHOD,
+                        "Failed to transmit data to ESP TCP server due to disconnection",
+                        Constants.LOGGING_BEARER_TOKEN
+                );
+                Log.d("Monitoring Info", "Data is transmitted to TCP : " + Arrays.toString(bytesToTransmit));
+
+            }
+            else {
+                mainActivity.sendTCP(bytesToTransmit);
+                requireActivity().runOnUiThread(() -> {
+                    Toast.makeText(requireContext(), "Please connect to ESP TCP server first!", Toast.LENGTH_SHORT).show();
+                });
+                LogHelper.sendLog(
+                        Constants.LOGGING_BASE_URL,
+                        Constants.LOGGING_REQUEST_METHOD,
+                        "Data is transmitted to TCP : " + Arrays.toString(bytesToTransmit),
+                        Constants.LOGGING_BEARER_TOKEN
+                );
+                Log.d("Monitoring Info", "Data is transmitted to TCP : " + Arrays.toString(bytesToTransmit));
+            }
+        });
+    }
+
+    CompoundButton.OnCheckedChangeListener handleCheckedChangeListener = (buttonView, isChecked) -> {
+        ToggleButton thisButton = (ToggleButton) buttonView;
+        if (isChecked) {
+            uncheckOtherToggles(thisButton, experimentToggleButtons);
+            LinearLayout parent = (LinearLayout) buttonView.getParent();
+            int colNum = parent.indexOfChild(buttonView);
+            LinearLayout oParent = (LinearLayout) parent.getParent();
+            int rowNum = oParent.indexOfChild(parent);
+            currentExperimentSetId = 2 * rowNum + colNum;
+            if (currentExperiments.isEmpty() || currentExperiments.size() < currentExperimentSetId + 1)
+                return;
+            List<String> commands = currentExperiments.get(currentExperimentSetId).getCommands();
+            displayCommandSetButtons(commands);
+
+            commandViewModel.getByTitles(commands, results -> {
+                currentCommands.clear();
+                currentCommands.addAll(results);
+            });
+        }
+    };
+
+    public void enableOrDisableButtons(List<ToggleButton> buttons, Boolean status) {
+        for (ToggleButton button: buttons) {
+            button.setEnabled(status);
+        }
+    }
 }

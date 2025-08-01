@@ -418,23 +418,6 @@ public class ESPRXRTSetting extends Fragment {
 
         int cnt = thresholdEditTable.getChildCount();
         List<ESPThreshold> thresholds = new ArrayList<>();
-        for (int i = 1; i < cnt; i++) {
-            View rowView = thresholdEditTable.getChildAt(i);
-            if (rowView instanceof TableRow) {
-                TableRow tableRow = (TableRow) rowView;
-                EditText initialValueText = (EditText) tableRow.getChildAt(1);
-                int initialValue = Integer.parseInt(initialValueText.getText().toString());
-                EditText upperLimitText = (EditText) tableRow.getChildAt(2);
-                int upperLimit = Integer.parseInt(upperLimitText.getText().toString());
-                EditText lowerLimitText = (EditText) tableRow.getChildAt(3);
-                int lowerLimit = Integer.parseInt(lowerLimitText.getText().toString());
-
-                CheckBox activateCheckBox = (CheckBox) tableRow.getChildAt(4);
-                int activate = activateCheckBox.isChecked() ? 1 : 0;
-                ESPThreshold threshold = new ESPThreshold(i, initialValue, upperLimit, lowerLimit, activate, 0, new ArrayList<>(), 0, "");
-                thresholds.add(threshold);
-            }
-        }
         currentESPRXRT.setThresholds(thresholds);
         ESPRXRT finalCurrentESPRXRT = currentESPRXRT;
         if (currentESPRXRT.getId() != null && currentESPRXRT.getId() > 0) {

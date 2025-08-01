@@ -1,6 +1,8 @@
 package com.prtech.spiapp.utils.communications;
 
+import com.prtech.spiapp.db.entity.CommandThresholdWithDataType;
 import com.prtech.spiapp.db.entity.ESPReceiveData;
+import com.prtech.spiapp.db.entity.ESPSendData;
 import com.prtech.spiapp.db.entity.RangeDTO;
 
 import java.nio.ByteBuffer;
@@ -113,7 +115,7 @@ public class PacketParser {
                             throw new IllegalArgumentException("Unknown type: " + var.getDataType());
                     }
                 }
-                result.put(var.getSensorActuatorId(), values);
+                result.put(var.getEspPacketId(), values);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -135,6 +137,84 @@ public class PacketParser {
         return (b3 << 16) | (b2 << 8) | b1;
     }
 
+    public static byte[] encodeCommand(ESPSendData espSendData) {
+        ByteBuffer buffer = ByteBuffer.allocate(1024);
+        buffer.order(ByteOrder.LITTLE_ENDIAN);
+
+        buffer.put(hexStringToByteArray(espSendData.getCommandCode()));
+        getByte(espSendData.getTime1(), "float", buffer);
+        getByte(espSendData.getTime2(), "float", buffer);
+        List<CommandThresholdWithDataType> dtos = espSendData.getThresholds();
+        for (int i = 0; i < dtos.size(); i++) {
+            String type = dtos.get(i).getDataType().toLowerCase();
+            int nChannels = dtos.get(i).getThresholds().size();
+            for (int j = 0; j < nChannels; j ++) {
+                int value = dtos.get(i).getThresholds().get(j);
+                    getByte((Object) value, type, buffer);
+            }
+        }
+
+        byte[] result = new byte[buffer.position()];
+        buffer.rewind();
+        buffer.get(result);
+        return result;
+    }
+
+    private static void getByte(Object value, String dataType, ByteBuffer buffer) {
+        switch (dataType) {
+            case "uint8":
+            case "int8":
+                buffer.put(((Number) value).byteValue());
+                break;
+
+            case "uint16":
+            case "int16":
+                buffer.putShort(((Number) value).shortValue());
+                break;
+
+            case "uint24":
+            case "int24":
+                int int24 = ((Number) value).intValue();
+                buffer.put((byte) (int24 & 0xFF));
+                buffer.put((byte) ((int24 >> 8) & 0xFF));
+                buffer.put((byte) ((int24 >> 16) & 0xFF));
+                break;
+
+            case "uint32":
+            case "int32":
+                buffer.putInt(((Number) value).intValue());
+                break;
+
+            case "float":
+                buffer.putFloat(((Number) value).floatValue());
+                break;
+
+            case "double":
+                buffer.putDouble(((Number) value).doubleValue());
+                break;
+
+            default:
+                throw new IllegalArgumentException("Unsupported data type: " + dataType);
+        }
+    }
+
+    public static byte[] hexStringToByteArray(String hexStr) {
+        if (hexStr.startsWith("0x") || hexStr.startsWith("0X")) {
+            hexStr = hexStr.substring(2); // Remove "0x" prefix
+        }
+        // Ensure even length
+        if (hexStr.length() % 2 != 0) {
+            hexStr = "0" + hexStr;
+        }
+
+        int len = hexStr.length();
+        byte[] data = new byte[len / 2];
+
+        for (int i = 0; i < len; i += 2) {
+            data[i / 2] = (byte) Integer.parseInt(hexStr.substring(i, i + 2), 16);
+        }
+        return data;
+    }
 
 }
 

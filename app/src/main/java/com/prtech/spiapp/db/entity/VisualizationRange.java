@@ -1,7 +1,7 @@
 package com.prtech.spiapp.db.entity;
 
 public class VisualizationRange {
-    private Long sensorActuatorId;
+    private Long espPacketId;
     private Integer visualizationType;
     private Integer yAxisRange;
     private Float yStart;
@@ -9,8 +9,8 @@ public class VisualizationRange {
     private Long upperLimit;
     private Long lowerLimit;
 
-    public VisualizationRange(Long sensorActuatorId, Integer yAxisRange, Integer visualizationType, Float yStart, Float yEnd, Long upperLimit, Long lowerLimit) {
-        this.sensorActuatorId = sensorActuatorId;
+    public VisualizationRange(Long espPacketId, Integer yAxisRange, Integer visualizationType, Float yStart, Float yEnd, Long upperLimit, Long lowerLimit) {
+        this.espPacketId = espPacketId;
         this.yAxisRange = yAxisRange;
         this.visualizationType = visualizationType;
         this.yStart = yStart;
@@ -19,12 +19,12 @@ public class VisualizationRange {
         this.lowerLimit = lowerLimit;
     }
 
-    public Long getSensorActuatorId() {
-        return sensorActuatorId;
+    public Long getEspPacketId() {
+        return espPacketId;
     }
 
-    public void setSensorActuatorId(Long sensorActuatorId) {
-        this.sensorActuatorId = sensorActuatorId;
+    public void setEspPacketId(Long espPacketId) {
+        this.espPacketId = espPacketId;
     }
 
     public Integer getVisualizationType() {

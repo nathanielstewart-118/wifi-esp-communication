@@ -1,6 +1,8 @@
 package com.prtech.spiapp.settings;
 
 import static com.prtech.spiapp.utils.CommonUtils.getNumberOfBytesFromDataTypeString;
+import static com.prtech.spiapp.utils.CommonUtils.string2Float;
+import static com.prtech.spiapp.utils.CommonUtils.string2Int;
 import static com.prtech.spiapp.utils.UIUtils.initAutoCompleteWithSuggestionList;
 import static com.prtech.spiapp.utils.UIUtils.setSpinnerWithContent;
 import static com.prtech.spiapp.utils.UIUtils.setupOperationalButtons;
@@ -176,7 +178,11 @@ public class ESPPacketSetting extends Fragment {
             if(currentTableRowIndex == -1) {
                 currentESPPackets.add(espPacket);
             }
-            else currentESPPackets.set(currentTableRowIndex -1, espPacket);
+            else {
+                espPacket.setId(currentESPPackets.get(currentTableRowIndex - 1).getId());
+                currentESPPackets.set(currentTableRowIndex - 1, espPacket);
+
+            }
             initEditControls();
             currentTableRowIndex = -1;
             
@@ -198,6 +204,7 @@ public class ESPPacketSetting extends Fragment {
             int rowsCnt = espPacketListTable.getChildCount();
             for (int i = 1; i < rowsCnt; i++) {
                 ESPPacket result = getSensorActuatorFromTableRow(i, sensorSetTitle);
+                if(allTitles.contains(sensorSetTitle) && currentESPPackets.get(i - 1).getId() != null) result.setId(currentESPPackets.get(i - 1).getId());
                 if (result == null) continue;
                 results.add(result);
             }
@@ -221,44 +228,53 @@ public class ESPPacketSetting extends Fragment {
                         List<ESPThreshold> espThresholds  = new ArrayList<>();
                         int nChannels = espPacket.getNumberOfChannels();
                         for (int i = 0; i < nChannels; i ++) {
-                            ESPThreshold espThreshold = new ESPThreshold(0, 0, 0, 0, 0, 0, new ArrayList<>(), 0, "");
+                            Float initialValue = null;
+                            Float upperLimit = null;
+                            Float lowerLimit = null;
+                            Float outlier = null;
+                            Integer order = null;
+                            Integer thresholdsEnabled = null;
+                            Integer outliersEnabled = null;
+                            String compare = null;
                             try {
                                 TableRow row = (TableRow) thresholdListTable.getChildAt(thresCnt + 2);
+
                                 TextView orderView = (TextView) row.getChildAt(1);
-                                espThreshold.setOrder(Integer.parseInt(orderView.getText().toString().trim()));
+                                order = string2Int(orderView.getText().toString().trim(), null);
 
                                 EditText iEdit = (EditText) row.getChildAt(2);
-                                espThreshold.setInitialValue(Integer.parseInt(iEdit.getText().toString().trim()));
+                                initialValue = string2Float(iEdit.getText().toString().trim(), null);
 
                                 EditText lEdit = (EditText) row.getChildAt(3);
-                                espThreshold.setLowerLimit(Integer.parseInt(lEdit.getText().toString().trim()));
+                                lowerLimit = string2Float(lEdit.getText().toString().trim(), null);
 
                                 EditText uEdit = (EditText) row.getChildAt(4);
-                                espThreshold.setUpperLimit(Integer.parseInt(uEdit.getText().toString().trim()));
+                                upperLimit = string2Float(uEdit.getText().toString().trim(), null);
 
                                 LinearLayout tLayout = (LinearLayout) row.getChildAt(5);
                                 CheckBox tCheckBox = (CheckBox) tLayout.getChildAt(0);
-                                espThreshold.setThresholdsEnabled(tCheckBox.isChecked() ? 1 : 0);
+                                thresholdsEnabled = tCheckBox.isChecked() ? 1 : 0;
 
                                 EditText oEdit = (EditText) row.getChildAt(6);
-                                espThreshold.setOutlier(Integer.parseInt(oEdit.getText().toString().trim()));
+                                outlier = string2Float(oEdit.getText().toString().trim(), null);
 
                                 EditText compareEdit = (EditText) row.getChildAt(7);
-                                espThreshold.setCompare(compareEdit.getText().toString().trim());
+                                compare = compareEdit.getText().toString().trim();
 
                                 LinearLayout oLayout = (LinearLayout) row.getChildAt(8);
                                 CheckBox oCheckBox = (CheckBox) oLayout.getChildAt(0);
-                                espThreshold.setOutliersEnabled(oCheckBox.isChecked() ? 1 : 0);
+                                outliersEnabled = oCheckBox.isChecked() ? 1 : 0;
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
+                            ESPThreshold espThreshold = new ESPThreshold(order, initialValue, upperLimit, lowerLimit, thresholdsEnabled, outliersEnabled, new ArrayList<>(), outlier, compare);
                             espThresholds.add(espThreshold);
                             thresCnt ++;
                         }
                         espPacket.setThresholds(espThresholds);
                     }
-                    if (!allTitles.contains(sensorSetTitle)) {
-                        espPacketViewModel.insertBatch(results, insertResults -> {
+                    if(allTitles.contains(sensorSetTitle)) {
+                        espPacketViewModel.saveBatch(results, insertResults -> {
                             if (results.size() == insertResults.size()) {
                                 Toast.makeText(requireContext(), R.string.sensor_setting_saved_successfully, Toast.LENGTH_SHORT).show();
                                 initEditControls();
@@ -271,9 +287,9 @@ public class ESPPacketSetting extends Fragment {
                         });
                     }
                     else {
-                        espPacketViewModel.updateBatch(results, updateResults -> {
-                            if (results.size() == updateResults.size()) {
-                                Toast.makeText(requireContext(), "Sensor Setting updated successfully!", Toast.LENGTH_SHORT).show();
+                        espPacketViewModel.insertBatch(results, insertResults -> {
+                            if (results.size() == insertResults.size()) {
+                                Toast.makeText(requireContext(), R.string.inserted_esp_packet_setting_successfully, Toast.LENGTH_SHORT).show();
                                 initEditControls();
                                 espPacketListTable.removeViews(1, espPacketListTable.getChildCount() - 1);
                                 thresholdListTable.removeViews(2, thresholdListTable.getChildCount() - 2);
@@ -500,6 +516,8 @@ public class ESPPacketSetting extends Fragment {
         btnLayout.addView(deleteBtn);
 
         DNDHelper.enableRowDragAndDrop(changeOrderBtn, tableRow, espPacketListTable, currentESPPackets, result -> {
+            initEditControls();
+            currentTableRowIndex = -1;
         });
 
         tableRow.addView(btnLayout);
@@ -575,12 +593,12 @@ public class ESPPacketSetting extends Fragment {
 
             try {
                 if(threshold != null) {
-                    initialEdit.setText(String.valueOf(threshold.getInitialValue()));
-                    lowerEdit.setText(String.valueOf(threshold.getLowerLimit()));
-                    upperEdit.setText(String.valueOf(threshold.getUpperLimit()));
+                    initialEdit.setText(threshold.getInitialValue() == null ? "" : String.valueOf(threshold.getInitialValue()));
+                    lowerEdit.setText(threshold.getLowerLimit() == null ? "" : String.valueOf(threshold.getLowerLimit()));
+                    upperEdit.setText(threshold.getUpperLimit() == null ? "" : String.valueOf(threshold.getUpperLimit()));
                     thresholdCheckBox.setChecked(threshold.getThresholdsEnabled() == 1);
-                    outlierEdit.setText(String.valueOf(threshold.getOutlier()));
-                    compareEdit.setText(threshold.getCompare());
+                    outlierEdit.setText(threshold.getOutlier() == null ? "" : String.valueOf(threshold.getOutlier()));
+                    compareEdit.setText(threshold.getCompare() == null ? "" : threshold.getCompare());
                     outlierCheckBox.setChecked(threshold.getOutliersEnabled() == 1);
                 }
             } catch (Exception e) {

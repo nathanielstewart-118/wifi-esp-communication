@@ -22,10 +22,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.prtech.spiapp.db.viewmodel.TCPUDPReceiveViewModel;
-import com.prtech.spiapp.settings.ActuatorSetting;
 import com.prtech.spiapp.settings.CommandSetting;
-import com.prtech.spiapp.settings.ESPRXRTSetting;
-import com.prtech.spiapp.settings.ESPTXSetting;
 import com.prtech.spiapp.settings.ExperimentSetting;
 import com.prtech.spiapp.settings.MonitoringSetting;
 import com.prtech.spiapp.settings.PlayBack;
@@ -51,7 +48,10 @@ public class MainActivity extends AppCompatActivity {
     private Spinner languageSpinner;
     private TCPUDPReceiveViewModel receiveViewModel;
     private final Gson gson = new Gson();
-    private boolean isFirstSelection = true;
+    private Boolean isFirstSelection = true;
+    public Boolean tcpConnected = false;
+    public Boolean udpConnected = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -132,7 +132,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         String[] lagnuages = new String[Constants.LANGUAGES.length + 1];
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getApplicationContext(), R.array.my_array_items, R.layout.language_spinner_item);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getApplicationContext(), R.array.my_array_items, R.layout.white_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         languageSpinner.setAdapter((adapter));
         SharedPreferences prefs = getSharedPreferences("settings", MODE_PRIVATE);

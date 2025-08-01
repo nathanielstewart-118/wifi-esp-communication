@@ -23,7 +23,7 @@ import com.prtech.spiapp.db.entity.Monitoring;
 import com.prtech.spiapp.db.entity.ESPPacket;
 import com.prtech.spiapp.db.entity.Visualization;
 
-@Database(entities = {ESPPacket.class, Command.class, ESPTX.class, ESPRXRT.class, Experiment.class, Visualization.class, Monitoring.class}, version = 23)
+@Database(entities = {ESPPacket.class, Command.class, ESPTX.class, ESPRXRT.class, Experiment.class, Visualization.class, Monitoring.class}, version = 26)
 public abstract class AppDatabase extends RoomDatabase {
 
     private static AppDatabase instance;

@@ -85,7 +85,7 @@ public class PlayBack extends Fragment {
         visualizationViewModel = new ViewModelProvider(requireActivity()).get(VisualizationViewModel.class);
         visualizationViewModel.getActivatedVisualization(result -> {
             if (result == null) {
-                currentVisualization = new Visualization("", 0, 0, 0, new ArrayList<>(), 0, "", 0, System.currentTimeMillis());
+                currentVisualization = new Visualization("", "", 0, 0, 0, new ArrayList<>(), 0, "", 0, System.currentTimeMillis());
                 rangeDTOs = new ArrayList<>();
                 Toast.makeText(requireContext(), "There is no completed Visualization setting.", Toast.LENGTH_SHORT).show();
             } else {
@@ -107,7 +107,7 @@ public class PlayBack extends Fragment {
 
     private void addAccordionSection(VisualizationRange visualizationRange) {
 
-        espPacketViewModel.getById(visualizationRange.getSensorActuatorId(), result -> {
+        espPacketViewModel.getById(visualizationRange.getEspPacketId(), result -> {
             // Header
             TextView header = new TextView(requireContext());
             header.setLayoutParams(new LinearLayout.LayoutParams(
@@ -180,8 +180,8 @@ public class PlayBack extends Fragment {
             scatterChart.getAxisLeft().setAxisMaximum(Float.parseFloat(Constants.Y_AXIS_RANGES[visualizationRange.getyAxisRange()][2]));
             scatterChart.getXAxis().setDrawGridLines(false);
             scatterChart.getLegend().setForm(Legend.LegendForm.SQUARE);
-            chartsMap.put(visualizationRange.getSensorActuatorId(), scatterChart);
-            currentWindowStartMap.put(visualizationRange.getSensorActuatorId(), 0F);
+            chartsMap.put(visualizationRange.getEspPacketId(), scatterChart);
+            currentWindowStartMap.put(visualizationRange.getEspPacketId(), 0F);
             contentLayout.addView(scatterChart);
             contentLayout.setVisibility(View.VISIBLE);
             // Save reference for updates
@@ -219,12 +219,12 @@ public class PlayBack extends Fragment {
                     lastTimestamp = m.getCreated_at();
                     Map<Long, Object> parsed = PacketParser.parse(rangeDTOs, CommonUtils.fromStringToByteArray(m.getData()));
                     for (RangeDTO rangeDTO: rangeDTOs) {
-                        List<Object> values = (List<Object>) parsed.get(rangeDTO.getSensorActuatorId());
-                        ScatterChart scatterChart = (ScatterChart) chartsMap.get(rangeDTO.getSensorActuatorId());
+                        List<Object> values = (List<Object>) parsed.get(rangeDTO.getEspPacketId());
+                        ScatterChart scatterChart = (ScatterChart) chartsMap.get(rangeDTO.getEspPacketId());
                         Runnable updater = new Runnable() {
                             @Override
                             public void run() {
-                                updateChartWithData(scatterChart, values, rangeDTO.getSensorActuatorId());
+                                updateChartWithData(scatterChart, values, rangeDTO.getEspPacketId());
                             }
                         };
                         handler.post(updater);

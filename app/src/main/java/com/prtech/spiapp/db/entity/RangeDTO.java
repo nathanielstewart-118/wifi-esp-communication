@@ -2,9 +2,8 @@ package com.prtech.spiapp.db.entity;
 
 public class RangeDTO {
 
-    public Long visualizationId;
 
-    public Long sensorActuatorId;
+    public Long espPacketId;
 
     public String variableName;
 
@@ -20,9 +19,8 @@ public class RangeDTO {
 
     public Long lowerLimit;
 
-    public RangeDTO(Long visualizationId, Long sensorActuatorId, String variableName, String dataType, Integer numberOfChannels, Integer visualizationType, Integer yAxisRange, Long upperLimit, Long lowerLimit) {
-        this.visualizationId = visualizationId;
-        this.sensorActuatorId = sensorActuatorId;
+    public RangeDTO(Long espPacketId, String variableName, String dataType, Integer numberOfChannels, Integer visualizationType, Integer yAxisRange, Long upperLimit, Long lowerLimit) {
+        this.espPacketId = espPacketId;
         this.variableName = variableName;
         this.dataType = dataType;
         this.numberOfChannels = numberOfChannels;
@@ -32,20 +30,12 @@ public class RangeDTO {
         this.lowerLimit = lowerLimit;
     }
 
-    public Long getVisualizationId() {
-        return visualizationId;
+    public Long getEspPacketId() {
+        return espPacketId;
     }
 
-    public void setVisualizationId(Long visualizationId) {
-        this.visualizationId = visualizationId;
-    }
-
-    public Long getSensorActuatorId() {
-        return sensorActuatorId;
-    }
-
-    public void setSensorActuatorId(Long sensorActuatorId) {
-        this.sensorActuatorId = sensorActuatorId;
+    public void setEspPacketId(Long espPacketId) {
+        this.espPacketId = espPacketId;
     }
 
     public String getVariableName() {

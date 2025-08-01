@@ -100,6 +100,25 @@ public class ESPPacketViewModel extends AndroidViewModel {
         });
     }
 
+    public void saveBatch(List<ESPPacket> espPackets, Consumer<List<Integer>> callback) {
+        executorService.execute(() -> {
+            List<Integer> results = new ArrayList<>();
+            for (ESPPacket espPacket: espPackets) {
+                if(espPacket.getId() != null) {
+                    espPacketDao.update(espPacket);
+                    results.add(1);
+                }
+                else {
+                    espPacketDao.insert(espPacket);
+                    results.add(1);
+                }
+            }
+            new Handler(Looper.getMainLooper()).post(() -> {
+                callback.accept(results);
+            });
+        });
+    }
+
     // --- DELETE ---
     public void delete(ESPPacket espPacket) {
         executorService.execute(() -> {

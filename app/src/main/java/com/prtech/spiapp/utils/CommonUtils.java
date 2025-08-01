@@ -1,5 +1,8 @@
 package com.prtech.spiapp.utils;
 
+import android.widget.Spinner;
+import android.widget.SpinnerAdapter;
+
 import java.util.Random;
 
 public class CommonUtils {
@@ -52,6 +55,18 @@ public class CommonUtils {
             return Float.parseFloat(input);
         } catch (NumberFormatException e) {
             return defaultValue;
+        }
+    }
+
+    public static void selectSpinnerItemWithContent(Spinner spinner, String targetValue) {
+        if (spinner == null || targetValue == null) return;
+        SpinnerAdapter adapter = spinner.getAdapter();
+        for (int i = 0; i < adapter.getCount(); i++) {
+            String item = adapter.getItem(i).toString();
+            if (item.equals(targetValue)) {
+                spinner.setSelection(i);
+                break;
+            }
         }
     }
 }

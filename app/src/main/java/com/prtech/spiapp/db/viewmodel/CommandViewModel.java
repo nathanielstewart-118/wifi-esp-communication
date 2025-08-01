@@ -111,8 +111,20 @@ public class CommandViewModel extends AndroidViewModel {
         });
     }
 
+    public void getByTitles(List<String> titles, Consumer<List<Command>> callback) {
+        executorService.execute(() -> {
+            List<Command> results = commandDao.getByTitles(titles);
+            new Handler(Looper.getMainLooper()).post(() -> {
+                callback.accept(results);
+            });
+        });
+    }
+
+
     public LiveData<List<String>> getAllTitles() {
         return commandDao.getAllTitles();
     }
+
+
 
 }

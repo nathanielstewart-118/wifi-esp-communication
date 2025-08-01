@@ -14,6 +14,9 @@ public class Command extends BaseEntity {
     @ColumnInfo(name = "title")
     private String title;
 
+    @ColumnInfo(name="esp_packet_title")
+    private String espPacketTitle;
+
     @ColumnInfo(name = "command_code")
     private String commandCode;
 
@@ -31,9 +34,10 @@ public class Command extends BaseEntity {
     private List<CommandThreshold> thresholds;
 
 
-    public Command(String title, String commandCode, float time1, float time2, Integer displayOrder, Integer activated, List<CommandThreshold> thresholds) {
+    public Command(String title, String espPacketTitle, String commandCode, float time1, float time2, Integer displayOrder, Integer activated, List<CommandThreshold> thresholds) {
         this.commandCode = commandCode;
         this.title = title;
+        this.espPacketTitle = espPacketTitle;
         this.time1 = time1;
         this.time2 = time2;
         this.displayOrder = displayOrder;
@@ -56,6 +60,14 @@ public class Command extends BaseEntity {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public String getEspPacketTitle() {
+        return espPacketTitle;
+    }
+
+    public void setEspPacketTitle(String espPacketTitle) {
+        this.espPacketTitle = espPacketTitle;
     }
 
     public Float getTime1() {

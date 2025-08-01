@@ -1,6 +1,7 @@
 package com.prtech.spiapp.settings;
 
 import static com.prtech.spiapp.utils.UIUtils.initAutoCompleteWithSuggestionList;
+import static com.prtech.spiapp.utils.UIUtils.setSpinnerWithContent;
 import static com.prtech.spiapp.utils.UIUtils.setupOperationalButtons;
 
 import androidx.annotation.NonNull;
@@ -62,31 +63,23 @@ public class CommandSetting extends Fragment {
     private EditText time1Edit;
     private EditText time2Edit;
 
-    private Button openThresholdDialogBtn;
     private Button addCommandBtn;
     private Button sendCommandBtn;
-    private Button saveThresholdBtn;
-    private Button closeThresholdDialogBtn;
     private Button saveBtn;
     private Button loadBtn;
     private Spinner espSpinner;
     private TableLayout thresholdEditTable;
     private TableLayout commandViewTable;
     private AutoCompleteTextView idAutoComplete;
-    private View thresholdDialog;
-    private AlertDialog dialog;
 
     private String currentSettingTitle = "";
     private String commandCode;
     private Float time1;
     private Float time2;
-    private int selectedSetting = -1;
     private List<String> allTitles = new ArrayList<>();
     private CommandViewModel commandViewModel;
     private ESPPacketViewModel espPacketViewModel;
-    private AppDatabase db;
     private List<ESPPacket> currentESPPackets = new ArrayList<>();
-    private List<CommandThreshold> currentCommandThresholds = new ArrayList<>();
     private List<Command> currentCommands = new ArrayList<>();
     private WiFiSocketManager socketManager = WiFiSocketManager.getInstance();
     private Integer selectedCommandIndex = -1;
@@ -100,7 +93,6 @@ public class CommandSetting extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(Constants.TITLES[2]);
         View commandFragment = inflater.inflate(R.layout.fragment_command, container, false);
-        db = AppDatabase.getInstance(requireContext());
         commandViewModel = new ViewModelProvider(requireActivity()).get(CommandViewModel.class);
         thresholdEditTable = commandFragment.findViewById(R.id.command_thresholds_list_tb);
         espSpinner = (Spinner) commandFragment.findViewById(R.id.command_esp_packet_spinner);
@@ -115,6 +107,7 @@ public class CommandSetting extends Fragment {
             ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, options);
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             espSpinner.setAdapter(adapter);
+
         });
 
         espSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -143,14 +136,13 @@ public class CommandSetting extends Fragment {
             initAutoCompleteWithSuggestionList(idAutoComplete, data, requireContext());
         });
 
-
         saveBtn = (Button) commandFragment.findViewById(R.id.command_save_btn);
-        saveBtn.setOnClickListener(v -> handleClickSaveBtn(v));
+        saveBtn.setOnClickListener(this::handleClickSaveBtn);
 
         idAutoComplete = (AutoCompleteTextView) commandFragment.findViewById(R.id.command_id_autocomplete);
 
         loadBtn = (Button) commandFragment.findViewById(R.id.command_load_btn);
-        loadBtn.setOnClickListener(v -> handleClickLoadBtn(v));
+        loadBtn.setOnClickListener(this::handleClickLoadBtn);
 
         commandViewTable = (TableLayout) commandFragment.findViewById(R.id.command_view_table);
         commandCodeEdit = (EditText) commandFragment.findViewById(R.id.command_code_input);
@@ -175,117 +167,110 @@ public class CommandSetting extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         LayoutInflater inflater = getLayoutInflater();
-        thresholdDialog = inflater.inflate(R.layout.command_layout_dialog, null);
-//        thresholdEditTable = (TableLayout) thresholdDialog.findViewById(R.id.command_threshold_edit_table);
         espPacketViewModel.getAllSensorActuators().observe(getViewLifecycleOwner(), sas -> {
 //            displayThresholdTable(sas, new Command("", 0, 0, new ArrayList<>()));
 //            sensorActuators.addAll(sas);
         });
     }
 
-
-    public void openThresholdDialog(Long commandId) {
-        dialog.show();
-        List<Command> selected = currentCommands.stream()
-                .filter(command -> Objects.equals(command.getId(), commandId))
-                .collect(Collectors.toList());
-        Command command = selected.isEmpty() ? new Command("", "", 0, 0, -1, 0, new ArrayList<>()) : selected.get(0);
-        displayThresholdTable(currentESPPackets, currentCommands);
-    }
-
     public void addTableRow(Command data) {
-            TableRow row = new TableRow(requireContext());
-            row.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.table_border));
-            row.setVerticalGravity(Gravity.CENTER);
+        TableRow row = new TableRow(requireContext());
+        row.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.table_border));
+        row.setVerticalGravity(Gravity.CENTER);
 
-            TextView sequenceView = new TextView(requireContext());
-            sequenceView.setText(String.valueOf(commandViewTable.getChildCount()));
-            sequenceView.setGravity(Gravity.CENTER);
-            row.addView(sequenceView);
+        TextView sequenceView = new TextView(requireContext());
+        sequenceView.setText(String.valueOf(commandViewTable.getChildCount()));
+        sequenceView.setGravity(Gravity.CENTER);
+        row.addView(sequenceView);
 
-            TextView commandCodeView = new TextView(requireContext());
-            commandCodeView.setText(data.getCommandCode());
-            commandCodeView.setGravity(Gravity.CENTER);
-            row.addView(commandCodeView);
+        TextView commandCodeView = new TextView(requireContext());
+        commandCodeView.setText(data.getCommandCode());
+        commandCodeView.setGravity(Gravity.CENTER);
+        row.addView(commandCodeView);
 
-            TextView time1View = new TextView(requireContext());
-            time1View.setText(String.valueOf(data.getTime1()));
-            time1View.setGravity(Gravity.CENTER);
-            row.addView(time1View);
+        TextView time1View = new TextView(requireContext());
+        time1View.setText(String.valueOf(data.getTime1()));
+        time1View.setGravity(Gravity.CENTER);
+        row.addView(time1View);
 
-            TextView time2View = new TextView(requireContext());
-            time2View.setText(String.valueOf(data.getTime2()));
-            time2View.setGravity(Gravity.CENTER);
-            row.addView(time2View);
+        TextView time2View = new TextView(requireContext());
+        time2View.setText(String.valueOf(data.getTime2()));
+        time2View.setGravity(Gravity.CENTER);
+        row.addView(time2View);
 
-            List<ImageButton> operationalButtons = setupOperationalButtons(data.getId(), requireContext());
-            ImageButton changeValueBtn = operationalButtons.get(0);
-            changeValueBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    ImageButton button = (ImageButton) v;
-                    LinearLayout linearLayout = (LinearLayout) button.getParent();
-                    TableRow tr = (TableRow) linearLayout.getParent();
-                    int index = commandViewTable.indexOfChild(tr);
-                    Command selectedCommand = currentCommands.get(index - 1);
-                    commandCodeEdit.setText(selectedCommand.getCommandCode());
-                    time1Edit.setText(selectedCommand.getTime1().toString());
-                    time2Edit.setText(selectedCommand.getTime2().toString());
-                    selectedCommandIndex = index - 1;
-                }
-            });
+        List<ImageButton> operationalButtons = setupOperationalButtons(data.getId(), requireContext());
+        ImageButton changeValueBtn = operationalButtons.get(0);
+        changeValueBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ImageButton button = (ImageButton) v;
+                LinearLayout linearLayout = (LinearLayout) button.getParent();
+                TableRow tr = (TableRow) linearLayout.getParent();
+                int index = commandViewTable.indexOfChild(tr);
+                Command selectedCommand = currentCommands.get(index - 1);
+                commandCodeEdit.setText(selectedCommand.getCommandCode());
+                time1Edit.setText(selectedCommand.getTime1().toString());
+                time2Edit.setText(selectedCommand.getTime2().toString());
+                selectedCommandIndex = index - 1;
+            }
+        });
 
-            ImageButton changeOrderBtn = operationalButtons.get(1);
-            changeOrderBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
+        ImageButton changeOrderBtn = operationalButtons.get(1);
+        changeOrderBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
 
-                }
-            });
+            }
+        });
 
-            ImageButton deleteBtn = operationalButtons.get(2);
-            deleteBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    new AlertDialog.Builder(requireContext())
-                            .setTitle("Confirm")
-                            .setMessage("Are you sure you want to proceed?")
-                            .setPositiveButton("Yes", (dialog, which) -> {
-                                // Handle Yes button click
-                                ImageButton delButton = (ImageButton) v;
-                                LinearLayout linearLayout = (LinearLayout) delButton.getParent();
-                                TableRow tr = (TableRow) linearLayout.getParent();
-                                int index = commandViewTable.indexOfChild(tr);
-                                if(index < 1) return;
-                                currentCommands.remove(index - 1);
-                                displayTables();
-                            })
-                            .setNegativeButton("No", (dialog, which) -> {
-                                // Handle No button click (optional)
-                                dialog.dismiss();
-                            })
-                            .show();
-                }
-            });
+        ImageButton deleteBtn = operationalButtons.get(2);
+        deleteBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new AlertDialog.Builder(requireContext())
+                        .setTitle("Confirm")
+                        .setMessage("Are you sure you want to proceed?")
+                        .setPositiveButton("Yes", (dialog, which) -> {
+                            // Handle Yes button click
+                            ImageButton delButton = (ImageButton) v;
+                            LinearLayout linearLayout = (LinearLayout) delButton.getParent();
+                            TableRow tr = (TableRow) linearLayout.getParent();
+                            int index = commandViewTable.indexOfChild(tr);
+                            if(index < 1) return;
+                            currentCommands.remove(index - 1);
+                            displayTables();
+                        })
+                        .setNegativeButton("No", (dialog, which) -> {
+                            // Handle No button click (optional)
+                            dialog.dismiss();
+                        })
+                        .show();
+            }
+        });
 
-            LinearLayout btnLayout = new LinearLayout(requireContext());
-            btnLayout.setGravity(Gravity.CENTER);
+        LinearLayout btnLayout = new LinearLayout(requireContext());
+        btnLayout.setGravity(Gravity.CENTER);
 
-            btnLayout.addView(changeValueBtn);
-            btnLayout.addView(changeOrderBtn);
-            btnLayout.addView(deleteBtn);
-            DNDHelper.enableRowDragAndDrop(changeOrderBtn, row, commandViewTable, currentCommands, result -> {
-//                result.sort()
-                Log.d("success", String.valueOf(currentCommands.size()));
-            });
-            row.addView(btnLayout);
-            commandViewTable.addView(row);
+        btnLayout.addView(changeValueBtn);
+        btnLayout.addView(changeOrderBtn);
+        btnLayout.addView(deleteBtn);
+        DNDHelper.enableRowDragAndDrop(changeOrderBtn, row, commandViewTable, currentCommands, result -> {
+            initEditControls(0);
+            selectedCommandIndex = -1;
+            Log.d("success", String.valueOf(currentCommands.size()));
+        });
+        row.addView(btnLayout);
+        commandViewTable.addView(row);
     }
 
-    public void initEditControls() {
+    public void initEditControls(int mode) {
         commandCodeEdit.setText("");
         time1Edit.setText("");
         time2Edit.setText("");
+        if (mode == 1) {
+            idAutoComplete.setText("");
+            espSpinner.setSelection(0);
+        }
     }
 
     public void displayCommandsTable(List<Command> commands) {
@@ -460,12 +445,11 @@ public class CommandSetting extends Fragment {
         commandCode = commandCodeEdit.getText().toString();
         time1 = Float.parseFloat(time1Edit.getText().toString());
         time2 = Float.parseFloat(time2Edit.getText().toString());
-        Command command = new Command("", commandCode, time1, time2, -1, 0, new ArrayList<>());
+        Command command = new Command("", "", commandCode, time1, time2, -1, 0, new ArrayList<>());
         if (selectedCommandIndex == -1) currentCommands.add(command);
         else currentCommands.set(selectedCommandIndex, command);
-        initEditControls();
+        initEditControls(0);
         displayTables();
-        selectedSetting = -1;
     }
 
     public void handleClickSaveBtn(View v) {
@@ -478,6 +462,7 @@ public class CommandSetting extends Fragment {
             Toast.makeText(requireContext(), "Please add some data to the table", Toast.LENGTH_SHORT).show();
             return;
         }
+        String espPacketTitle = espSpinner.getSelectedItem().toString().trim();
         String msg = "";
         if (allTitles.contains(title)) msg = "Records with the same title already exist. Are you sure you want to update this Sensor Setting Data?";
         else msg = "Are you sure you want to save this Sensor Setting Data?";
@@ -491,6 +476,7 @@ public class CommandSetting extends Fragment {
                             .map(command -> {
                                 command.setId(null);
                                 command.setTitle(title);
+                                command.setEspPacketTitle(espPacketTitle);
                                 return command;
                             })
                             .collect(Collectors.toList());
@@ -537,11 +523,11 @@ public class CommandSetting extends Fragment {
                             commandViewModel.insertBatch(currentCommands, insertResults -> {
                                 if (currentCommands.size() == insertResults.size()) {
                                     Toast.makeText(requireContext(), R.string.sensor_setting_saved_successfully, Toast.LENGTH_SHORT).show();
-                                    initEditControls();
+                                    initEditControls(1);
                                     commandViewTable.removeViews(1, commandViewTable.getChildCount() - 1);
                                     thresholdEditTable.removeAllViews();
                                     currentSettingTitle = "";
-                                    idAutoComplete.setText("");
+
                                 } else {
                                     Toast.makeText(requireContext(), R.string.an_error_occurred_while_saving_please_load_and_check, Toast.LENGTH_SHORT).show();
                                 }
@@ -551,11 +537,10 @@ public class CommandSetting extends Fragment {
                             commandViewModel.updateBatch(currentCommands, updateResults -> {
                                 if (currentCommands.size() == updateResults.size()) {
                                     Toast.makeText(requireContext(), "Sensor Setting updated successfully!", Toast.LENGTH_SHORT).show();
-                                    initEditControls();
+                                    initEditControls(1);
                                     commandViewTable.removeViews(1, commandViewTable.getChildCount() - 1);
                                     thresholdEditTable.removeAllViews();
                                     currentSettingTitle = "";
-                                    idAutoComplete.setText("");
                                 } else {
                                     Toast.makeText(requireContext(), R.string.an_error_occurred_while_saving_please_load_and_check, Toast.LENGTH_SHORT).show();
                                 }
@@ -580,9 +565,11 @@ public class CommandSetting extends Fragment {
         commandViewModel.getByTitle(title, results -> {
             if (results.isEmpty()) {
                 Toast.makeText(requireContext(), "There is no records with that title", Toast.LENGTH_SHORT).show();
-                initEditControls();
+                initEditControls(1);
                 commandViewTable.removeViews(1, commandViewTable.getChildCount() - 1);
                 thresholdEditTable.removeAllViews();
+                currentCommands.clear();
+                currentESPPackets.clear();
                 return;
             }
             else {
@@ -590,12 +577,13 @@ public class CommandSetting extends Fragment {
                 currentCommands.clear();
                 currentCommands.addAll(results);
                 List<Long> packetIds = results.get(0).getThresholds()
-                                .stream()
-                                .map(t -> t.getEspPacketId())
-                                .collect(Collectors.toList());
+                    .stream()
+                    .map(CommandThreshold::getEspPacketId)
+                    .collect(Collectors.toList());
                 espPacketViewModel.getByIds(packetIds, resultPackets-> {
                     currentESPPackets.clear();
                     currentESPPackets.addAll(resultPackets);
+                    if(!currentCommands.isEmpty()) setSpinnerWithContent(espSpinner, currentCommands.get(0).getEspPacketTitle());
                     displayTables();
                 });
             }
@@ -614,6 +602,7 @@ public class CommandSetting extends Fragment {
 
             Command result = new Command(
                     title,
+                    "",
                     ccView.getText().toString().trim(),
                     Float.parseFloat(t1View.getText().toString().trim()),
                     Float.parseFloat(t2View.getText().toString().trim()),

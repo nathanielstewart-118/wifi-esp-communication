@@ -88,13 +88,8 @@ public class ExperimentViewModel extends AndroidViewModel {
         return deleteResult;
     }
 
-    public void getAllTitles(Consumer<List<String>> callback) {
-        executorService.execute(() -> {
-            List<String> results = experimentDao.getAllTitles();
-            new Handler(Looper.getMainLooper()).post(() -> {
-               callback.accept(results);
-            });
-        });
+    public LiveData<List<String>> getAllTitles() {
+        return experimentDao.getAllTitles();
     }
 
     public void findExperimentsByTitle(String title, Consumer<List<Experiment>> callback) {
@@ -122,5 +117,18 @@ public class ExperimentViewModel extends AndroidViewModel {
                 callback.accept(results);
             });
         });
+    }
+
+    public void getByTitle(String title, Consumer<List<Experiment>> callback) {
+        executorService.execute(() -> {
+            List<Experiment> results = experimentDao.getByTitle(title);
+            new Handler(Looper.getMainLooper()).post(() -> {
+                callback.accept(results);
+            });
+        });
+    }
+
+    public void getByTitles(List<String> titles, Consumer<List<Experiment>> callback) {
+
     }
 }

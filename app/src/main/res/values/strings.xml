@@ -156,6 +156,7 @@
     <string name="failed_to_update_data">Failed to update data.</string>
     <string name="saved_data_successfully">Saved data successfully.</string>
     <string name="failed_to_save_data">Failed to save data.</string>
+    <string name="inserted_esp_packet_setting_successfully">Inserted ESP Packet setting successfully</string>
     <string-array name="my_array_items">
         <item>en</item>
         <item>cn</item>

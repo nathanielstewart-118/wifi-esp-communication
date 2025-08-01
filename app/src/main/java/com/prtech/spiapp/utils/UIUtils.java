@@ -7,6 +7,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TableRow;
+import android.widget.ToggleButton;
 
 import com.prtech.spiapp.R;
 
@@ -69,11 +70,11 @@ public class UIUtils {
         return -1; // Not found
     }
 
-    public static int initSpinnerWithSuggestionList(Spinner spinner, List<String> suggestions, Context context) {
+    public static int initSpinnerWithSuggestionList(Spinner spinner, List<String> suggestions, Context context, int layoutResId) {
         if (spinner == null) return -1;
         try {
             ArrayAdapter<String> adapter = new ArrayAdapter<>(context,
-                    android.R.layout.simple_spinner_item, suggestions);
+                    layoutResId, suggestions);
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             spinner.setAdapter(adapter);
             return 1;
@@ -95,6 +96,14 @@ public class UIUtils {
         } catch (Exception e) {
             e.printStackTrace();
             return -1;
+        }
+    }
+
+    public static void uncheckOtherToggles(ToggleButton selectedToggle, List<ToggleButton> allToggleButtons) {
+        for (ToggleButton toggle: allToggleButtons) {
+            if (toggle != selectedToggle) {
+                toggle.setChecked(false);
+            }
         }
     }
 }

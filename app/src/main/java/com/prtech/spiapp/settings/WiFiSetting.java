@@ -66,14 +66,14 @@ public class WiFiSetting extends Fragment {
 
     public void displayWiFiList(TableLayout tableLayout, String[][] data) {
         tableLayout.removeViews(1, tableLayout.getChildCount() - 1);
-        for (int i = 0; i < this.wifiList.length; i++) {
+        for (int i = 0; i <data.length; i++) {
             TableRow tableRow = new TableRow(requireContext());
             tableRow.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.table_border));
             tableRow.setBackgroundResource(R.drawable.row_selector);
             tableRow.setTag(i + 1);
-            for (int j = 0; j < this.wifiList[i].length; j++) {
+            for (int j = 0; j <data[i].length; j++) {
                 TextView textView = new TextView(requireContext());
-                textView.setText(this.wifiList[i][j]);
+                textView.setText(data[i][j]);
                 textView.setPadding(16, 16, 16, 16);
                 tableRow.addView(textView);
             }
@@ -85,7 +85,7 @@ public class WiFiSetting extends Fragment {
                 LogHelper.sendLog(
                         Constants.LOGGING_BASE_URL,
                         Constants.LOGGING_REQUEST_METHOD,
-                        "User selected wifi: " + wifiList[selectedRowIndex - 1][0],
+                        "User selected wifi: " + data[selectedRowIndex - 1][0],
                         Constants.LOGGING_BEARER_TOKEN
                 );
             });
@@ -288,28 +288,24 @@ public class WiFiSetting extends Fragment {
             return;
         }
         wifiHelper.scanWifiNetworks(scanResults -> {
-            StringBuilder builder = new StringBuilder();
-            builder.append("End of scanning,  ");
-            wifiList = new String[scanResults.size()][];
-            for (int i = 0; i < scanResults.size(); i ++) {
-                ScanResult result = scanResults.get(i);
-                String[] wifi = new String[5];
-                String name = result.SSID;
-                wifi[0] = name;
-                wifi[1] = "10";
-                wifi[2] = "150";
-                wifi[3] = "Secure";
-                wifi[4] = "";
-                builder.append(wifi[0]).append(", ");
-                wifiList[i] = wifi;
+            wifiList = scanResults;
+            StringBuilder result = new StringBuilder();
+
+            for (String[] row : scanResults) {
+                for (String item : row) {
+                    result.append(item).append(" ");
+                }
             }
+
+            // Remove trailing space
+            String plainString = result.toString().trim();
             LogHelper.sendLog(
                     Constants.LOGGING_BASE_URL,
                     Constants.LOGGING_REQUEST_METHOD,
-                    builder.toString().trim(),
+                    plainString,
                     Constants.LOGGING_BEARER_TOKEN);
-
-            displayWiFiList(wifiListTable, wifiList);
+            Log.d("WiFi Scan Success",  plainString);
+            displayWiFiList(wifiListTable, scanResults);
         });
         clickSearch = false;
     }

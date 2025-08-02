@@ -129,7 +129,8 @@ public class MonitoringSetting extends Fragment {
     private final float windowSize = 500f;
     private MainActivity mainActivity;
     private volatile Boolean bRunning = false;
-
+    private Long totalRecordsCnt = 0L;
+    private int tableRowsCnt = 10;
 
     public MonitoringSetting() {
 
@@ -189,8 +190,10 @@ public class MonitoringSetting extends Fragment {
             );
             Log.d("Monitoring Info", "New Data arrived from TCP : " + Arrays.toString(data));
             Toast.makeText(requireContext(), "Data arrived", Toast.LENGTH_SHORT).show();
-            if(bRunning) updateViews(data, 6);
-
+            if(bRunning) {
+                updateViews(data, 6);
+                totalRecordsCnt ++;
+            }
         });
 
         espPacketViewModel = new ViewModelProvider(requireActivity()).get(ESPPacketViewModel.class);
@@ -355,9 +358,9 @@ public class MonitoringSetting extends Fragment {
     }
     private void addAccordionSection(long espId) {
         List<VisualizationRange> filtered = currentVisualizations.get((Integer) espVisualizationMap.get(espId)).getRanges()
-                        .stream()
-                        .filter(one -> Objects.equals(one.getEspPacketId(), espId))
-                        .collect(Collectors.toList());
+                .stream()
+                .filter(one -> Objects.equals(one.getEspPacketId(), espId))
+                .collect(Collectors.toList());
         if (filtered.isEmpty()) return;
         VisualizationRange visualizationRange = filtered.get(0);
         List<ESPPacket> filteredESPs = currentESPPackets
@@ -366,72 +369,72 @@ public class MonitoringSetting extends Fragment {
                 .collect(Collectors.toList());
         if(filteredESPs.isEmpty()) return;
         ESPPacket result = filteredESPs.get(0);
-            // Header
-            if (result == null) return;
-            RangeDTO rangeDTO = new RangeDTO(currentVisualizations.get(0).getId(), visualizationRange.getEspPacketId(), result.getVariableName(), result.getDataType(), result.getNumberOfChannels(), visualizationRange.getVisualizationType(), visualizationRange.getyAxisRange(), visualizationRange.getUpperLimit(), visualizationRange.getLowerLimit());
-            rangeDTOs.add(rangeDTO);
-            LinearLayout headerLayout = new LinearLayout(requireContext());
-            headerLayout.setLayoutParams(new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT
-            ));
-            headerLayout.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.bs_primary));
-            headerLayout.setOrientation(LinearLayout.HORIZONTAL);
-            headerLayout.setTag(visualizationRange.getEspPacketId());
+        // Header
+        if (result == null) return;
+        LinearLayout headerLayout = new LinearLayout(requireContext());
+        headerLayout.setLayoutParams(new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        ));
+        headerLayout.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.bs_primary));
+        headerLayout.setOrientation(LinearLayout.HORIZONTAL);
+        headerLayout.setTag(visualizationRange.getEspPacketId());
 
-            TextView header = new TextView(requireContext());
-            header.setLayoutParams(new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.WRAP_CONTENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT
-            ));
+        TextView header = new TextView(requireContext());
+        header.setLayoutParams(new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        ));
 
 
-            header.setText(result.getVariableName());
-            header.setTextSize(18);
-            header.setTypeface(null, Typeface.BOLD);
-            header.setPadding(24, 24, 24, 24);
-            header.setTextColor(Color.WHITE);
+        header.setText(result.getVariableName());
+        header.setTextSize(18);
+        header.setTypeface(null, Typeface.BOLD);
+        header.setPadding(24, 24, 24, 24);
+        header.setTextColor(Color.WHITE);
 
-            View spaceView = new View(requireContext());
-            spaceView.setLayoutParams(new LinearLayout.LayoutParams(
-                    0,
-                    0,
-                    1
-            ));
+        View spaceView = new View(requireContext());
+        spaceView.setLayoutParams(new LinearLayout.LayoutParams(
+                0,
+                0,
+                1
+        ));
 
-            Spinner visualizationSpinner = new Spinner(requireContext());
-            visualizationSpinner.setLayoutParams(new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.WRAP_CONTENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT
-            ));
-            List<String> candidates = currentVisualizations
-                    .stream()
-                    .map(Visualization::getTitle)
-                    .collect(Collectors.toList());
+        Spinner visualizationSpinner = new Spinner(requireContext());
+        visualizationSpinner.setLayoutParams(new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        ));
+        List<String> candidates = currentVisualizations
+                .stream()
+                .map(Visualization::getTitle)
+                .collect(Collectors.toList());
 
-            int color = ContextCompat.getColor(requireContext(), R.color.white); // Replace with your color
-            ViewCompat.setBackgroundTintList(visualizationSpinner, ColorStateList.valueOf(color));
-            initSpinnerWithSuggestionList(visualizationSpinner, candidates, requireContext(), R.layout.white_spinner_item);
-            visualizationSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                @Override
-                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    espVisualizationMap.put(espId, position);
-                }
+        int color = ContextCompat.getColor(requireContext(), R.color.white); // Replace with your color
+        ViewCompat.setBackgroundTintList(visualizationSpinner, ColorStateList.valueOf(color));
+        initSpinnerWithSuggestionList(visualizationSpinner, candidates, requireContext(), R.layout.white_spinner_item);
+        int visualizationIndex = (Integer) espVisualizationMap.get(espId);
+        visualizationSpinner.setSelection(visualizationIndex);
+        visualizationSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                espVisualizationMap.put(espId, position);
+            }
 
-                @Override
-                public void onNothingSelected(AdapterView<?> parent) {
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
 
-                }
-            });
-            // Content container
-            LinearLayout contentLayout = new LinearLayout(requireContext());
-            contentLayout.setOrientation(LinearLayout.VERTICAL);
-            contentLayout.setVisibility(View.GONE);
-            contentLayout.setPadding(24, 24, 24, 24);
-            contentLayout.setLayoutParams(new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    500
-            ));
+            }
+        });
+        // Content container
+        LinearLayout contentLayout = new LinearLayout(requireContext());
+        contentLayout.setOrientation(LinearLayout.VERTICAL);
+        contentLayout.setVisibility(View.GONE);
+        contentLayout.setPadding(24, 24, 24, 24);
+        contentLayout.setLayoutParams(new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                500
+        ));
 
 //        ArrayList<Entry> entries = new ArrayList<>();
 //        for (int i = 0; i <= 100; i += 10) {
@@ -449,33 +452,33 @@ public class MonitoringSetting extends Fragment {
 
 //        scatterChart.invalidate(); // refresh chart
 
-            // Content TextView
-            if(visualizationRange.getVisualizationType() == 0) {
-                ScatterChart scatterChart = displayChart(visualizationRange, requireContext());
-                chartsMap.put(visualizationRange.getEspPacketId(), scatterChart);
-                currentWindowStartMap.put(visualizationRange.getEspPacketId(), 0F);
-                contentLayout.addView(scatterChart);
-            }
-            else if(visualizationRange.getVisualizationType() == 1) {
-                TableLayout tableLayout = displayTable(visualizationRange, requireContext());
-                tablesMap.put(visualizationRange.getEspPacketId(), tableLayout);
-                contentLayout.addView(tableLayout);
-            }
-            contentLayout.setVisibility(View.VISIBLE);
-            // Save reference for updates
-            accordionContentMap.put(result.getId(), contentLayout);
-
-            // Toggle logic
-            header.setOnClickListener(v -> {
-                contentLayout.setVisibility(
+        // Content TextView
+        if(visualizationRange.getVisualizationType() == 0) {
+            ScatterChart scatterChart = displayChart(visualizationRange, requireContext());
+            chartsMap.put(visualizationRange.getEspPacketId(), scatterChart);
+            currentWindowStartMap.put(visualizationRange.getEspPacketId(), 0F);
+            contentLayout.addView(scatterChart);
+        }
+        else if(visualizationRange.getVisualizationType() == 1) {
+            TableLayout tableLayout = displayTable(visualizationRange, requireContext());
+            tablesMap.put(visualizationRange.getEspPacketId(), tableLayout);
+            contentLayout.addView(tableLayout);
+        }
+        contentLayout.setVisibility(View.VISIBLE);
+        // Save reference for updates
+        accordionContentMap.put(result.getId(), contentLayout);
+        contentLayout.setTag(visualizationRange.getVisualizationType());
+        // Toggle logic
+        header.setOnClickListener(v -> {
+            contentLayout.setVisibility(
                     contentLayout.getVisibility() == View.VISIBLE ? View.GONE : View.VISIBLE
-                );
-            });
-            headerLayout.addView(header);
-            headerLayout.addView(spaceView);
-            headerLayout.addView(visualizationSpinner);
-            accordionContainer.addView(headerLayout);
-            accordionContainer.addView(contentLayout);
+            );
+        });
+        headerLayout.addView(header);
+        headerLayout.addView(spaceView);
+        headerLayout.addView(visualizationSpinner);
+        accordionContainer.addView(headerLayout);
+        accordionContainer.addView(contentLayout);
 
     }
 
@@ -484,7 +487,6 @@ public class MonitoringSetting extends Fragment {
         accordionContainer.removeAllViews();
         accordionContentMap.clear();
         chartsMap.clear();
-        rangeDTOs.clear();
         for (Long espId: espIds) {
             addAccordionSection(espId);
         }
@@ -501,16 +503,21 @@ public class MonitoringSetting extends Fragment {
 //               Toast.makeText(requireContext(), R.string.insert_failed, Toast.LENGTH_SHORT).show();
             }
         });
-        if(rangeDTOs == null || rangeDTOs.isEmpty()) return;
-        Map<Long, Object> parsed = PacketParser.parse(rangeDTOs, data);
+        if(currentESPPackets == null || currentESPPackets.isEmpty()) return;
+        Map<Long, Object> parsed = PacketParser.parse(currentESPPackets, data);
         final int[] updateCnt = {0};
-        for (RangeDTO rangeDTO: rangeDTOs) {
-            List<Object> values = (List<Object>) parsed.get(rangeDTO.getEspPacketId());
-            ScatterChart scatterChart = (ScatterChart) chartsMap.get(rangeDTO.getEspPacketId());
+        for (ESPPacket espPacket: currentESPPackets) {
+            List<Object> values = (List<Object>) parsed.get(espPacket.getId());
+            ScatterChart scatterChart = (ScatterChart) chartsMap.get(espPacket.getId());
+            TableLayout targetTable = (TableLayout) tablesMap.get(espPacket.getId());
             Runnable updater = new Runnable() {
                 @Override
                 public void run() {
-                    updateChartWithData(scatterChart, values, rangeDTO.getEspPacketId());
+                    LinearLayout linearLayout = (LinearLayout)accordionContentMap.get(espPacket.getId());
+                    if (linearLayout == null) return;
+                    int vType = (Integer) linearLayout.getTag();
+                    if (vType == 0) updateChartWithData(scatterChart, values, espPacket.getId());
+                    else if (vType == 1) updateTableWithData(targetTable, values, espPacket.getId(), requireContext());
                 }
             };
 
@@ -606,8 +613,10 @@ public class MonitoringSetting extends Fragment {
                                     .stream()
                                     .map(VisualizationRange::getEspPacketId)
                                     .collect(Collectors.toList());
-                            for (Long espId: espIds) {
-                                espVisualizationMap.put(espId, 0);
+                            if(espVisualizationMap.isEmpty()) {
+                                for (Long espId : espIds) {
+                                    espVisualizationMap.put(espId, 0);
+                                }
                             }
                             displayAccordion(espIds);
 
@@ -938,12 +947,12 @@ public class MonitoringSetting extends Fragment {
 
 
         TableRow channelRow = new TableRow(requireContext());
-        headerRow.setBackgroundColor(ContextCompat.getColor(context, R.color.bs_primary));
-
+        channelRow.setBackgroundColor(ContextCompat.getColor(context, R.color.bs_primary));
         TextView orderChannelView = new TextView(requireContext());
         channelRow.addView(orderChannelView);
         for (int i = 0; i < nChannels; i ++) {
             TextView channelView = new TextView(requireContext());
+            channelView.setTextColor(ContextCompat.getColor(context, R.color.white));
             channelView.setText(String.valueOf(i + 1));
             channelRow.addView(channelView);
         }
@@ -953,4 +962,27 @@ public class MonitoringSetting extends Fragment {
         return tableLayout;
     }
 
+    private void updateTableWithData(TableLayout table, List<Object> values, Long espId, Context context) {
+        if(table == null || values == null || values.isEmpty()) return;
+        if(table.getChildCount() - 2 > tableRowsCnt - 1) table.removeViews(2, table.getChildCount() - 2);
+        TableRow tableRow = new TableRow(context);
+
+        TextView textView = new TextView(requireContext());
+        textView.setText(String.valueOf(totalRecordsCnt));
+        textView.setGravity(Gravity.CENTER);
+        tableRow.addView(textView);
+
+        int cnt = values.size();
+        for (int i = 0; i < cnt; i ++) {
+            TextView valueView = new TextView(context);
+            Integer value = (int) values.get(i);
+            if (value != null) {
+                valueView.setText(String.valueOf(value));
+            }
+            tableRow.addView(valueView);
+        }
+
+        table.addView(tableRow);
+
+    }
 }

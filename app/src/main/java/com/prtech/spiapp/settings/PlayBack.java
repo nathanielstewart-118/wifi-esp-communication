@@ -23,6 +23,7 @@ import android.widget.Toast;
 import com.prtech.spiapp.R;
 import com.prtech.spiapp.db.AppDatabase;
 import com.prtech.spiapp.db.dao.MonitoringDao;
+import com.prtech.spiapp.db.entity.ESPPacket;
 import com.prtech.spiapp.db.entity.Monitoring;
 import com.prtech.spiapp.db.entity.RangeDTO;
 import com.prtech.spiapp.db.entity.Visualization;
@@ -63,6 +64,8 @@ public class PlayBack extends Fragment {
     private Map<Long, Float> currentWindowStartMap = new HashMap<>();
     private final Float windowSize = 500F;
     private final Handler handler = new Handler(Looper.getMainLooper());
+    private List<ESPPacket> currentESPPackets = new ArrayList<>();
+
     public PlayBack() {
 
     }
@@ -217,7 +220,7 @@ public class PlayBack extends Fragment {
                     if(!isPlaying) break;
                     long waitTime = m.getCreated_at() - lastTimestamp;
                     lastTimestamp = m.getCreated_at();
-                    Map<Long, Object> parsed = PacketParser.parse(rangeDTOs, CommonUtils.fromStringToByteArray(m.getData()));
+                    Map<Long, Object> parsed = PacketParser.parse(currentESPPackets, CommonUtils.fromStringToByteArray(m.getData()));
                     for (RangeDTO rangeDTO: rangeDTOs) {
                         List<Object> values = (List<Object>) parsed.get(rangeDTO.getEspPacketId());
                         ScatterChart scatterChart = (ScatterChart) chartsMap.get(rangeDTO.getEspPacketId());

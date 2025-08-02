@@ -1,6 +1,7 @@
 package com.prtech.spiapp.utils.communications;
 
 import com.prtech.spiapp.db.entity.CommandThresholdWithDataType;
+import com.prtech.spiapp.db.entity.ESPPacket;
 import com.prtech.spiapp.db.entity.ESPReceiveData;
 import com.prtech.spiapp.db.entity.ESPSendData;
 import com.prtech.spiapp.db.entity.RangeDTO;
@@ -72,12 +73,12 @@ public class PacketParser {
         return buffer.array();
     }
 
-    public static Map<Long, Object> parse(List<RangeDTO> variables, byte[] data) {
+    public static Map<Long, Object> parse(List<ESPPacket> variables, byte[] data) {
         Map<Long, Object> result = new LinkedHashMap<>();
         ByteBuffer buffer = ByteBuffer.wrap(data).order(ByteOrder.LITTLE_ENDIAN);
         int cmd = Byte.toUnsignedInt(buffer.get());
         try {
-            for (RangeDTO var : variables) {
+            for (ESPPacket var : variables) {
                 List<Object> values = new ArrayList<>();
 
                 for (int i = 0; i < var.getNumberOfChannels(); i++) {
@@ -116,7 +117,7 @@ public class PacketParser {
                             throw new IllegalArgumentException("Unknown type: " + var.getDataType());
                     }
                 }
-                result.put(var.getEspPacketId(), values);
+                result.put(var.getId(), values);
             }
         } catch (Exception e) {
             e.printStackTrace();

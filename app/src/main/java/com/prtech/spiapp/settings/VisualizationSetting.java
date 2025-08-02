@@ -501,7 +501,7 @@ public class VisualizationSetting extends Fragment {
                                     .filter(ran -> Objects.equals(ran.getEspPacketId(), r.getId()))
                                     .collect(Collectors.toList());
 
-                            RangeDTO rangeDTO = new RangeDTO(r.getId(), r.getVariableName(), r.getDataType(), r.getNumberOfChannels(), null, null, null, null);
+                            RangeDTO rangeDTO = new RangeDTO(data.getId(), r.getId(), r.getVariableName(), r.getDataType(), r.getNumberOfChannels(), null, null, null, null);
                             if (!filtered.isEmpty()) {
                                 VisualizationRange match = filtered.get(0);
                                 rangeDTO.setVisualizationType(match.getVisualizationType());
@@ -557,7 +557,7 @@ public class VisualizationSetting extends Fragment {
                 currentRangeDTOs = results
                         .stream()
                         .map(esp -> {
-                            RangeDTO rangeDTO = new RangeDTO(esp.getId(), esp.getVariableName(), esp.getDataType(), esp.getNumberOfChannels(), null, null, null, null);
+                            RangeDTO rangeDTO = new RangeDTO(0L, esp.getId(), esp.getVariableName(), esp.getDataType(), esp.getNumberOfChannels(), null, null, null, null);
                             return rangeDTO;
                         })
                         .collect(Collectors.toList());

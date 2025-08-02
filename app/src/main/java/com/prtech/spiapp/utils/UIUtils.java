@@ -2,12 +2,17 @@ package com.prtech.spiapp.utils;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.Typeface;
+import android.view.Gravity;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TableRow;
+import android.widget.TextView;
 import android.widget.ToggleButton;
+
+import androidx.core.content.ContextCompat;
 
 import com.prtech.spiapp.R;
 
@@ -105,5 +110,15 @@ public class UIUtils {
                 toggle.setChecked(false);
             }
         }
+    }
+
+    public static TextView createHeaderTextView(String text, Context context) {
+        TextView tv = new TextView(context);
+        tv.setText(text);
+        tv.setTextColor(ContextCompat.getColor(context, R.color.white));
+        tv.setPadding(6, 6, 6, 6);
+        tv.setTypeface(null, Typeface.BOLD);
+        tv.setGravity(Gravity.CENTER);
+        return tv;
     }
 }

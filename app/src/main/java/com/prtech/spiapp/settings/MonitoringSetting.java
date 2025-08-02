@@ -1,6 +1,7 @@
 package com.prtech.spiapp.settings;
 
 import static com.prtech.spiapp.utils.Constants.COLORS;
+import static com.prtech.spiapp.utils.UIUtils.createHeaderTextView;
 import static com.prtech.spiapp.utils.UIUtils.initSpinnerWithSuggestionList;
 import static com.prtech.spiapp.utils.UIUtils.uncheckOtherToggles;
 import static com.prtech.spiapp.utils.communications.PacketParser.encodeCommand;
@@ -12,6 +13,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -29,6 +31,8 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
+import android.widget.TableLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
@@ -85,6 +89,10 @@ public class MonitoringSetting extends Fragment {
     private LinearLayout accordionContainer;
     private final Map<Long, Object> accordionContentMap = new HashMap<>();
     private final Map<Long, Object> chartsMap = new HashMap<>();
+    private final Map<Long, Object> tablesMap = new HashMap<>();
+    private final Map<Long, Float> currentWindowStartMap = new HashMap<>();
+    private final Map<Long, Integer> espVisualizationMap = new HashMap<>();
+
     private Spinner experimentSpinner;
     private final Gson gson = new Gson();
     private List<ToggleButton> experimentToggleButtons = new ArrayList<>();
@@ -112,12 +120,12 @@ public class MonitoringSetting extends Fragment {
     private List<String> experimentTitles = new ArrayList<>();
     private List<Experiment> currentExperiments = new ArrayList<>();
     private List<Command> currentCommands = new ArrayList<>();
+    private List<ESPPacket> currentESPPackets = new ArrayList<>();
     private List<Command> allCommands = new ArrayList<>();
     private List<Visualization> currentVisualizations = new ArrayList<>();
     private Boolean bDrawing = true;
     private Integer currentExperimentSetId = 0;
     private Integer currentCommandSetIndex = 0;
-    private Map<Long, Float> currentWindowStartMap = new HashMap<>();
     private final float windowSize = 500f;
     private MainActivity mainActivity;
     private volatile Boolean bRunning = false;
@@ -174,13 +182,14 @@ public class MonitoringSetting extends Fragment {
         receiveViewModel = new ViewModelProvider(requireActivity()).get(TCPUDPReceiveViewModel.class);
         receiveViewModel.getData().observe(getViewLifecycleOwner(), data -> {
             LogHelper.sendLog(
-                Constants.LOGGING_BASE_URL,
-                Constants.LOGGING_REQUEST_METHOD,
-                "New Data arrived from TCP : " + Arrays.toString(data),
-                Constants.LOGGING_BEARER_TOKEN
+                    Constants.LOGGING_BASE_URL,
+                    Constants.LOGGING_REQUEST_METHOD,
+                    "New Data arrived from TCP : " + Arrays.toString(data),
+                    Constants.LOGGING_BEARER_TOKEN
             );
             Log.d("Monitoring Info", "New Data arrived from TCP : " + Arrays.toString(data));
-            updateViews(data, 6);
+            Toast.makeText(requireContext(), "Data arrived", Toast.LENGTH_SHORT).show();
+            if(bRunning) updateViews(data, 6);
 
         });
 
@@ -204,6 +213,7 @@ public class MonitoringSetting extends Fragment {
         visualizationViewModel = new ViewModelProvider(requireActivity()).get(VisualizationViewModel.class);
 
         // Test data
+        /*
         visualizationViewModel.getActivatedVisualization(result -> {
             if (result == null) {
                 currentVisualization = new Visualization("", "", 0, 0, 0, new ArrayList<>(), 0, "", 0, System.currentTimeMillis());
@@ -215,7 +225,8 @@ public class MonitoringSetting extends Fragment {
                 displayAccordion(currentVisualization.getRanges());
 //                ByteBuffer buffer = ByteBuffer.allocate(4 * Constants.MAX_VARIABLE_NUMBER_IN_PACKET);
                 /*
-                visualizationViewModel.getCorrespondingSAs(currentVisualization.getId(), results -> {
+                visualizationViewModel.getCorrespondingSAs
+                (currentVisualization.getId(), results -> {
                     rangeDTOs = results;
                     executorService.execute(() -> {
                         while(bDrawing) {
@@ -303,12 +314,9 @@ public class MonitoringSetting extends Fragment {
                     });
 
                 });
-                 */
-
             }
-
         });
-
+        */
         experimentToggleButtons.add(view.findViewById(R.id.monitoring_experiment_set1_btn));
         experimentToggleButtons.add(view.findViewById(R.id.monitoring_experiment_set2_btn));
         experimentToggleButtons.add(view.findViewById(R.id.monitoring_experiment_set3_btn));
@@ -345,11 +353,23 @@ public class MonitoringSetting extends Fragment {
         bDrawing = false;
         super.onStop();
     }
-    private void addAccordionSection(VisualizationRange visualizationRange) {
-
-        espPacketViewModel.getById(visualizationRange.getEspPacketId(), result -> {
+    private void addAccordionSection(long espId) {
+        List<VisualizationRange> filtered = currentVisualizations.get((Integer) espVisualizationMap.get(espId)).getRanges()
+                        .stream()
+                        .filter(one -> Objects.equals(one.getEspPacketId(), espId))
+                        .collect(Collectors.toList());
+        if (filtered.isEmpty()) return;
+        VisualizationRange visualizationRange = filtered.get(0);
+        List<ESPPacket> filteredESPs = currentESPPackets
+                .stream()
+                .filter(one -> Objects.equals(one.getId(), espId))
+                .collect(Collectors.toList());
+        if(filteredESPs.isEmpty()) return;
+        ESPPacket result = filteredESPs.get(0);
             // Header
             if (result == null) return;
+            RangeDTO rangeDTO = new RangeDTO(currentVisualizations.get(0).getId(), visualizationRange.getEspPacketId(), result.getVariableName(), result.getDataType(), result.getNumberOfChannels(), visualizationRange.getVisualizationType(), visualizationRange.getyAxisRange(), visualizationRange.getUpperLimit(), visualizationRange.getLowerLimit());
+            rangeDTOs.add(rangeDTO);
             LinearLayout headerLayout = new LinearLayout(requireContext());
             headerLayout.setLayoutParams(new LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
@@ -357,11 +377,12 @@ public class MonitoringSetting extends Fragment {
             ));
             headerLayout.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.bs_primary));
             headerLayout.setOrientation(LinearLayout.HORIZONTAL);
+            headerLayout.setTag(visualizationRange.getEspPacketId());
 
             TextView header = new TextView(requireContext());
             header.setLayoutParams(new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
             ));
 
 
@@ -387,21 +408,29 @@ public class MonitoringSetting extends Fragment {
                     .stream()
                     .map(Visualization::getTitle)
                     .collect(Collectors.toList());
+
             int color = ContextCompat.getColor(requireContext(), R.color.white); // Replace with your color
             ViewCompat.setBackgroundTintList(visualizationSpinner, ColorStateList.valueOf(color));
             initSpinnerWithSuggestionList(visualizationSpinner, candidates, requireContext(), R.layout.white_spinner_item);
+            visualizationSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    espVisualizationMap.put(espId, position);
+                }
 
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
 
-
-
+                }
+            });
             // Content container
             LinearLayout contentLayout = new LinearLayout(requireContext());
             contentLayout.setOrientation(LinearLayout.VERTICAL);
             contentLayout.setVisibility(View.GONE);
             contentLayout.setPadding(24, 24, 24, 24);
             contentLayout.setLayoutParams(new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                500
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    500
             ));
 
 //        ArrayList<Entry> entries = new ArrayList<>();
@@ -421,38 +450,17 @@ public class MonitoringSetting extends Fragment {
 //        scatterChart.invalidate(); // refresh chart
 
             // Content TextView
-
-            ScatterChart scatterChart = new ScatterChart(requireContext());
-            scatterChart.setLayoutParams(new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.MATCH_PARENT));
-
-            scatterChart.getDescription().setEnabled(false);
-            scatterChart.getAxisRight().setEnabled(false);
-            scatterChart.getXAxis().setAxisMinimum(0f);
-            scatterChart.getXAxis().setAxisMaximum(500f);
-            scatterChart.setVisibleXRangeMaximum(500f);
-            scatterChart.setTouchEnabled(true);
-            scatterChart.setDragEnabled(true);
-            scatterChart.setScaleEnabled(true);
-            scatterChart.setPinchZoom(true);
-            scatterChart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
-//            scatterChart.getXAxis().setValueFormatter(new ValueFormatter() {
-//                private final SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
-//
-//                @Override
-//                public String getFormattedValue(float value) {
-//                    long millis = (long) value;
-//                    return sdf.format(new Date(millis));
-//                }
-//            });
-            scatterChart.getAxisLeft().setAxisMinimum(Float.parseFloat(Constants.Y_AXIS_RANGES[visualizationRange.getyAxisRange()][1]));
-            scatterChart.getAxisLeft().setAxisMaximum(Float.parseFloat(Constants.Y_AXIS_RANGES[visualizationRange.getyAxisRange()][2]));
-            scatterChart.getXAxis().setDrawGridLines(false);
-            scatterChart.getLegend().setForm(Legend.LegendForm.SQUARE);
-            chartsMap.put(visualizationRange.getEspPacketId(), scatterChart);
-            currentWindowStartMap.put(visualizationRange.getEspPacketId(), 0F);
-            contentLayout.addView(scatterChart);
+            if(visualizationRange.getVisualizationType() == 0) {
+                ScatterChart scatterChart = displayChart(visualizationRange, requireContext());
+                chartsMap.put(visualizationRange.getEspPacketId(), scatterChart);
+                currentWindowStartMap.put(visualizationRange.getEspPacketId(), 0F);
+                contentLayout.addView(scatterChart);
+            }
+            else if(visualizationRange.getVisualizationType() == 1) {
+                TableLayout tableLayout = displayTable(visualizationRange, requireContext());
+                tablesMap.put(visualizationRange.getEspPacketId(), tableLayout);
+                contentLayout.addView(tableLayout);
+            }
             contentLayout.setVisibility(View.VISIBLE);
             // Save reference for updates
             accordionContentMap.put(result.getId(), contentLayout);
@@ -460,7 +468,7 @@ public class MonitoringSetting extends Fragment {
             // Toggle logic
             header.setOnClickListener(v -> {
                 contentLayout.setVisibility(
-                        contentLayout.getVisibility() == View.VISIBLE ? View.GONE : View.VISIBLE
+                    contentLayout.getVisibility() == View.VISIBLE ? View.GONE : View.VISIBLE
                 );
             });
             headerLayout.addView(header);
@@ -469,31 +477,31 @@ public class MonitoringSetting extends Fragment {
             accordionContainer.addView(headerLayout);
             accordionContainer.addView(contentLayout);
 
-        });
     }
 
-    public void displayAccordion(List<VisualizationRange> data) {
+    public void displayAccordion(List<Long> espIds) {
 
         accordionContainer.removeAllViews();
         accordionContentMap.clear();
         chartsMap.clear();
-
-        for (VisualizationRange vr: data) {
-            addAccordionSection(vr);
+        rangeDTOs.clear();
+        for (Long espId: espIds) {
+            addAccordionSection(espId);
         }
     }
 
     public void updateViews(byte[] data, int cnt) {
-        Monitoring monitoring = new Monitoring(Arrays.toString(data), currentVisualization.getId(), System.currentTimeMillis());
+        Monitoring monitoring = new Monitoring(Arrays.toString(data), System.currentTimeMillis());
 
         monitoringViewModel.insert(monitoring, result -> {
-           if (result != null && result > 0) {
+            if (result != null && result > 0) {
 //               Toast.makeText(requireContext(), R.string.insert_success, Toast.LENGTH_SHORT).show();
-           }
-           else {
+            }
+            else {
 //               Toast.makeText(requireContext(), R.string.insert_failed, Toast.LENGTH_SHORT).show();
-           }
+            }
         });
+        if(rangeDTOs == null || rangeDTOs.isEmpty()) return;
         Map<Long, Object> parsed = PacketParser.parse(rangeDTOs, data);
         final int[] updateCnt = {0};
         for (RangeDTO rangeDTO: rangeDTOs) {
@@ -506,64 +514,64 @@ public class MonitoringSetting extends Fragment {
                 }
             };
 
-            scatterChart.post(updater);
+            updater.run();
 
         }
     }
 
     private void updateChartWithData(ScatterChart scatterChart, List<Object> data, Long saId) {
-            float maxX = 0;
-            if(scatterChart == null) return;
-            ScatterData scatterData= scatterChart.getData();
-            int cnt = data.size();
-            if (scatterData == null) {
-                scatterData = new ScatterData();
-                for (int i = 0; i < cnt; i ++) {
-                    ScatterDataSet set = new ScatterDataSet(new ArrayList<>(), requireContext().getString(R.string.channel) + " " + String.valueOf(i + 1));
-                    set.setDrawValues(false);
-                    set.setScatterShape(ScatterChart.ScatterShape.CIRCLE);
-                        set.setColor(COLORS[i % COLORS.length]);
+        float maxX = 0;
+        if(scatterChart == null || data == null || data.isEmpty()) return;
+        ScatterData scatterData= scatterChart.getData();
+        int cnt = data.size();
+        if (scatterData == null) {
+            scatterData = new ScatterData();
+            for (int i = 0; i < cnt; i ++) {
+                ScatterDataSet set = new ScatterDataSet(new ArrayList<>(), requireContext().getString(R.string.channel) + " " + String.valueOf(i + 1));
+                set.setDrawValues(false);
+                set.setScatterShape(ScatterChart.ScatterShape.CIRCLE);
+                set.setColor(COLORS[i % COLORS.length]);
+                Object obj = data.get(i);
+                if (obj instanceof Integer) {
+                    Integer value = (Integer) obj;
+                    set.addEntry(new Entry(0, value));
+                }
+                scatterData.addDataSet(set);
+            }
+            scatterChart.setData(scatterData);
+        }
+        else {
+            for (int i = 0; i < cnt; i ++) {
+                IScatterDataSet set = scatterData.getDataSetByIndex(i);
+                if (set instanceof ScatterDataSet) {
+                    ScatterDataSet scatterDataSet = (ScatterDataSet) set;
+                    float prevX = 0;
+                    if (scatterDataSet.getEntryCount() > 0) {
+                        Entry last = scatterDataSet.getEntryForIndex(scatterDataSet.getEntryCount() - 1);
+                        prevX = last.getX();
+                    }
                     Object obj = data.get(i);
                     if (obj instanceof Integer) {
                         Integer value = (Integer) obj;
-                        set.addEntry(new Entry(0, value));
-                    }
-                    scatterData.addDataSet(set);
-                }
-                scatterChart.setData(scatterData);
-            }
-            else {
-                for (int i = 0; i < cnt; i ++) {
-                    IScatterDataSet set = scatterData.getDataSetByIndex(i);
-                    if (set instanceof ScatterDataSet) {
-                        ScatterDataSet scatterDataSet = (ScatterDataSet) set;
-                        float prevX = 0;
-                        if (scatterDataSet.getEntryCount() > 0) {
-                            Entry last = scatterDataSet.getEntryForIndex(scatterDataSet.getEntryCount() - 1);
-                            prevX = last.getX();
-                        }
-                        Object obj = data.get(i);
-                        if (obj instanceof Integer) {
-                            Integer value = (Integer) obj;
-                            float newX = prevX + 10;
-                            scatterDataSet.addEntry(new Entry(newX, value));
-                            if(newX > maxX) maxX = newX;
-                            Log.d("Chart", "MAXX is " + String.valueOf(maxX));
-                        }
+                        float newX = prevX + 10;
+                        scatterDataSet.addEntry(new Entry(newX, value));
+                        if(newX > maxX) maxX = newX;
+                        Log.d("Chart", "MAXX is " + String.valueOf(maxX));
                     }
                 }
             }
-            Log.d("Chart", "Maximum values is " + String.valueOf(scatterChart.getHighestVisibleX()));
-            scatterData.notifyDataChanged();
-            scatterChart.notifyDataSetChanged();
-            float start = currentWindowStartMap.get(saId);
-            if (maxX > start + windowSize) {
-                currentWindowStartMap.put(saId, start + windowSize);
-                scatterChart.getXAxis().setAxisMinimum(start + windowSize);
-                scatterChart.getXAxis().setAxisMaximum(start + windowSize * 2);
-            }
-            scatterChart.invalidate();
-            scatterChart.postDelayed(() -> updateChartWithData(scatterChart, data, saId), 10000);
+        }
+        Log.d("Chart", "Maximum values is " + String.valueOf(scatterChart.getHighestVisibleX()));
+        scatterData.notifyDataChanged();
+        scatterChart.notifyDataSetChanged();
+        float start = currentWindowStartMap.get(saId);
+        if (maxX > start + windowSize) {
+            currentWindowStartMap.put(saId, start + windowSize);
+            scatterChart.getXAxis().setAxisMinimum(start + windowSize);
+            scatterChart.getXAxis().setAxisMaximum(start + windowSize * 2);
+        }
+        scatterChart.invalidate();
+//            scatterChart.postDelayed(() -> updateChartWithData(scatterChart, data, saId), 10000);
 //                    Toast.makeText(requireContext(), "MaxX value is" + String.valueOf(maxX), Toast.LENGTH_SHORT).show();
 //                    scatterChart.moveViewToAnimated(maxX, 0f, YAxis.AxisDependency.LEFT, 300);
 
@@ -576,19 +584,33 @@ public class MonitoringSetting extends Fragment {
             List<String> commands = currentExperiments.get(currentExperimentSetId).getCommands();
             int cnt = commands.size();
 
-            for (int i = 0; i < cnt; i ++ ) {
+            for (int i = 0; i < cnt; i ++ ) {           // for each Command Set
                 int finalI = i;
                 List<Command> filtered = allCommands
                         .stream()
                         .filter(c -> c.getTitle().equals(commands.get(finalI)))
                         .collect(Collectors.toList());
                 if(!filtered.isEmpty()) {
+                    // display accordion according esp packet variables belonging to this command
                     String espPacketTitle = filtered.get(0).getEspPacketTitle();
+                    espPacketViewModel.getByTitle(espPacketTitle, results -> {
+                        currentESPPackets.clear();
+                        currentESPPackets.addAll(results);
+                    });
                     visualizationViewModel.getByESPPacketTitle(espPacketTitle, results -> {
                         currentVisualizations.clear();
                         currentVisualizations.addAll(results);
                         if (!results.isEmpty()) {
-                            displayAccordion(results.get(0).getRanges());
+                            // all visualizations with the same esp packet title have the same esp packet variables, so get(0)
+                            List<Long> espIds = results.get(0).getRanges()
+                                    .stream()
+                                    .map(VisualizationRange::getEspPacketId)
+                                    .collect(Collectors.toList());
+                            for (Long espId: espIds) {
+                                espVisualizationMap.put(espId, 0);
+                            }
+                            displayAccordion(espIds);
+
                         }
                     });
                 }
@@ -656,7 +678,7 @@ public class MonitoringSetting extends Fragment {
                         (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 4, getResources().getDisplayMetrics())
                 );
                 loadButton.setLayoutParams(params);
-                loadButton.setEnabled(false);
+//                loadButton.setEnabled(false);
                 loadButton.setText(titles.get(i + j));
                 // Set text and text size
 //                toggleButton.setTextOn(titles.get(i + j));
@@ -719,55 +741,55 @@ public class MonitoringSetting extends Fragment {
     }
 
     public void runCommands(int experimentSetIndex, int commandSetIndex) throws InterruptedException {
-            Experiment experiment = currentExperiments.get(experimentSetIndex);
-            List<String> titles = experiment.getCommands();
-            List<Command> commands = allCommands
-                    .stream()
-                    .filter(one -> titles.contains(one.getTitle()))
-                    .collect(Collectors.toList());
+        Experiment experiment = currentExperiments.get(experimentSetIndex);
+        List<String> titles = experiment.getCommands();
+        List<Command> commands = allCommands
+                .stream()
+                .filter(one -> titles.contains(one.getTitle()))
+                .collect(Collectors.toList());
 
-            if(!commands.isEmpty()) {
+        if(!commands.isEmpty()) {
+            try {
+                float preRun = experiment.getPreRun();
+                for (int j = 0; j < preRun; j++) {
+                    if (!bRunning) return;
+                    Thread.sleep(1000);
+                }
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            int cnt = commands.size();
+            for (int j = 0; j < cnt; j++) {
+                Command command = commands.get(j);
+                sendCommand(command);
                 try {
-                    float preRun = experiment.getPreRun();
-                    for (int j = 0; j < preRun; j++) {
+                    float runSec = experiment.getCommand() + experiment.getRest();
+                    for (int k = 0; k < runSec; k++) {
                         if (!bRunning) return;
                         Thread.sleep(1000);
                     }
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
-                }
-                int cnt = commands.size();
-                for (int j = 0; j < cnt; j++) {
-                    Command command = commands.get(j);
-                    sendCommand(command);
-                    try {
-                        float runSec = experiment.getCommand() + experiment.getRest();
-                        for (int k = 0; k < runSec; k++) {
-                            if (!bRunning) return;
-                            Thread.sleep(1000);
-                        }
-                    } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-                try {
-                    float postRun = experiment.getPostRun();
-                    for (int i = 0; i < postRun; i++) {
-                        if (!bRunning) return;
-                        Thread.sleep(1000);
-                    }
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-
-                if (commandSetIndex + 1 < experiment.getCommands().size()) {
-                    try {
-                        runCommands(experimentSetIndex, commandSetIndex + 1);
-                    } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
-                    }
                 }
             }
+            try {
+                float postRun = experiment.getPostRun();
+                for (int i = 0; i < postRun; i++) {
+                    if (!bRunning) return;
+                    Thread.sleep(1000);
+                }
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+
+            if (commandSetIndex + 1 < experiment.getCommands().size()) {
+                try {
+                    runCommands(experimentSetIndex, commandSetIndex + 1);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
     }
 
     public void sendCommand(Command command) {
@@ -850,4 +872,85 @@ public class MonitoringSetting extends Fragment {
             button.setEnabled(status);
         }
     }
+
+    public ScatterChart displayChart(VisualizationRange visualizationRange, Context context) {
+        ScatterChart scatterChart = new ScatterChart(requireContext());
+        scatterChart.setLayoutParams(new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.MATCH_PARENT));
+
+        scatterChart.getDescription().setEnabled(false);
+        scatterChart.getAxisRight().setEnabled(false);
+        scatterChart.getXAxis().setAxisMinimum(0f);
+        scatterChart.getXAxis().setAxisMaximum(500f);
+        scatterChart.setVisibleXRangeMaximum(500f);
+        scatterChart.setTouchEnabled(true);
+        scatterChart.setDragEnabled(true);
+        scatterChart.setScaleEnabled(true);
+        scatterChart.setPinchZoom(true);
+        scatterChart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
+//            scatterChart.getXAxis().setValueFormatter(new ValueFormatter() {
+//                private final SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
+//
+//                @Override
+//                public String getFormattedValue(float value) {
+//                    long millis = (long) value;
+//                    return sdf.format(new Date(millis));
+//                }
+//            });
+        scatterChart.getAxisLeft().setAxisMinimum(Float.parseFloat(Constants.Y_AXIS_RANGES[visualizationRange.getyAxisRange()][1]));
+        scatterChart.getAxisLeft().setAxisMaximum(Float.parseFloat(Constants.Y_AXIS_RANGES[visualizationRange.getyAxisRange()][2]));
+        scatterChart.getXAxis().setDrawGridLines(false);
+        scatterChart.getLegend().setForm(Legend.LegendForm.SQUARE);
+        return scatterChart;
+    }
+
+    public TableLayout displayTable(VisualizationRange range, Context context) {
+
+        TableLayout tableLayout = new TableLayout(context);
+        tableLayout.setLayoutParams(new TableLayout.LayoutParams(
+                TableLayout.LayoutParams.MATCH_PARENT,
+                TableLayout.LayoutParams.WRAP_CONTENT));
+        tableLayout.setPadding(16, 16, 16, 16);
+        tableLayout.setStretchAllColumns(true);
+        tableLayout.setGravity(Gravity.CENTER);
+
+        List<ESPPacket> filteredPackets = currentESPPackets
+                .stream()
+                .filter(one -> Objects.equals(one.getId(), range.getEspPacketId()))
+                .collect(Collectors.toList());
+        if (filteredPackets.isEmpty()) return tableLayout;
+        ESPPacket espPacket = filteredPackets.get(0);
+        int nChannels = espPacket.getNumberOfChannels();
+
+        TableRow headerRow = new TableRow(requireContext());
+        headerRow.setBackgroundColor(ContextCompat.getColor(context, R.color.bs_primary));
+
+        TextView orderHeaderView = createHeaderTextView("Order", requireContext());
+        TextView channelHeaderView = createHeaderTextView("Channel", requireContext());
+
+        TableRow.LayoutParams spanParams = new TableRow.LayoutParams();
+        spanParams.span = nChannels;
+        channelHeaderView.setLayoutParams(spanParams);
+
+        headerRow.addView(orderHeaderView);
+        headerRow.addView(channelHeaderView);
+
+
+        TableRow channelRow = new TableRow(requireContext());
+        headerRow.setBackgroundColor(ContextCompat.getColor(context, R.color.bs_primary));
+
+        TextView orderChannelView = new TextView(requireContext());
+        channelRow.addView(orderChannelView);
+        for (int i = 0; i < nChannels; i ++) {
+            TextView channelView = new TextView(requireContext());
+            channelView.setText(String.valueOf(i + 1));
+            channelRow.addView(channelView);
+        }
+
+        tableLayout.addView(headerRow);
+        tableLayout.addView(channelRow);
+        return tableLayout;
+    }
+
 }

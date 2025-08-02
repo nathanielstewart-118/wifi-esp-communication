@@ -539,7 +539,7 @@ public class ESPPacketSetting extends Fragment {
             tableRow.setLayoutParams(tableRowLayoutParams);
 
             TextView nameView = new TextView(requireContext());
-            if(i == 0) nameView.setText(data.getVariableName() + "/" + data.getDataType());
+            if(i == 0) nameView.setText(data.getVariableName() + " / " + data.getDataType());
             nameView.setGravity(Gravity.CENTER);
 
             TextView orderView = new TextView(requireContext());

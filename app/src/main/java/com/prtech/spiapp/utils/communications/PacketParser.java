@@ -75,6 +75,7 @@ public class PacketParser {
     public static Map<Long, Object> parse(List<RangeDTO> variables, byte[] data) {
         Map<Long, Object> result = new LinkedHashMap<>();
         ByteBuffer buffer = ByteBuffer.wrap(data).order(ByteOrder.LITTLE_ENDIAN);
+        int cmd = Byte.toUnsignedInt(buffer.get());
         try {
             for (RangeDTO var : variables) {
                 List<Object> values = new ArrayList<>();

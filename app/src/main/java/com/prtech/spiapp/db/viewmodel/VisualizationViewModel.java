@@ -112,7 +112,7 @@ public class VisualizationViewModel extends AndroidViewModel {
                 .stream()
                 .map(r -> {
                     ESPPacket s = espPacketDao.getSensorActuatorById(r.getEspPacketId());
-                    return new RangeDTO(s.getId(), s.getVariableName(), s.getDataType(), s.getNumberOfChannels(), r.getVisualizationType(), r.getyAxisRange(), r.getUpperLimit(), r.getLowerLimit());
+                    return new RangeDTO(id, s.getId(), s.getVariableName(), s.getDataType(), s.getNumberOfChannels(), r.getVisualizationType(), r.getyAxisRange(), r.getUpperLimit(), r.getLowerLimit());
                 })
                 .collect(Collectors.toList());
             new Handler(Looper.getMainLooper()).post(() -> {
@@ -129,4 +129,6 @@ public class VisualizationViewModel extends AndroidViewModel {
             });
         });
     }
+
+
 }

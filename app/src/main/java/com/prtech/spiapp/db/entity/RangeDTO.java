@@ -5,6 +5,8 @@ public class RangeDTO {
 
     public Long espPacketId;
 
+    public Long visualizationId;
+
     public String variableName;
 
     public String dataType;
@@ -19,7 +21,8 @@ public class RangeDTO {
 
     public Long lowerLimit;
 
-    public RangeDTO(Long espPacketId, String variableName, String dataType, Integer numberOfChannels, Integer visualizationType, Integer yAxisRange, Long upperLimit, Long lowerLimit) {
+    public RangeDTO(Long visualizationId, Long espPacketId, String variableName, String dataType, Integer numberOfChannels, Integer visualizationType, Integer yAxisRange, Long upperLimit, Long lowerLimit) {
+        this.visualizationId = visualizationId;
         this.espPacketId = espPacketId;
         this.variableName = variableName;
         this.dataType = dataType;
@@ -28,6 +31,14 @@ public class RangeDTO {
         this.yAxisRange = yAxisRange;
         this.upperLimit = upperLimit;
         this.lowerLimit = lowerLimit;
+    }
+
+    public Long getVisualizationId() {
+        return visualizationId;
+    }
+
+    public void setVisualizationId(Long visualizationId) {
+        this.visualizationId = visualizationId;
     }
 
     public Long getEspPacketId() {

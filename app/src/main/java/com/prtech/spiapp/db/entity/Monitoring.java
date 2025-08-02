@@ -23,10 +23,9 @@ public class Monitoring {
     @ColumnInfo(name="updated_at")
     private Long updated_at;
 
-    public Monitoring(String data, Long visualizationId, Long created_at) {
+    public Monitoring(String data, Long created_at) {
         this.data = data;
         this.created_at = created_at;
-        this.visualizationId = visualizationId;
     }
 
     public Long getId() {

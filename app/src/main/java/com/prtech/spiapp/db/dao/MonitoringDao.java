@@ -34,5 +34,11 @@ public interface MonitoringDao {
     @Query("SELECT MIN(created_at) FROM monitorings")
     long getFirstTimestamp();
 
+    @Query("SELECT count(*) as count FROM monitorings")
+    Long getRecordsCount();
+
+    @Query("SELECT * FROM monitorings LIMIT :size OFFSET :offset")
+    List<Monitoring> getMonitoringsByOffset(Long offset, Integer size);
+
 
 }

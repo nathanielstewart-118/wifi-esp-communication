@@ -493,7 +493,16 @@ public class MonitoringSetting extends Fragment {
     }
 
     public void updateViews(byte[] data, int cnt) {
-        Monitoring monitoring = new Monitoring(Arrays.toString(data), System.currentTimeMillis());
+        Command currentCommand = currentCommands.get(currentCommandSetIndex);
+        Map<Long, Long> espVisualizationIdMap = new HashMap<>();
+        for (Map.Entry<Long, Integer> entry: espVisualizationMap.entrySet()) {
+            Long espId = entry.getKey();
+            Integer index = entry.getValue();
+            Visualization v = currentVisualizations.get(index);
+            espVisualizationIdMap.put(espId, v.getId());
+        }
+        Long currentTime = System.currentTimeMillis();
+        Monitoring monitoring = new Monitoring(currentCommand.getEspPacketTitle(), currentCommand.getTitle(), Arrays.toString(data), espVisualizationIdMap, currentTime, currentTime);
 
         monitoringViewModel.insert(monitoring, result -> {
             if (result != null && result > 0) {
@@ -592,10 +601,10 @@ public class MonitoringSetting extends Fragment {
             int cnt = commands.size();
 
             for (int i = 0; i < cnt; i ++ ) {           // for each Command Set
-                int finalI = i;
+                currentCommandSetIndex = i;
                 List<Command> filtered = allCommands
                         .stream()
-                        .filter(c -> c.getTitle().equals(commands.get(finalI)))
+                        .filter(c -> c.getTitle().equals(commands.get(currentCommandSetIndex)))
                         .collect(Collectors.toList());
                 if(!filtered.isEmpty()) {
                     // display accordion according esp packet variables belonging to this command
@@ -603,26 +612,28 @@ public class MonitoringSetting extends Fragment {
                     espPacketViewModel.getByTitle(espPacketTitle, results -> {
                         currentESPPackets.clear();
                         currentESPPackets.addAll(results);
-                    });
-                    visualizationViewModel.getByESPPacketTitle(espPacketTitle, results -> {
-                        currentVisualizations.clear();
-                        currentVisualizations.addAll(results);
-                        if (!results.isEmpty()) {
-                            // all visualizations with the same esp packet title have the same esp packet variables, so get(0)
-                            List<Long> espIds = results.get(0).getRanges()
-                                    .stream()
-                                    .map(VisualizationRange::getEspPacketId)
-                                    .collect(Collectors.toList());
-                            if(espVisualizationMap.isEmpty()) {
-                                for (Long espId : espIds) {
-                                    espVisualizationMap.put(espId, 0);
-                                }
-                            }
-                            displayAccordion(espIds);
 
-                        }
+                        visualizationViewModel.getByESPPacketTitle(espPacketTitle, vResults -> {
+                            currentVisualizations.clear();
+                            currentVisualizations.addAll(vResults);
+                            if (!vResults.isEmpty()) {
+                                // all visualizations with the same esp packet title have the same esp packet variables, so get(0)
+                                List<Long> espIds = vResults.get(0).getRanges()
+                                        .stream()
+                                        .map(VisualizationRange::getEspPacketId)
+                                        .collect(Collectors.toList());
+                                if(espVisualizationMap.isEmpty()) {
+                                    for (Long espId : espIds) {
+                                        espVisualizationMap.put(espId, 0);
+                                    }
+                                }
+                                displayAccordion(espIds);
+
+                            }
+                        });
+
                     });
-                }
+                    }
                 int rowNo = i / 2;
                 int colNo = i % 2;
                 LinearLayout linearLayout = (LinearLayout) commandSetBtnLayout.getChildAt(rowNo);

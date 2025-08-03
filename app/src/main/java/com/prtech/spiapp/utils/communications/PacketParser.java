@@ -1,5 +1,7 @@
 package com.prtech.spiapp.utils.communications;
 
+import static java.lang.Math.round;
+
 import com.prtech.spiapp.db.entity.CommandThresholdWithDataType;
 import com.prtech.spiapp.db.entity.ESPPacket;
 import com.prtech.spiapp.db.entity.ESPReceiveData;
@@ -84,34 +86,79 @@ public class PacketParser {
                 for (int i = 0; i < var.getNumberOfChannels(); i++) {
                     switch (var.getDataType()) {
                         case "uint8":
-                            values.add(Byte.toUnsignedInt(buffer.get()));
+                            if (buffer.remaining() >= 1)
+                                values.add(Byte.toUnsignedInt(buffer.get()));
+                            else
+                                values.add(null);
                             break;
+
                         case "int8":
-                            values.add(buffer.get());
+                            if (buffer.remaining() >= 1)
+                                values.add(buffer.get());
+                            else
+                                values.add(null);
                             break;
+
                         case "uint16":
-                            values.add(Short.toUnsignedInt(buffer.getShort()));
+                            if (buffer.remaining() >= 2)
+                                values.add(Short.toUnsignedInt(buffer.getShort()));
+                            else
+                                values.add(null);
                             break;
+
                         case "int16":
-                            values.add(buffer.getShort());
+                            if (buffer.remaining() >= 2)
+                                values.add(buffer.getShort());
+                            else
+                                values.add(null);
                             break;
+
                         case "uint24":
-                            values.add(toUnsigned24(buffer));
+                            if (buffer.remaining() >= 3)
+                                values.add(toUnsigned24(buffer));
+                            else
+                                values.add(null);
                             break;
+
                         case "int24":
-                            values.add(toSigned24(buffer));
+                            if (buffer.remaining() >= 3)
+                                values.add(toSigned24(buffer));
+                            else
+                                values.add(null);
                             break;
+
                         case "uint32":
-                            values.add(Integer.toUnsignedLong(buffer.getInt()));
+                            if (buffer.remaining() >= 4)
+                                values.add(Integer.toUnsignedLong(buffer.getInt()));
+                            else
+                                values.add(null);
                             break;
+
                         case "int32":
-                            values.add(buffer.getInt());
+                            if (buffer.remaining() >= 4)
+                                values.add(buffer.getInt());
+                            else
+                                values.add(null);
                             break;
+
                         case "float":
-                            values.add(buffer.getFloat());
+                            if (buffer.remaining() >= 4) {
+                                float f = buffer.getFloat();
+                                if (!Float.isNaN(f) && !Float.isInfinite(f)) values.add(Math.round(f * 100f) / 100f);
+                                else values.add(null);
+                            } else {
+                                values.add(null);
+                            }
                             break;
+
                         case "double":
-                            values.add(buffer.getDouble());
+                            if (buffer.remaining() >= 8) {
+                                double d = buffer.getDouble();
+                                if(!Double.isNaN(d) && !Double.isInfinite(d)) values.add(Math.round(d * 100d) / 100d);
+                                else values.add(null);
+                            }
+                            else
+                                values.add(null);
                             break;
                         default:
                             throw new IllegalArgumentException("Unknown type: " + var.getDataType());
@@ -152,7 +199,7 @@ public class PacketParser {
             int nChannels = dtos.get(i).getThresholds().size();
             for (int j = 0; j < nChannels; j ++) {
                 int value = dtos.get(i).getThresholds().get(j);
-                    getByte((Object) value, type, buffer);
+                getByte((Object) value, type, buffer);
             }
         }
 

@@ -4,6 +4,11 @@ package com.prtech.spiapp.db.entity;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
+import androidx.room.TypeConverters;
+
+import com.prtech.spiapp.db.converters.MapConverter;
+
+import java.util.Map;
 
 @Entity(tableName="monitorings")
 public class Monitoring {
@@ -11,21 +16,32 @@ public class Monitoring {
     @PrimaryKey(autoGenerate = true)
     private Long id;
 
-    @ColumnInfo(name="visualization_id")
-    private Long visualizationId;
+    @ColumnInfo(name="esp_packet_title")
+    private String espPacketTitle;
+
+    @ColumnInfo(name="command_title")
+    private String commandTitle;
 
     @ColumnInfo(name="data")
     private String data;
 
+    @ColumnInfo(name="esp_visualization_map")
+    @TypeConverters(MapConverter.class)
+    private Map<Long, Long> espVisualizationMap;
+
     @ColumnInfo(name="created_at")
-    private Long created_at;
+    private Long createdAt;
 
     @ColumnInfo(name="updated_at")
-    private Long updated_at;
+    private Long updatedAt;
 
-    public Monitoring(String data, Long created_at) {
+    public Monitoring(String espPacketTitle, String commandTitle, String data, Map<Long, Long> espVisualizationMap, Long createdAt, Long updatedAt) {
+        this.espPacketTitle = espPacketTitle;
+        this.commandTitle = commandTitle;
         this.data = data;
-        this.created_at = created_at;
+        this.espVisualizationMap = espVisualizationMap;
+        if(createdAt != null) this.createdAt = createdAt;
+        if(updatedAt != null) this.updatedAt = updatedAt;
     }
 
     public Long getId() {
@@ -36,14 +52,6 @@ public class Monitoring {
         this.id = id;
     }
 
-    public Long getVisualizationId() {
-        return visualizationId;
-    }
-
-    public void setVisualizationId(Long visualizationId) {
-        this.visualizationId = visualizationId;
-    }
-
     public String getData() {
         return data;
     }
@@ -52,19 +60,43 @@ public class Monitoring {
         this.data = data;
     }
 
-    public Long getCreated_at() {
-        return created_at;
+    public String getEspPacketTitle() {
+        return espPacketTitle;
     }
 
-    public void setCreated_at(Long created_at) {
-        this.created_at = created_at;
+    public void setEspPacketTitle(String espPacketTitle) {
+        this.espPacketTitle = espPacketTitle;
     }
 
-    public Long getUpdated_at() {
-        return updated_at;
+    public String getCommandTitle() {
+        return commandTitle;
     }
 
-    public void setUpdated_at(Long updated_at) {
-        this.updated_at = updated_at;
+    public void setCommandTitle(String commandTitle) {
+        this.commandTitle = commandTitle;
+    }
+
+    public Map<Long, Long> getEspVisualizationMap() {
+        return espVisualizationMap;
+    }
+
+    public void setEspVisualizationMap(Map<Long, Long> espVisualizationMap) {
+        this.espVisualizationMap = espVisualizationMap;
+    }
+
+    public Long getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Long createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Long getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Long updatedAt) {
+        this.updatedAt = updatedAt;
     }
 }

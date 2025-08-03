@@ -16,6 +16,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -51,21 +52,35 @@ public class PlayBack extends Fragment {
 
     private LinearLayout accordionContainer;
     private final Map<Long, Object> accordionContentMap = new HashMap<>();
+    private Map<Long, Object> chartsMap = new HashMap<>();
+    private Map<Long, Object> tablesMap = new HashMap<>();
+    private Map<Long, Float> currentWindowStartMap = new HashMap<>();
+    private Button startBtn;
+    private Button stopBtn;
+    private Button forward1sBtn;
+    private Button backward1sBtn;
+    private Button forward10sBtn;
+    private Button backward10sBtn;
+    private Button nextCommandBtn;
+    private Button previousCommandBtn;
+    private Button logBtn;
 
     private MonitoringViewModel monitoringViewModel;
     private VisualizationViewModel visualizationViewModel;
     private MonitoringDao monitoringDao;
-    private Visualization currentVisualization;
     private ESPPacketViewModel espPacketViewModel;
+
+    private Visualization currentVisualization;
     private List<RangeDTO> rangeDTOs;
-    private Map<Long, Object> chartsMap = new HashMap<>();
     private Boolean isPlaying = true;
     private Long lastTimestamp;
-    private Map<Long, Float> currentWindowStartMap = new HashMap<>();
     private final Float windowSize = 500F;
-    private final Handler handler = new Handler(Looper.getMainLooper());
     private List<ESPPacket> currentESPPackets = new ArrayList<>();
-
+    private Boolean bRunning = false;
+    private final Handler handler = new Handler(Looper.getMainLooper());
+    private Long recordsCnt = 0L;
+    private Integer pageSize = 10;
+    private Long pageNo = 0L;
     public PlayBack() {
 
     }
@@ -73,7 +88,7 @@ public class PlayBack extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.fragment_reproduction, container, false);
+        View view = inflater.inflate(R.layout.fragment_playback, container, false);
         AppDatabase db = AppDatabase.getInstance(requireContext());
         ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(Constants.TITLES[6]);
 
@@ -81,9 +96,33 @@ public class PlayBack extends Fragment {
 
         accordionContainer = view.findViewById(R.id.playback_accordion_container);
 
+        startBtn = view.findViewById(R.id.playback_start_btn);
+        startBtn.setOnClickListener(v -> handleClickStartBtn());
+
+        stopBtn = view.findViewById(R.id.playback_stop_btn);
+        stopBtn.setOnClickListener(v -> handleClickStopBtn());
+
+        forward1sBtn = view.findViewById(R.id.playback_time_forward_1s_btn);
+        forward1sBtn.setOnClickListener(v -> handleClickForward1SBtn());
+
+        forward10sBtn = view.findViewById(R.id.playback_time_forward_10s_btn);
+        forward10sBtn.setOnClickListener(v -> handleClickForward10SBtn());
+
+        backward1sBtn = view.findViewById(R.id.playback_time_backward_1s_btn);
+        backward1sBtn.setOnClickListener(v -> handleClickBackward1SBtn());
+
+        backward10sBtn = view.findViewById(R.id.playback_time_backward_10s_btn);
+        backward10sBtn.setOnClickListener(v -> handleClickBackward10SBtn());
+
+        nextCommandBtn = view.findViewById(R.id.playback_next_command_btn);
+        nextCommandBtn.setOnClickListener(v -> handleClickNextCommandBtn());
+
+        previousCommandBtn = view.findViewById(R.id.playback_previous_command_btn);
+        previousCommandBtn.setOnClickListener(v -> handleClickPreviousCommandBtn());
+
         monitoringViewModel = new ViewModelProvider(requireActivity()).get(MonitoringViewModel.class);
-        monitoringViewModel.getAllMonitorings(results -> {
-            Log.d("Success", "Loaded all playback data");
+        monitoringViewModel.getCount(result -> {
+            if (result != null) recordsCnt = result;
         });
         visualizationViewModel = new ViewModelProvider(requireActivity()).get(VisualizationViewModel.class);
         visualizationViewModel.getActivatedVisualization(result -> {
@@ -218,8 +257,8 @@ public class PlayBack extends Fragment {
                 if (batch.isEmpty()) return;
                 for(Monitoring m: batch) {
                     if(!isPlaying) break;
-                    long waitTime = m.getCreated_at() - lastTimestamp;
-                    lastTimestamp = m.getCreated_at();
+                    long waitTime = m.getCreatedAt() - lastTimestamp;
+                    lastTimestamp = m.getCreatedAt();
                     Map<Long, Object> parsed = PacketParser.parse(currentESPPackets, CommonUtils.fromStringToByteArray(m.getData()));
                     for (RangeDTO rangeDTO: rangeDTOs) {
                         List<Object> values = (List<Object>) parsed.get(rangeDTO.getEspPacketId());
@@ -299,5 +338,44 @@ public class PlayBack extends Fragment {
 
     }
 
+    public void handleClickStartBtn() {
+        bRunning = true;
+
+    }
+
+    public void startPlayBack() {
+        if(!bRunning) return;
+        monitoringViewModel.getMonitoringsByOffset(pageNo, pageSize, results -> {
+
+        });
+    }
+
+    public void handleClickStopBtn() {
+
+    }
+
+    public void handleClickForward1SBtn() {
+
+    }
+
+    public void handleClickForward10SBtn() {
+
+    }
+
+    public void handleClickBackward1SBtn() {
+
+    }
+
+    public void handleClickBackward10SBtn() {
+
+    }
+
+    public void handleClickNextCommandBtn() {
+
+    }
+
+    public void handleClickPreviousCommandBtn() {
+
+    }
 
 }

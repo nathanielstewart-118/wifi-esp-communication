@@ -60,7 +60,7 @@
                     android:layout_marginBottom="6dp"
                     android:orientation="horizontal">
                     <Button
-                        android:id="@+id/monitoring_start_btn"
+                        android:id="@+id/playback_start_btn"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
@@ -69,7 +69,7 @@
                         android:layout_marginRight="16dp"
                         android:background="@drawable/ripple_success_button"/>
                     <Button
-                        android:id="@+id/monitoring_stop_btn"
+                        android:id="@+id/playback_stop_btn"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:text="@string/stop"
@@ -89,16 +89,16 @@
                     android:gravity="center"
                     android:orientation="horizontal">
                     <Button
-                        android:id="@+id/playback_time_control1_btn"
+                        android:id="@+id/playback_time_forward_1s_btn"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:text="@string/plus_1s"
                         android:textColor="@color/basic_button_text_color"
                         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                        android:layout_marginRight="16dp"
+                        android:layout_marginEnd="16dp"
                         android:background="@drawable/ripple_primary_button"/>
                     <Button
-                        android:id="@+id/playback_time_control2_btn"
+                        android:id="@+id/playback_time_backward_1s_btn"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:text="@string/minus_1s"
@@ -113,16 +113,16 @@
                     android:layout_marginVertical="12dp"
                     android:orientation="horizontal">
                     <Button
-                        android:id="@+id/playback_time_control3_btn"
+                        android:id="@+id/playback_time_forward_10s_btn"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:text="@string/plus_10s"
                         android:textColor="@color/basic_button_text_color"
                         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                        android:layout_marginRight="16dp"
+                        android:layout_marginEnd="16dp"
                         android:background="@drawable/ripple_primary_button"/>
                     <Button
-                        android:id="@+id/playback_time_control4_btn"
+                        android:id="@+id/playback_time_backward_10s_btn"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:text="@string/minus_10s"
@@ -136,7 +136,7 @@
                     android:gravity="center"
                     android:orientation="vertical">
                     <Button
-                        android:id="@+id/playback_time_control_next_command_btn"
+                        android:id="@+id/playback_next_command_btn"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:text="@string/next_ncommand"
@@ -145,7 +145,7 @@
                         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                         android:background="@drawable/ripple_info_button"/>
                     <Button
-                        android:id="@+id/playback_time_control_previous_command_btn"
+                        android:id="@+id/playback_previous_command_btn"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:textAppearance="@style/TextAppearance.AppCompat.Body1"

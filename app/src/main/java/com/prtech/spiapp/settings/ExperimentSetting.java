@@ -25,6 +25,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import com.google.android.material.button.MaterialButton;
 import com.prtech.spiapp.R;
 import com.prtech.spiapp.db.entity.Command;
 import com.prtech.spiapp.db.entity.Experiment;
@@ -44,11 +45,11 @@ public class ExperimentSetting extends Fragment {
     private AutoCompleteTextView idAutocomplete;
     private ExperimentViewModel experimentViewModel;
     private CommandViewModel commandViewModel;
-    private Button saveBtn;
-    private Button loadBtn;
-    private Button reloadBtn;
-    private Button updateBtn;
-    private Button setSaveBtn;
+    private MaterialButton saveBtn;
+    private MaterialButton loadBtn;
+    private MaterialButton reloadBtn;
+    private MaterialButton updateBtn;
+    private MaterialButton setSaveBtn;
     private EditText nTrialsEdit;
     private EditText commandEdit;
     private EditText restEdit;
@@ -146,16 +147,16 @@ public class ExperimentSetting extends Fragment {
             });
         });
 
-        saveBtn = (Button) view.findViewById(R.id.experiment_save_btn);
+        saveBtn = view.findViewById(R.id.experiment_save_btn);
         saveBtn.setOnClickListener(v -> handleClickSaveBtn());
 
-        loadBtn = (Button) view.findViewById(R.id.experiment_load_btn);
+        loadBtn = view.findViewById(R.id.experiment_load_btn);
         loadBtn.setOnClickListener(v -> handleClickLoadBtn());
 
-        reloadBtn = (Button) view.findViewById(R.id.experiment_reload_btn);
+        reloadBtn = view.findViewById(R.id.experiment_reload_btn);
         reloadBtn.setOnClickListener(v -> handleClickReloadBtn());
 
-        updateBtn = (Button) view.findViewById(R.id.experiment_update_btn);
+        updateBtn = view.findViewById(R.id.experiment_update_btn);
         updateBtn.setOnClickListener(v -> handleClickUpdateBtn());
 
         toggleButtons.add((ToggleButton) view.findViewById(R.id.experiment_set1_btn));

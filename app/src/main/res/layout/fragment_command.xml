@@ -31,26 +31,25 @@
                 android:focusableInTouchMode="true"
                 android:completionThreshold="2"
                 android:inputType="text" />
-
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/ripple_success_button"
+            <com.google.android.material.button.MaterialButton
+                style="@style/RoundedMaterialButton"
+                android:backgroundTint="@color/bs_success"
                 android:id="@+id/command_save_btn"
-                android:textColor="@color/basic_button_text_color"
-                android:layout_margin="16dp"
-                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                android:text="@string/save_btn" />
-
-            <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@drawable/ripple_primary_button"
                 android:textColor="@color/basic_button_text_color"
-                android:id="@+id/command_load_btn"
                 android:layout_margin="16dp"
-                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                android:text="@string/load_btn" />
+                android:text="@string/save_btn"/>
+
+            <com.google.android.material.button.MaterialButton
+                style="@style/RoundedMaterialButton"
+                android:backgroundTint="@color/bs_primary"
+                android:id="@+id/command_load_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/basic_button_text_color"
+                android:layout_margin="16dp"
+                android:text="@string/load_btn"/>
         </LinearLayout>
         <LinearLayout
             android:layout_width="0dp"
@@ -148,16 +147,15 @@
                         android:inputType="numberDecimal"
                         android:hint="@string/enter_the_number"
                         android:padding="8dp" />
-
-                    <Button
+                    <com.google.android.material.button.MaterialButton
+                        style="@style/RoundedMaterialButton"
+                        android:backgroundTint="@color/bs_info"
                         android:id="@+id/command_add_btn"
-                        android:layout_width="0dp"
-                        android:layout_height="40dp"
-                        android:layout_weight="1"
-                        android:backgroundTint="@color/bs_primary"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         android:textColor="@color/basic_button_text_color"
-                        android:text="@string/add_btn"
-                        />
+                        android:layout_margin="16dp"
+                        android:text="@string/add_btn"/>
                 </TableRow>
 
                 <!-- Table Row -->
@@ -251,19 +249,20 @@
                 android:padding="16dp">
             </TableLayout>
         </LinearLayout>
-            <LinearLayout
+        <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:orientation="horizontal">
-                <Button
+                <com.google.android.material.button.MaterialButton
+                    style="@style/RoundedMaterialButton"
+                    android:backgroundTint="@color/bs_success"
+                    android:id="@+id/command_send_btn"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/ripple_success_button"
-                    android:id="@+id/command_send_btn"
-                    android:paddingHorizontal="12dp"
                     android:textColor="@color/basic_button_text_color"
-                    android:text="@string/command_send_command_esp" />
+                    android:layout_margin="16dp"
+                    android:text="@string/command_send_command_esp"/>
 
             </LinearLayout>
 

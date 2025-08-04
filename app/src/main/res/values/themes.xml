@@ -1,18 +1,23 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Theme.MyApplication" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="Theme.MyApplication" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/purple_500</item>
+        <item name="colorPrimary">@color/bs_primary</item>
         <item name="colorPrimaryVariant">@color/purple_700</item>
         <item name="colorOnPrimary">@color/white</item>
         <!-- Secondary brand color. -->
-        <item name="colorSecondary">@color/teal_200</item>
+        <item name="colorSecondary">@color/bs_secondary</item>
         <item name="colorSecondaryVariant">@color/teal_700</item>
         <item name="colorOnSecondary">@color/black</item>
+
+        <item name="colorInfo">@color/bs_info</item>
+        <item name="colorSuccess">@color/bs_success</item>
+        <item name="colorDanger">@color/bs_danger</item>
+        <item name="colorWarning">@color/bs_warning</item>
+
+
         <!-- Status bar color. -->
-        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
-        <item name="android:itemTextAppearance">@style/TextAppearance</item>
-        <item name="popupMenuStyle">@style/PopupMenuBlue</item>
+
         <!-- Customize your theme here. -->
     </style>
     <style name="TextAppearance" parent="@style/Theme.MaterialComponents.DayNight.NoActionBar">
@@ -28,4 +33,5 @@
     <style name="PopupMenuBlue" parent="Widget.AppCompat.PopupMenu">
         <item name="android:popupBackground">@color/bs_danger</item>
     </style>
+
 </resources>

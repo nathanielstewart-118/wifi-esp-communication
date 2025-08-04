@@ -24,23 +24,25 @@
             android:focusableInTouchMode="true"
             android:completionThreshold="2"
             android:inputType="text" />
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/ripple_success_button"
-            android:textColor="@color/basic_button_text_color"
+        <com.google.android.material.button.MaterialButton
+            style="@style/RoundedMaterialButton"
+            android:backgroundTint="@color/bs_success"
             android:id="@+id/sensor_save_btn"
-            android:layout_margin="16dp"
-            android:text="@string/save_btn" />
-
-        <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/ripple_primary_button"
             android:textColor="@color/basic_button_text_color"
-            android:id="@+id/sensor_load_btn"
             android:layout_margin="16dp"
-            android:text="@string/load_btn" />
+            android:text="@string/save_btn"/>
+        <com.google.android.material.button.MaterialButton
+            style="@style/RoundedMaterialButton"
+            android:backgroundTint="@color/bs_primary"
+            android:id="@+id/sensor_load_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/basic_button_text_color"
+            android:layout_margin="16dp"
+            android:text="@string/load_btn"/>
+
     </LinearLayout>
 
     <ScrollView
@@ -159,14 +161,16 @@
                                 android:textAlignment="center"
                                 android:checked="false" />
                         </LinearLayout>
-                        <Button
+                        <com.google.android.material.button.MaterialButton
+                            style="@style/RoundedMaterialButton"
+                            android:backgroundTint="@color/bs_info"
                             android:id="@+id/sensor_add_btn"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_margin="8dp"
-                            android:background="@drawable/ripple_success_button"
-                            android:text="@string/add_btn"
-                            android:textColor="@color/basic_button_text_color"/>
+                            android:textColor="@color/basic_button_text_color"
+                            android:layout_margin="16dp"
+                            android:text="@string/add_btn"/>
+
                     </TableRow>
                 </TableLayout>
             </LinearLayout>

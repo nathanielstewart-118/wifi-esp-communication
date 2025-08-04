@@ -26,6 +26,8 @@ import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.FrameLayout;
+
+import com.google.android.material.button.MaterialButton;
 import com.prtech.spiapp.MainActivity;
 import com.prtech.spiapp.R;
 import com.prtech.spiapp.utils.Constants;
@@ -43,8 +45,8 @@ public class WiFiSetting extends Fragment {
     private BroadcastReceiver wifiReceiver;
     private TableLayout wifiListTable;
 
-    private Button searchBtn;
-    private Button wifiConnectBtn;
+    private MaterialButton searchBtn;
+    private MaterialButton wifiConnectBtn;
     private CheckBox autoConnectCheckBox;
 
     private MainActivity mainActivity;

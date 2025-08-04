@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/scrollView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -46,21 +47,28 @@
                     android:gravity="center"
                     android:layout_marginVertical="12dp"
                     android:orientation="horizontal">
-                    <Button
+
+                    <com.google.android.material.button.MaterialButton
+                        style="@style/RoundedMaterialButton"
+                        android:backgroundTint="@color/bs_success"
                         android:id="@+id/monitoring_start_btn"
                         android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:text="@string/start"
+                        android:layout_height="wrap_content"
                         android:textColor="@color/basic_button_text_color"
-                        android:layout_marginRight="16dp"
-                        android:background="@drawable/ripple_success_button"/>
-                    <Button
+                        android:layout_margin="6dp"
+                        android:text="@string/start"/>
+                    <com.google.android.material.button.MaterialButton
+                        style="@style/RoundedMaterialButton"
+                        android:backgroundTint="@color/bs_danger"
                         android:id="@+id/monitoring_stop_btn"
                         android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:text="@string/stop"
+                        android:layout_height="wrap_content"
                         android:textColor="@color/basic_button_text_color"
-                        android:background="@drawable/ripple_danger_button"/>
+                        android:layout_margin="16dp"
+                        android:text="@string/stop"/>
+
+
+
                 </LinearLayout>
                 <Spinner
                     android:id="@+id/monitoring_experiment_select_spinner"
@@ -137,17 +145,17 @@
                     android:layout_height="wrap_content"
                     android:layout_marginVertical="6dp"
                     >
-                    <Button
+
+                    <com.google.android.material.button.MaterialButton
+                        style="@style/RoundedMaterialButton"
+                        android:backgroundTint="@color/bs_primary"
+                        android:visibility="gone"
                         android:id="@+id/monitoring_load_settings_btn"
                         android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:text="@string/sensor_load_command_settings"
-                        android:layout_marginHorizontal="16dp"
-                        android:gravity="center"
-                        android:padding="8dp"
+                        android:layout_height="wrap_content"
                         android:textColor="@color/basic_button_text_color"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                        android:background="@drawable/ripple_info_button"/>
+                        android:layout_margin="16dp"
+                        android:text="@string/sensor_load_command_settings"/>
                 </LinearLayout>
                 <TextView
                     android:layout_width="match_parent"
@@ -162,18 +170,33 @@
                     android:orientation="vertical">
 
                 </LinearLayout>
-                <TextView
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:orientation="vertical"
                     android:gravity="center"
-                    android:layout_marginVertical="30dp"
-                    android:text="@string/log" />
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:text="@string/log_message" />
-
+                    >
+                    <com.google.android.material.materialswitch.MaterialSwitch
+                        android:id="@+id/monitoring_log_switch"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=" Log "
+                        android:checked="true"
+                        android:gravity="center"
+                        app:thumbTint="@color/switch_thumb_color"
+                        app:trackTint="@color/switch_track_color"
+                        android:textSize="16sp"
+                        style="@style/Widget.Material3.CompoundButton.MaterialSwitch" />
+                    <com.google.android.material.button.MaterialButton
+                        style="@style/RoundedMaterialButton"
+                        android:backgroundTint="@color/bs_info"
+                        android:id="@+id/monitoring_log_message_btn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/basic_button_text_color"
+                        android:layout_margin="16dp"
+                        android:text="@string/log_message"/>
+                </LinearLayout>
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>

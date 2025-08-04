@@ -29,6 +29,7 @@ import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.material.button.MaterialButton;
 import com.prtech.spiapp.MainActivity;
 import com.prtech.spiapp.R;
 import com.prtech.spiapp.db.entity.ESPPacket;
@@ -51,10 +52,10 @@ import java.util.stream.Collectors;
 public class VisualizationSetting extends Fragment {
 
     private AutoCompleteTextView idAutocomplete;
-    private Button saveBtn;
-    private Button loadBtn;
+    private MaterialButton saveBtn;
+    private MaterialButton loadBtn;
     private Spinner loadESPPacketSpinner;
-    private Button setupCompleteBtn;
+    private MaterialButton setupCompleteBtn;
     private TableLayout rangeTable;
     private EditText sampleRateEdit;
     private TextView sampleRateView;

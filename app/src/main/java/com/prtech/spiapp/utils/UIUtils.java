@@ -116,7 +116,7 @@ public class UIUtils {
         TextView tv = new TextView(context);
         tv.setText(text);
         tv.setTextColor(ContextCompat.getColor(context, R.color.white));
-        tv.setPadding(6, 6, 6, 6);
+        tv.setPadding(6, 24, 6, 6);
         tv.setTypeface(null, Typeface.BOLD);
         tv.setGravity(Gravity.CENTER);
         return tv;

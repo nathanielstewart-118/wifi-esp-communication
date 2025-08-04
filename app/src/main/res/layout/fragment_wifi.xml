@@ -13,24 +13,26 @@
         android:gravity="center"
         android:orientation="horizontal">
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+
+        <com.google.android.material.button.MaterialButton
+            style="@style/RoundedMaterialButton"
             android:backgroundTint="@color/bs_primary"
             android:id="@+id/wifi_search_btn"
-            android:layout_margin="16dp"
-            android:background="@drawable/ripple_primary_button"
-            android:textColor="@color/basic_button_text_color"
-            android:text="Search" />
-
-        <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/ripple_success_button"
-            android:id="@+id/wifi_connect_btn"
             android:textColor="@color/basic_button_text_color"
             android:layout_margin="16dp"
-            android:text="Connect" />
+            android:text="Search"/>
+
+        <com.google.android.material.button.MaterialButton
+            style="@style/RoundedMaterialButton"
+            android:backgroundTint="@color/bs_success"
+            android:id="@+id/wifi_connect_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/basic_button_text_color"
+            android:layout_margin="16dp"
+            android:text="Connect"/>
         <CheckBox
             android:id="@+id/wifi_auto_connect_checkbox"
             android:layout_width="wrap_content"

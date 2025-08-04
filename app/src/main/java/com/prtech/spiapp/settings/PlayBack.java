@@ -31,6 +31,7 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
+import com.google.android.material.button.MaterialButton;
 import com.prtech.spiapp.R;
 import com.prtech.spiapp.db.AppDatabase;
 import com.prtech.spiapp.db.dao.MonitoringDao;
@@ -71,15 +72,15 @@ public class PlayBack extends Fragment {
     private final Map<Long, Object> tablesMap = new HashMap<>();
     private final Map<Long, Float> currentWindowStartMap = new HashMap<>();
     private final Map<Long, Integer> espVisualizationMap = new HashMap<>();
-    private Button startBtn;
-    private Button stopBtn;
-    private Button forward1sBtn;
-    private Button backward1sBtn;
-    private Button forward10sBtn;
-    private Button backward10sBtn;
-    private Button nextCommandBtn;
-    private Button previousCommandBtn;
-    private Button logBtn;
+    private MaterialButton startBtn;
+    private MaterialButton stopBtn;
+    private MaterialButton forward1sBtn;
+    private MaterialButton backward1sBtn;
+    private MaterialButton forward10sBtn;
+    private MaterialButton backward10sBtn;
+    private MaterialButton nextCommandBtn;
+    private MaterialButton previousCommandBtn;
+    private MaterialButton logBtn;
 
     private MonitoringViewModel monitoringViewModel;
     private VisualizationViewModel visualizationViewModel;
@@ -93,6 +94,8 @@ public class PlayBack extends Fragment {
     private final Float windowSize = 10000F;
     private List<ESPPacket> currentESPPackets = new ArrayList<>();
     private List<Visualization> currentVisualizations = new ArrayList<>();
+    private List<Monitoring> currentMonitorings = new ArrayList<>();
+    private final long[] currentTime = new long[]{-1};
     private List<Command> allCommands = new ArrayList<>();
     private final Handler handler = new Handler(Looper.getMainLooper());
     private Long recordsCnt = 0L;
@@ -101,7 +104,7 @@ public class PlayBack extends Fragment {
     private Integer tableRowsCnt = 10;
     private boolean isProcessingPage = false;
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
-
+    private Runnable playbackRunnable;
     private volatile Boolean forward1S = false;
     private volatile Boolean forward10S = false;
     private volatile Boolean backward1S = false;
@@ -110,8 +113,9 @@ public class PlayBack extends Fragment {
     private volatile Boolean runningPrevCommand = false;
     private volatile Long forwardClickTime = 0L;
     private volatile Long backwardClickTime = 0L;
+    private Long timeOffset = 0L;
 
-
+    private Long startTime = 0L;
     public PlayBack() {
 
     }
@@ -306,127 +310,125 @@ public class PlayBack extends Fragment {
 
     }
 
-    public void processOneMonitoringRecord(List<Monitoring> monitorings, long[] prevTime) {
-        if (monitorings == null || monitorings.isEmpty()) return;
-        AtomicInteger index = new AtomicInteger();
-        long[] totalSleep = new long[]{0};
-        Runnable[] taskHolder = new Runnable[1]; // use an array to hold a reference to the Runnable
-        String title = monitorings.get(0).getEspPacketTitle();
+    public void startPlayback() {
+        isPlaying = true;
+        pageNo = 0L;
+        currentMonitorings.clear();
+        currentESPPackets.clear();
+        currentVisualizations.clear();
+        currentTime[0] = -1;
+        fetchAndStart();
+    }
 
-        taskHolder[0] = () -> {
-            if (index.get() >= monitorings.size()) {
-                Log.d("Info", "Finished processing current page");
-                isProcessingPage = false;
-                handler.postDelayed(runnable, 0); // move to next page after this one finishes
+    public void stopPlayback() {
+        isPlaying = false;
+//        handler.removeCallbacks(playbackRunnable);
+    }
+
+    private void fetchAndStart() {
+        monitoringViewModel.getMonitoringsByOffset(pageNo, pageSize, results -> {
+            if (results.isEmpty()) {
+                isPlaying = false;
+                return;
+            }
+            currentMonitorings.addAll(results);
+            startNextFrame();
+        });
+    }
+
+    private void startNextFrame() {
+        playbackRunnable = () -> {
+            if (!isPlaying) return;
+
+            Monitoring next = getNextMonitoring();
+            if (next == null) {
+                pageNo++;
+                fetchAndStart();
                 return;
             }
 
-            Monitoring monitoring = monitorings.get(index.get());
-            if ((forward1S || forward10S) && prevTime[0] != 0) {
-                // Skip this record
-                int delayMS = forward1S ? 1000 : 10000;
-                if (forwardClickTime == 0) forwardClickTime = monitoring.getCreatedAt();
-                if (monitoring.getCreatedAt() < forwardClickTime + delayMS) {
-                    index.getAndIncrement();
-                    handler.post(taskHolder[0]);  // Post next task immediately
-                    return;
-                }
-                else {
-                    forward1S = false;
-                    forward10S = false;
-                }
+            long[] sleep = {0};
+            long[] offset = {0};
+            if (currentTime[0] != -1) {
+                sleep[0] = next.getCreatedAt() - currentTime[0];
+                offset[0] = next.getCreatedAt() - currentTime[0];
             }
-            if (currentESPPackets.isEmpty() || !Objects.equals(currentESPPackets.get(0).getTitle(), monitoring.getEspPacketTitle())) {
-                espPacketViewModel.getByTitle(title, espPackets -> {
-                    currentESPPackets.clear();
-                    currentESPPackets.addAll(espPackets);
-
-                    List<Long> espIds = espPackets.stream()
-                            .map(ESPPacket::getId)
-                            .collect(Collectors.toList());
-
-                    if (espVisualizationMap.isEmpty()) {
-                        for (Long espId : espIds) {
-                            espVisualizationMap.put(espId, 0);
-                        }
-                    }
-
-                    visualizationViewModel.getByESPPacketTitle(title, vResults -> {
-                        currentVisualizations.clear();
-                        currentVisualizations.addAll(vResults);
-
-                        Map<Long, Long> espVisualizationIdMap = new HashMap<>();
-                        for (Map.Entry<Long, Integer> entry : espVisualizationMap.entrySet()) {
-                            Long espId = entry.getKey();
-                            Integer idx = entry.getValue();
-                            Visualization v = currentVisualizations.get(idx);
-                            espVisualizationIdMap.put(espId, v.getId());
-                        }
-
-                        long sleep = 0;
-                        if (prevTime[0] != 0) {
-                            sleep = monitoring.getCreatedAt() - prevTime[0];
-                        }
-                        totalSleep[0] += sleep;
-                        prevTime[0] = monitoring.getCreatedAt();
-
-                        displayAccordion(espIds);
-                        updateViews(fromStringToByteArray(monitoring.getData()), sleep);
-
-                        // post next task
-
-                        Log.d("Info in if ", "Runnable sleep: " + String.valueOf(sleep) + ", createdAt is " + String.valueOf(monitoring.getCreatedAt()));
-                        index.getAndIncrement();
-                        handler.postDelayed(taskHolder[0], sleep);
-                    });
-                });
-            } else {
-
-                // post next task
-                long sleep = 0;
-                if (prevTime[0] != 0) {
-                    sleep = monitoring.getCreatedAt() - prevTime[0];
-                    if(forwardClickTime != 0) {
-                        sleep = monitoring.getCreatedAt() - forwardClickTime;
-                        forwardClickTime = 0L;
-                    }
-                }
-                totalSleep[0] += sleep;
-                updateViews(fromStringToByteArray(monitoring.getData()), sleep);
-                Log.d("Info in else", "Runnable sleep: " + String.valueOf(sleep) + ",Total Sleep is " + totalSleep[0] + "createdAt is " + String.valueOf(monitoring.getCreatedAt()));
-                prevTime[0] = monitoring.getCreatedAt();
-                index.getAndIncrement();
-                handler.postDelayed(taskHolder[0], sleep);
+            else if (pageNo == 0) {
+                startTime = next.getCreatedAt();
             }
+            if (timeOffset != 0) {
+                if(timeOffset < 0) {
+                    long x = next.getCreatedAt() - startTime;
+                    removeScatterEntriesUnderX(chartsMap, x);
+//                    removeCurrentMonitoringsByCreatedAt(currentTime[0]);
+                }
+                timeOffset = 0L;
+                sleep[0] = 0L;
+            }
+            currentTime[0] = next.getCreatedAt();
+
+            updateDataIfNeeded(next, () -> {
+                updateViews(fromStringToByteArray(next.getData()), offset[0]);
+                handler.postDelayed(playbackRunnable, sleep[0]);
+            });
         };
 
-        handler.post(taskHolder[0]);
+        handler.post(playbackRunnable);
     }
 
-    Runnable runnable = new Runnable() {
-        @Override
-        public void run() {
-            if (!isPlaying) return;
-
-            monitoringViewModel.getMonitoringsByOffset(pageNo, pageSize, results -> {
-                long[] prevTime = new long[]{0};
-                processOneMonitoringRecord(results, prevTime);
-
-                if(results.isEmpty() || results.size() < pageSize) {
-                    isPlaying = false;
-                    Log.d("Info", "This is callback function of ");
+    private Monitoring getNextMonitoring() {
+        currentMonitorings.sort((m1, m2) -> Long.compare(m1.getCreatedAt(), m2.getCreatedAt()));
+        for (Monitoring m : currentMonitorings) {
+            if (m.getCreatedAt() > currentTime[0] + timeOffset) {
+                if(timeOffset < 0) {
+                    Log.d("Infi", "Backward button is clicked.");
                 }
-                pageNo ++;
-//                handler.postDelayed(this, 0); // call again after 5s
-            });
+                return m;
+            }
         }
-    };
+        return null;
+    }
 
-    private void startPlayback() throws InterruptedException {
-        isPlaying = true;
-        pageNo = 0L;
-        currentESPPackets.clear();
-        handler.post(runnable);
+    private void updateDataIfNeeded(Monitoring monitoring, Runnable onComplete) {
+        String title = monitoring.getEspPacketTitle();
+
+        if (currentESPPackets.isEmpty() || !Objects.equals(currentESPPackets.get(0).getTitle(), title)) {
+            espPacketViewModel.getByTitle(title, espPackets -> {
+                currentESPPackets.clear();
+                currentESPPackets.addAll(espPackets);
+
+                List<Long> espIds = espPackets.stream().map(ESPPacket::getId).collect(Collectors.toList());
+
+                if (espVisualizationMap.isEmpty()) {
+                    for (Long id : espIds) espVisualizationMap.put(id, 0);
+                }
+
+                visualizationViewModel.getByESPPacketTitle(title, visualizations -> {
+                    currentVisualizations.clear();
+                    currentVisualizations.addAll(visualizations);
+                    displayAccordion(espIds);
+                    onComplete.run();
+                });
+            });
+        } else {
+            onComplete.run();
+        }
+    }
+
+    private void seekForwardOneSecond() {
+        timeOffset = 1000L;
+    }
+
+    public void seekBackwardOneSecond() {
+        timeOffset = -1000L;
+    }
+
+    public void seekForwardTenSeconds() {
+        timeOffset = 10000L;
+    }
+
+    public void seekBackwardTenSeconds() {
+        timeOffset = -10000L;
     }
 
     private void updateViews(byte[] data, long sleep) {
@@ -459,6 +461,7 @@ public class PlayBack extends Fragment {
         ScatterData scatterData= scatterChart.getData();
         int cnt = data.size();
         if (scatterData == null) {
+
             scatterData = new ScatterData();
             for (int i = 0; i < cnt; i ++) {
                 ScatterDataSet set = new ScatterDataSet(new ArrayList<>(), requireContext().getString(R.string.channel) + " " + String.valueOf(i + 1));
@@ -519,23 +522,19 @@ public class PlayBack extends Fragment {
     }
 
     public void handleClickForward1SBtn() {
-        if(!isPlaying || forward10S || backward1S || backward10S || runningNextCommand || runningPrevCommand ) return;
-        forward1S = true;
+        seekForwardOneSecond();
     }
 
     public void handleClickForward10SBtn() {
-        if(!isPlaying || forward1S || backward1S || backward10S || runningNextCommand || runningPrevCommand) return;
-        forward10S = true;
+        seekForwardTenSeconds();
     }
 
     public void handleClickBackward1SBtn() {
-        if(!isPlaying || forward1S || forward10S || backward10S || runningNextCommand || runningPrevCommand) return;
-        backward1S = true;
+        seekBackwardOneSecond();
     }
 
     public void handleClickBackward10SBtn() {
-        if(!isPlaying || forward1S || forward10S || backward1S || runningNextCommand || runningPrevCommand) return;
-        backward10S = true;
+        seekBackwardTenSeconds();
     }
 
     public void handleClickNextCommandBtn() {
@@ -652,5 +651,46 @@ public class PlayBack extends Fragment {
         table.addView(tableRow);
 
     }
+
+    public void removeScatterEntriesUnderX(Map<Long, Object> map, Long min) {
+        for (Map.Entry<Long, Object> entry : map.entrySet()) {
+            Long key = entry.getKey();
+            ScatterChart chart = (ScatterChart) entry.getValue();
+            removeScatterEntriesAboutXForAChart(chart, min);
+        }
+    }
+    public void removeScatterEntriesAboutXForAChart(ScatterChart scatterChart, Long minX) {
+        ScatterData data = scatterChart.getData();
+        if (data == null) return;
+
+        for (IScatterDataSet iSet : data.getDataSets()) {
+            if (iSet instanceof ScatterDataSet) {
+                ScatterDataSet set = (ScatterDataSet) iSet;
+
+                List<Entry> entriesToRemove = new ArrayList<>();
+
+                for (int i = 0; i < set.getEntryCount(); i++) {
+                    Entry entry = set.getEntryForIndex(i);
+                    if ((long) entry.getX() >= minX) {
+                        entriesToRemove.add(entry);
+                    }
+                }
+
+                for (Entry entry : entriesToRemove) {
+                    set.removeEntry(entry);
+                }
+            }
+        }
+
+        scatterChart.notifyDataSetChanged();
+        scatterChart.invalidate();
+    }
+    public void removeCurrentMonitoringsByCreatedAt(Long time) {
+        currentMonitorings = currentMonitorings
+                .stream()
+                .filter(one -> one.getCreatedAt() < time)
+                .collect(Collectors.toList());
+    }
+
 
 }

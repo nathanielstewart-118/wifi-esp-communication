@@ -158,6 +158,8 @@
     <string name="failed_to_save_data">Failed to save data.</string>
     <string name="inserted_esp_packet_setting_successfully">Inserted ESP Packet setting successfully</string>
     <string name="order">Order</string>
+    <string name="save">Save</string>
+    <string name="save_set_data">Save Set Data</string>
     <string-array name="my_array_items">
         <item>en</item>
         <item>cn</item>

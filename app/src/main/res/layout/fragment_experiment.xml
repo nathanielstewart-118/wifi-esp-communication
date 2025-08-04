@@ -32,25 +32,25 @@
                 android:completionThreshold="2"
                 android:inputType="text" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
+                style="@style/RoundedMaterialButton"
+                android:backgroundTint="@color/bs_success"
                 android:id="@+id/experiment_save_btn"
-                android:layout_width="0dp"
-                android:layout_height="40dp"
-                android:layout_margin="16dp"
-                android:layout_weight="1"
-                android:background="@drawable/ripple_success_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:textColor="@color/basic_button_text_color"
-                android:text="@string/save_btn" />
-
-            <Button
+                android:layout_margin="16dp"
+                android:text="@string/save_btn"/>
+            <com.google.android.material.button.MaterialButton
+                style="@style/RoundedMaterialButton"
+                android:backgroundTint="@color/bs_primary"
                 android:id="@+id/experiment_load_btn"
-                android:layout_width="0dp"
-                android:layout_height="40dp"
-                android:layout_margin="16dp"
-                android:layout_weight="1"
-                android:background="@drawable/ripple_primary_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:textColor="@color/basic_button_text_color"
-                android:text="@string/load_btn" />
+                android:layout_margin="16dp"
+                android:text="@string/load_btn"/>
+
         </LinearLayout>
 
         <!-- Spacer -->
@@ -385,33 +385,36 @@
                 android:orientation="vertical"
                 android:layout_marginHorizontal="20dp"
                 >
-                <Button
+                <com.google.android.material.button.MaterialButton
+                    style="@style/RoundedMaterialButton"
+                    android:backgroundTint="@color/bs_primary"
                     android:id="@+id/experiment_set_save_btn"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Save Set Data"
-                    android:textSize="18sp"
                     android:textColor="@color/basic_button_text_color"
-                    android:background="@drawable/ripple_info_button" />
+                    android:layout_margin="16dp"
+                    android:text="@string/save_set_data"/>
 
-                <Button
+                <com.google.android.material.button.MaterialButton
+                    style="@style/RoundedMaterialButton"
+                    android:backgroundTint="@color/bs_primary"
                     android:id="@+id/experiment_reload_btn"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Reload"
-                    android:layout_marginVertical="12dp"
-                    android:textSize="18sp"
                     android:textColor="@color/basic_button_text_color"
-                    android:background="@drawable/ripple_info_button" />
+                    android:layout_margin="16dp"
+                    android:text="Reload" />
 
-                <Button
+                <com.google.android.material.button.MaterialButton
+                    style="@style/RoundedMaterialButton"
+                    android:backgroundTint="@color/bs_primary"
                     android:id="@+id/experiment_update_btn"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/update"
-                    android:textSize="18sp"
                     android:textColor="@color/basic_button_text_color"
-                    android:background="@drawable/ripple_primary_button" />
+                    android:layout_margin="16dp"
+                    android:text="Update" />
+
             </LinearLayout>
         </LinearLayout>
         <!-- Bottom Buttons -->

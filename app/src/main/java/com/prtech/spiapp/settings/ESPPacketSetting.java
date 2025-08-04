@@ -34,6 +34,7 @@ import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.material.button.MaterialButton;
 import com.prtech.spiapp.R;
 import com.prtech.spiapp.db.AppDatabase;
 import com.prtech.spiapp.db.entity.ESPPacket;
@@ -52,9 +53,9 @@ public class ESPPacketSetting extends Fragment {
     private EditText numberOfChannelsEdit;
     private CheckBox monitoringCheckbox;
     private CheckBox realTimeControlCheckbox;
-    private Button addButton;
-    private Button saveBtn;
-    private Button loadBtn;
+    private MaterialButton addButton;
+    private MaterialButton saveBtn;
+    private MaterialButton loadBtn;
     private TableLayout espPacketListTable;
     private TableLayout thresholdListTable;
     private final List<ESPPacket> currentESPPackets = new ArrayList<>();
@@ -92,29 +93,27 @@ public class ESPPacketSetting extends Fragment {
             initAutoCompleteWithSuggestionList(idAutocomplete, results, requireContext());
             allTitles = results;
         });
-        dataTypeSpinner = (Spinner) view.findViewById(R.id.data_type_spinner);
-        idAutocomplete = (AutoCompleteTextView) view.findViewById(R.id.sensor_setting_id_autocomplete);
-        variableNameEdit = (EditText) view.findViewById(R.id.variable_name_input);
-        numberOfChannelsEdit = (EditText) view.findViewById(R.id.number_of_channels_input);
-        monitoringCheckbox = (CheckBox) view.findViewById(R.id.monitoring_esp_tx_checkbox);
-        realTimeControlCheckbox = (CheckBox) view.findViewById(R.id.real_time_control_checkbox);
-        espPacketListTable = (TableLayout) view.findViewById(R.id.sensor_list_tb);
-        thresholdListTable = (TableLayout) view.findViewById(R.id.esp_thresholds_list_tb);
-        addButton = (Button) view.findViewById(R.id.sensor_add_btn);
+        dataTypeSpinner = view.findViewById(R.id.data_type_spinner);
+        idAutocomplete = view.findViewById(R.id.sensor_setting_id_autocomplete);
+        variableNameEdit = view.findViewById(R.id.variable_name_input);
+        numberOfChannelsEdit = view.findViewById(R.id.number_of_channels_input);
+        monitoringCheckbox = view.findViewById(R.id.monitoring_esp_tx_checkbox);
+        realTimeControlCheckbox = view.findViewById(R.id.real_time_control_checkbox);
+        espPacketListTable = view.findViewById(R.id.sensor_list_tb);
+        thresholdListTable = view.findViewById(R.id.esp_thresholds_list_tb);
+        addButton = view.findViewById(R.id.sensor_add_btn);
         addButton.setOnClickListener(v -> handleClickAddBtn(v));
 
-        saveBtn = (Button) view.findViewById(R.id.sensor_save_btn);
+        saveBtn = view.findViewById(R.id.sensor_save_btn);
         saveBtn.setOnClickListener(v -> handleClickSaveBtn());
 
-        loadBtn = (Button) view.findViewById(R.id.sensor_load_btn);
+        loadBtn = view.findViewById(R.id.sensor_load_btn);
         loadBtn.setOnClickListener(v -> handleClickLoadBtn(v));
 
         String[] options = { "uint8", "int8", "uint16", "int16", "uint24", "int24", "uint32", "int32", "float", "double"};
         ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, options);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         dataTypeSpinner.setAdapter(adapter);
-
-
 
         return view;
     }

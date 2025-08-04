@@ -21,6 +21,7 @@ import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.util.Pair;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -28,8 +29,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TableLayout;
 import android.widget.TableRow;
@@ -37,6 +40,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.materialswitch.MaterialSwitch;
+import com.google.android.material.slider.RangeSlider;
 import com.prtech.spiapp.MainActivity;
 import com.prtech.spiapp.R;
 import com.prtech.spiapp.db.entity.Command;
@@ -97,8 +103,10 @@ public class MonitoringSetting extends Fragment {
     private final Gson gson = new Gson();
     private List<ToggleButton> experimentToggleButtons = new ArrayList<>();
     private List<CustomLoadingButton> commandToggleButtons = new ArrayList<>();
-    private Button startBtn;
-    private Button stopBtn;
+    private MaterialButton startBtn;
+    private MaterialButton stopBtn;
+    private MaterialButton logMsgBtn;
+    private MaterialSwitch logSwitch;
 
     private CustomLoadingButton loadingButton;
     private LinearLayout commandSetBtnLayout;
@@ -131,6 +139,7 @@ public class MonitoringSetting extends Fragment {
     private volatile Boolean bRunning = false;
     private Long totalRecordsCnt = 0L;
     private int tableRowsCnt = 10;
+    private Map<Long, List<Pair<Integer, Double>>> currentStatistics = new HashMap<>();
 
     public MonitoringSetting() {
 
@@ -357,6 +366,7 @@ public class MonitoringSetting extends Fragment {
         bDrawing = false;
         super.onStop();
     }
+
     private void addAccordionSection(long espId) {
         List<VisualizationRange> filtered = currentVisualizations.get((Integer) espVisualizationMap.get(espId)).getRanges()
                 .stream()
@@ -372,6 +382,13 @@ public class MonitoringSetting extends Fragment {
         ESPPacket result = filteredESPs.get(0);
         // Header
         if (result == null) return;
+        int nChannels = result.getNumberOfChannels();
+        List<Pair<Integer, Double>> statics = new ArrayList<>();
+        for (int i = 0; i < nChannels; i ++) {
+            Pair pair = new Pair<>(0, 0);
+            statics.add(pair);
+        }
+        currentStatistics.put(espId, statics);
         LinearLayout headerLayout = new LinearLayout(requireContext());
         headerLayout.setLayoutParams(new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
@@ -434,10 +451,26 @@ public class MonitoringSetting extends Fragment {
         contentLayout.setPadding(24, 24, 24, 24);
         contentLayout.setLayoutParams(new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
-                500
+                600
         ));
 
-//        ArrayList<Entry> entries = new ArrayList<>();
+
+        ScrollView scrollView = new ScrollView(requireContext());
+        scrollView.setLayoutParams(new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                500 // or set a fixed height to allow scrolling inside
+        ));
+        scrollView.setFillViewport(true);
+        scrollView.setVerticalScrollBarEnabled(true);
+
+        LinearLayout scrollInnerLayout = new LinearLayout(requireContext());
+        scrollInnerLayout.setLayoutParams(new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        ));
+        scrollInnerLayout.setOrientation(LinearLayout.VERTICAL);
+
+        //        ArrayList<Entry> entries = new ArrayList<>();
 //        for (int i = 0; i <= 100; i += 10) {
 //            entries.add(new Entry(i, i * 2)); // Example: All values = 0 (like your image)
 //        }
@@ -458,13 +491,25 @@ public class MonitoringSetting extends Fragment {
             ScatterChart scatterChart = displayChart(visualizationRange, requireContext());
             chartsMap.put(visualizationRange.getEspPacketId(), scatterChart);
             currentWindowStartMap.put(visualizationRange.getEspPacketId(), 0F);
-            contentLayout.addView(scatterChart);
+            LinearLayout chartLayout = new LinearLayout(requireContext());
+            chartLayout.setLayoutParams(new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+            ));
+            chartLayout.addView(scatterChart);
+//            contentLayout.addView(chartLayout);
+            scrollInnerLayout.addView(chartLayout);
         }
         else if(visualizationRange.getVisualizationType() == 1) {
             TableLayout tableLayout = displayTable(visualizationRange, requireContext());
             tablesMap.put(visualizationRange.getEspPacketId(), tableLayout);
-            contentLayout.addView(tableLayout);
+//            contentLayout.addView(tableLayout);
+            scrollInnerLayout.addView(tableLayout);
         }
+
+        LinearLayout channelTableLayout = displayChannelTable(result, requireContext());
+//        contentLayout.addView(channelTableLayout);
+        scrollInnerLayout.addView(channelTableLayout);
         contentLayout.setVisibility(View.VISIBLE);
         // Save reference for updates
         accordionContentMap.put(result.getId(), contentLayout);
@@ -478,6 +523,10 @@ public class MonitoringSetting extends Fragment {
         headerLayout.addView(header);
         headerLayout.addView(spaceView);
         headerLayout.addView(visualizationSpinner);
+
+        scrollView.addView(scrollInnerLayout);
+        contentLayout.addView(scrollView);
+
         accordionContainer.addView(headerLayout);
         accordionContainer.addView(contentLayout);
 
@@ -528,6 +577,7 @@ public class MonitoringSetting extends Fragment {
                     int vType = (Integer) linearLayout.getTag();
                     if (vType == 0) updateChartWithData(scatterChart, values, espPacket.getId());
                     else if (vType == 1) updateTableWithData(targetTable, values, espPacket.getId(), requireContext());
+                    updateStatistics(espPacket.getId(), values);
                 }
             };
 
@@ -595,9 +645,14 @@ public class MonitoringSetting extends Fragment {
     }
 
     public void handleClickStartBtn() throws InterruptedException {
+        if(currentExperiments.isEmpty()) {
+            Toast.makeText(requireContext(), "Please select an Experiment Set", Toast.LENGTH_SHORT).show();
+            return;
+        }
         bRunning = true;
         enableOrDisableButtons(experimentToggleButtons, false);
         executorService.execute(() -> {
+
             List<String> commands = currentExperiments.get(currentExperimentSetId).getCommands();
             int cnt = commands.size();
 
@@ -997,4 +1052,223 @@ public class MonitoringSetting extends Fragment {
         table.addView(tableRow);
 
     }
+
+    private LinearLayout displayChannelTable(ESPPacket espPacket, Context context) {
+        LinearLayout linearLayout = new LinearLayout(requireContext());
+        linearLayout.setLayoutParams(new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        ));
+        linearLayout.setOrientation(LinearLayout.HORIZONTAL);
+//        linearLayout.setWeightSum(3);
+
+        TableLayout tableLayout = new TableLayout(context);
+        tableLayout.setLayoutParams(new TableLayout.LayoutParams(
+                0,
+                TableLayout.LayoutParams.WRAP_CONTENT,
+                2f
+        ));
+        tableLayout.setPadding(16, 16, 16, 16);
+        tableLayout.setStretchAllColumns(true);
+        tableLayout.setGravity(Gravity.CENTER);
+
+        TableRow headerRow = new TableRow(requireContext());
+        headerRow.setBackgroundColor(ContextCompat.getColor(context, R.color.bs_primary));
+
+        TextView orderHeaderView = createHeaderTextView("Order", requireContext());
+        TextView channelHeaderView = createHeaderTextView("Channel", requireContext());
+        TextView visibleHeaderView = createHeaderTextView("Visible", requireContext());
+        TextView gainHeaderView = createHeaderTextView("Gain", requireContext());
+        TextView offsetHeaderView = createHeaderTextView("Offset", requireContext());
+
+        headerRow.addView(orderHeaderView);
+        headerRow.addView(channelHeaderView);
+        headerRow.addView(visibleHeaderView);
+        headerRow.addView(gainHeaderView);
+        headerRow.addView(offsetHeaderView);
+        tableLayout.addView(headerRow);
+
+        int nChannels = espPacket.getNumberOfChannels();
+        for (int i = 0; i < nChannels; i ++) {
+            TableRow tableRow = new TableRow(requireContext());
+            tableRow.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.table_border));
+            tableRow.setLayoutParams(new TableRow.LayoutParams(
+                    TableRow.LayoutParams.MATCH_PARENT,
+                    TableRow.LayoutParams.WRAP_CONTENT
+            ));
+
+            TextView orderView = createHeaderTextView(String.valueOf(i + 1), requireContext());
+            orderView.setTextColor(ContextCompat.getColor(requireContext(), R.color.black));
+            TextView channelView = createHeaderTextView(espPacket.getVariableName() + (i + 1), requireContext());
+            channelView.setTextColor(ContextCompat.getColor(requireContext(), R.color.black));
+            LinearLayout visibleCheckBoxLayout = new LinearLayout(requireContext());
+            visibleCheckBoxLayout.setOrientation(LinearLayout.VERTICAL);
+            visibleCheckBoxLayout.setPadding(10, 20, 10, 10);
+//            thresholdCheckBoxLayout.setBackgroundColor(getResources().getColor(R.color.bs_info));
+            visibleCheckBoxLayout.setLayoutParams(new TableRow.LayoutParams(
+                    TableRow.LayoutParams.WRAP_CONTENT,
+                    TableRow.LayoutParams.WRAP_CONTENT
+            ));
+            visibleCheckBoxLayout.setGravity(Gravity.CENTER);
+            CheckBox visibleCheckBox = new CheckBox(requireContext());
+            visibleCheckBox.setLayoutParams(new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+            ));
+            visibleCheckBox.setGravity(Gravity.CENTER);
+            int finalI = i;
+            visibleCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    setVisibilityToChannel(espPacket.getId(), finalI, isChecked);
+                }
+            });
+            visibleCheckBoxLayout.addView(visibleCheckBox);
+
+            LinearLayout gainCheckBoxLayout = new LinearLayout(requireContext());
+            gainCheckBoxLayout.setOrientation(LinearLayout.VERTICAL);
+            gainCheckBoxLayout.setPadding(10, 20, 10, 10);
+//            thresholdCheckBoxLayout.setBackgroundColor(getResources().getColor(R.color.bs_info));
+            gainCheckBoxLayout.setLayoutParams(new TableRow.LayoutParams(
+                    TableRow.LayoutParams.WRAP_CONTENT,
+                    TableRow.LayoutParams.WRAP_CONTENT
+            ));
+            gainCheckBoxLayout.setGravity(Gravity.CENTER);
+            CheckBox gainCheckBox = new CheckBox(requireContext());
+            gainCheckBox.setLayoutParams(new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+            ));
+            gainCheckBox.setGravity(Gravity.CENTER);
+            gainCheckBoxLayout.addView(gainCheckBox);
+
+            LinearLayout offsetCheckBoxLayout = new LinearLayout(requireContext());
+            offsetCheckBoxLayout.setOrientation(LinearLayout.VERTICAL);
+            offsetCheckBoxLayout.setPadding(10, 20, 10, 10);
+//            thresholdCheckBoxLayout.setBackgroundColor(getResources().getColor(R.color.bs_info));
+            offsetCheckBoxLayout.setLayoutParams(new TableRow.LayoutParams(
+                    TableRow.LayoutParams.WRAP_CONTENT,
+                    TableRow.LayoutParams.WRAP_CONTENT
+            ));
+            offsetCheckBoxLayout.setGravity(Gravity.CENTER);
+            CheckBox offsetCheckBox = new CheckBox(requireContext());
+            offsetCheckBox.setLayoutParams(new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+            ));
+            offsetCheckBox.setGravity(Gravity.CENTER);
+            offsetCheckBoxLayout.addView(offsetCheckBox);
+
+            tableRow.addView(orderView);
+            tableRow.addView(channelView);
+            tableRow.addView(visibleCheckBoxLayout);
+            tableRow.addView(gainCheckBoxLayout);
+            tableRow.addView(offsetCheckBoxLayout);
+
+            tableLayout.addView(tableRow);
+
+        }
+
+
+        LinearLayout rangeLayout = new LinearLayout(requireContext());
+        rangeLayout.setOrientation(LinearLayout.VERTICAL);
+        rangeLayout.setGravity(Gravity.CENTER_VERTICAL);
+        rangeLayout.setLayoutParams(new LinearLayout.LayoutParams(
+                1200,
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                3f
+        ));
+        rangeLayout.setPadding(16, 16, 16, 16);
+
+        RangeSlider rangeSlider = new RangeSlider(requireContext());
+        LinearLayout.LayoutParams sliderParams = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+        );
+        sliderParams.setMargins(16, 16, 16, 32);
+        sliderParams.gravity = Gravity.CENTER;
+        rangeSlider.setLayoutParams(sliderParams);
+
+        rangeSlider.addOnChangeListener((slider, value, fromUser) -> {
+            List<Float> values = slider.getValues();
+            handleChangeESPRange(values, espPacket.getId());
+        });
+
+        rangeSlider.setValueFrom(0);
+        rangeSlider.setValueTo(1000);
+        rangeSlider.setValues(0f, 1000f);
+        rangeSlider.setStepSize(10);
+        rangeLayout.addView(rangeSlider);
+        linearLayout.addView(tableLayout);
+        linearLayout.addView(rangeLayout);
+
+        return linearLayout;
+    }
+
+    private void handleChangeESPRange(List<Float> values, Long espPackeId) {
+        ScatterChart scatterChart = (ScatterChart) chartsMap.get(espPackeId);
+        if (scatterChart == null) return;
+        scatterChart.getAxisLeft().setAxisMinimum(values.get(0));
+        scatterChart.getAxisLeft().setAxisMaximum(values.get(1));
+
+    }
+
+
+    private void setVisibilityToChannel(Long espPacketId, int channelNo, boolean checked) {
+        ScatterChart scatterChart = (ScatterChart) chartsMap.get(espPacketId);
+        if (scatterChart == null) return;
+        ScatterData scatterData = scatterChart.getData();
+        if (scatterData == null || scatterData.getDataSetCount() == 0) return;
+        IScatterDataSet dataSet = scatterData.getDataSetByIndex(0); // or use getDataSetByLabel()
+
+        // hides the dataset
+        dataSet.setVisible(checked); // hides the dataset
+        scatterChart.invalidate(); // refreshes the chart
+    }
+
+    private void updateStatistics(Long espPacketId, List<Object> data) {
+        List<Pair<Integer, Double>> pairs = currentStatistics.get(espPacketId);
+        if (pairs == null || pairs.isEmpty()) return;
+
+        int cnt = pairs.size();
+        for (int i = 0; i < cnt; i ++) {
+            try {
+                Object obj = data.get(i);
+                Pair<Integer, Double> pair = pairs.get(i);
+                if (obj instanceof Integer) {
+                    Integer value = (Integer) obj;
+                    int newCount = pair.first + 1;
+                    Double newAvg = (pair.second * pair.first + value) / newCount;
+                    Pair<Integer, Double> newPair = new Pair<>(newCount, newAvg);
+                    pairs.set(i, newPair);
+                    LinearLayout linearLayout = (LinearLayout) accordionContentMap.get(espPacketId);
+                    if(linearLayout == null) continue;
+                    ScrollView scrollView = (ScrollView) linearLayout.getChildAt(0);
+                    if (scrollView == null) continue;
+                    LinearLayout scrollInnerLayout = (LinearLayout) scrollView.getChildAt(0);
+                    if (scrollInnerLayout == null) continue;
+                    LinearLayout tableWrapperLayout = (LinearLayout) scrollInnerLayout.getChildAt(1);
+                    if (tableWrapperLayout == null) continue;
+                    TableLayout tableLayout = (TableLayout) tableWrapperLayout.getChildAt(0);
+                    if(tableLayout == null) continue;
+                    TableRow tableRow = (TableRow) tableLayout.getChildAt(i + 1);
+                    if (tableRow == null) continue;
+                    LinearLayout gainLayout = (LinearLayout) tableRow.getChildAt(3);
+                    if (gainLayout == null) continue;
+                    CheckBox gainCheckBox = (CheckBox) gainLayout.getChildAt(0);
+                    gainCheckBox.setText(String.valueOf(newAvg));
+                    LinearLayout offsetLayout = (LinearLayout) tableRow.getChildAt(4);
+                    if( offsetLayout == null) continue;;
+                    CheckBox offsetCheckBox = (CheckBox) offsetLayout.getChildAt(0);
+                    if (offsetCheckBox == null) continue;
+                    offsetCheckBox.setText(String.valueOf(Math.abs(newAvg - value)));
+                }
+            } catch (Exception e) {
+                Log.w("Exception", "Content is " + e.toString());
+            }
+        }
+
+    }
 }
+
+

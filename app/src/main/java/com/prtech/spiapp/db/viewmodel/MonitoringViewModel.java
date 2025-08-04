@@ -74,14 +74,23 @@ public class MonitoringViewModel extends AndroidViewModel {
     }
 
     public void getCount(Consumer<Long> callback) {
-        Long cnt = monitoringDao.getRecordsCount();
-        new Handler(Looper.getMainLooper()).post(() -> {
-            callback.accept(cnt);
+        executorService.execute(() -> {
+            Long cnt = monitoringDao.getRecordsCount();
+            new Handler(Looper.getMainLooper()).post(() -> {
+                callback.accept(cnt);
+            });
         });
+
     }
 
     public void getMonitoringsByOffset(Long no, Integer size, Consumer<List<Monitoring>> callback) {
-        List<Monitoring> results = monitoringDao.getMonitoringsByOffset(no * size, size);
+        executorService.execute(() -> {
+            List<Monitoring> results = monitoringDao.getMonitoringsByOffset(no * size, size);
+            new Handler(Looper.getMainLooper()).post(() -> {
+                callback.accept(results);
+            });
+        });
+
     }
 
 }

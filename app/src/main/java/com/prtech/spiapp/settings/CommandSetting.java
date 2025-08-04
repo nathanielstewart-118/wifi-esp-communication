@@ -1,5 +1,6 @@
 package com.prtech.spiapp.settings;
 
+import static com.prtech.spiapp.utils.CommonUtils.string2Float;
 import static com.prtech.spiapp.utils.UIUtils.initAutoCompleteWithSuggestionList;
 import static com.prtech.spiapp.utils.UIUtils.setSpinnerWithContent;
 import static com.prtech.spiapp.utils.UIUtils.setupOperationalButtons;
@@ -184,17 +185,17 @@ public class CommandSetting extends Fragment {
         row.addView(sequenceView);
 
         TextView commandCodeView = new TextView(requireContext());
-        commandCodeView.setText(data.getCommandCode());
+        commandCodeView.setText(data.getCommandCode() == null ? "" : data.getCommandCode());
         commandCodeView.setGravity(Gravity.CENTER);
         row.addView(commandCodeView);
 
         TextView time1View = new TextView(requireContext());
-        time1View.setText(String.valueOf(data.getTime1()));
+        time1View.setText(data.getTime1() == null ? "" : String.valueOf(data.getTime1()));
         time1View.setGravity(Gravity.CENTER);
         row.addView(time1View);
 
         TextView time2View = new TextView(requireContext());
-        time2View.setText(String.valueOf(data.getTime2()));
+        time2View.setText(data.getTime2() == null ? "" : String.valueOf(data.getTime2()));
         time2View.setGravity(Gravity.CENTER);
         row.addView(time2View);
 
@@ -358,8 +359,10 @@ public class CommandSetting extends Fragment {
                                 .stream()
                                 .filter(t -> Objects.equals(t.getEspPacketId(), packet.getId()))
                                 .collect(Collectors.toList());
-                        if (!filtered.isEmpty())
-                            thresholdEdit.setText(String.valueOf(filtered.get(0).getThresholds().get(j)));
+                        if (!filtered.isEmpty()) {
+                            Integer value = filtered.get(0).getThresholds().get(j);
+                            thresholdEdit.setText(value == null ? "" : String.valueOf(value));
+                        }
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -368,12 +371,14 @@ public class CommandSetting extends Fragment {
 
                 TextView lowerView = new TextView(requireContext());
                 lowerView.setGravity(Gravity.CENTER);
-                lowerView.setText(String.valueOf(packet.getThresholds().get(j).getLowerLimit()));
+                Float lowerLimit = packet.getThresholds().get(j).getLowerLimit();
+                lowerView.setText(lowerLimit == null ? "" : String.valueOf(lowerLimit));
                 tableRow.addView(lowerView);
 
                 TextView upperView = new TextView(requireContext());
                 upperView.setGravity(Gravity.CENTER);
-                upperView.setText(String.valueOf(packet.getThresholds().get(j).getUpperLimit()));
+                Float upperLimit = packet.getThresholds().get(j).getUpperLimit();
+                upperView.setText(upperLimit == null ? "" : String.valueOf(upperLimit));
                 tableRow.addView(upperView);
                 thresholdEditTable.addView(tableRow);
             }
@@ -443,8 +448,8 @@ public class CommandSetting extends Fragment {
 
     public void handleClickAddBtn() {
         commandCode = commandCodeEdit.getText().toString();
-        time1 = Float.parseFloat(time1Edit.getText().toString());
-        time2 = Float.parseFloat(time2Edit.getText().toString());
+        time1 = string2Float(time1Edit.getText().toString(), null);
+        time2 = string2Float(time2Edit.getText().toString(), null);
         Command command = new Command("", "", commandCode, time1, time2, -1, 0, new ArrayList<>());
         if (selectedCommandIndex == -1) currentCommands.add(command);
         else currentCommands.set(selectedCommandIndex, command);
@@ -604,8 +609,8 @@ public class CommandSetting extends Fragment {
                     title,
                     "",
                     ccView.getText().toString().trim(),
-                    Float.parseFloat(t1View.getText().toString().trim()),
-                    Float.parseFloat(t2View.getText().toString().trim()),
+                    string2Float(t1View.getText().toString().trim(), null),
+                    string2Float(t2View.getText().toString().trim(), null),
                     index,
                     0,
                     new ArrayList<>()

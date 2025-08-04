@@ -182,6 +182,7 @@ public class MonitoringSetting extends Fragment {
 
         receiveViewModel = new ViewModelProvider(requireActivity()).get(TCPUDPReceiveViewModel.class);
         receiveViewModel.getData().observe(getViewLifecycleOwner(), data -> {
+            Long curTime = System.currentTimeMillis();
             LogHelper.sendLog(
                     Constants.LOGGING_BASE_URL,
                     Constants.LOGGING_REQUEST_METHOD,
@@ -191,7 +192,7 @@ public class MonitoringSetting extends Fragment {
             Log.d("Monitoring Info", "New Data arrived from TCP : " + Arrays.toString(data));
             Toast.makeText(requireContext(), "Data arrived", Toast.LENGTH_SHORT).show();
             if(bRunning) {
-                updateViews(data, 6);
+                updateViews(data, curTime);
                 totalRecordsCnt ++;
             }
         });
@@ -487,12 +488,13 @@ public class MonitoringSetting extends Fragment {
         accordionContainer.removeAllViews();
         accordionContentMap.clear();
         chartsMap.clear();
+        tablesMap.clear();
         for (Long espId: espIds) {
             addAccordionSection(espId);
         }
     }
 
-    public void updateViews(byte[] data, int cnt) {
+    public void updateViews(byte[] data, long time) {
         Command currentCommand = currentCommands.get(currentCommandSetIndex);
         Map<Long, Long> espVisualizationIdMap = new HashMap<>();
         for (Map.Entry<Long, Integer> entry: espVisualizationMap.entrySet()) {
@@ -501,8 +503,7 @@ public class MonitoringSetting extends Fragment {
             Visualization v = currentVisualizations.get(index);
             espVisualizationIdMap.put(espId, v.getId());
         }
-        Long currentTime = System.currentTimeMillis();
-        Monitoring monitoring = new Monitoring(currentCommand.getEspPacketTitle(), currentCommand.getTitle(), Arrays.toString(data), espVisualizationIdMap, currentTime, currentTime);
+        Monitoring monitoring = new Monitoring(currentCommand.getEspPacketTitle(), currentCommand.getTitle(), Arrays.toString(data), espVisualizationIdMap, time, time);
 
         monitoringViewModel.insert(monitoring, result -> {
             if (result != null && result > 0) {
@@ -633,7 +634,7 @@ public class MonitoringSetting extends Fragment {
                         });
 
                     });
-                    }
+                }
                 int rowNo = i / 2;
                 int colNo = i % 2;
                 LinearLayout linearLayout = (LinearLayout) commandSetBtnLayout.getChildAt(rowNo);

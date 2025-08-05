@@ -175,8 +175,11 @@
     <color name="md_theme_surfaceContainerHighest_highContrast">#CCC6B9</color>
 
     <!-- For log table rows -->
-    <color name="table_header">#6200EE</color> <!-- Material Purple -->
+    <color name="table_header">#0d6efd</color> <!-- Material Purple -->
     <color name="table_row_even">#FAFAFA</color> <!-- Light gray -->
     <color name="table_row_odd">#FFFFFF</color> <!-- White -->
-
+    <color name="signal_excellent">#4CAF50</color> <!-- Green -->
+    <color name="signal_good">#8BC34A</color>    <!-- Light Green -->
+    <color name="signal_fair">#FFC107</color>    <!-- Amber -->
+    <color name="signal_weak">#F44336</color>    <!-- Red -->
 </resources>

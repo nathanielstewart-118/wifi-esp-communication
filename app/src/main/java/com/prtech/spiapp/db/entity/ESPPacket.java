@@ -27,6 +27,9 @@ public class ESPPacket extends BaseEntity {
     @ColumnInfo(name = "number_of_channels")
     private Integer numberOfChannels;
 
+    @ColumnInfo(name="crc")
+    private Integer crc;
+
     @ColumnInfo(name = "monitoring")
     private Integer monitoring;
 
@@ -99,6 +102,14 @@ public class ESPPacket extends BaseEntity {
 
     public void setNumberOfChannels(Integer numberOfChannels) {
         this.numberOfChannels = numberOfChannels;
+    }
+
+    public Integer getCrc() {
+        return crc;
+    }
+
+    public void setCrc(Integer crc) {
+        this.crc = crc;
     }
 
     public Integer getMonitoring() {

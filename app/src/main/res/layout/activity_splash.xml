@@ -5,14 +5,4 @@
     android:layout_height="match_parent"
     android:background="@color/transparent"
     android:gravity="center">
-
-<!--    <ImageView-->
-<!--        android:id="@+id/splash_logo"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:src="@drawable/splash_screen"-->
-<!--        android:layout_centerInParent="true" />-->
-
-    <!-- Optional: Add app name or animation -->
-
 </LinearLayout>

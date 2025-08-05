@@ -1182,7 +1182,7 @@ public class MonitoringSetting extends Fragment {
         TableRow headerRow = new TableRow(requireContext());
         headerRow.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.table_header));
 
-        String[] headers = {"Order", "Context", "DateTime"};
+        String[] headers = {"Order", "Content", "DateTime"};
         for (String header : headers) {
             TextView textView = new TextView(requireContext());
             textView.setText(header);

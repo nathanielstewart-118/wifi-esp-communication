@@ -17,8 +17,13 @@ import android.net.wifi.WifiManager;
 import android.net.wifi.WifiNetworkSpecifier;
 import android.os.Build;
 import android.util.Log;
+import android.view.View;
 
 import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.FragmentActivity;
+
+import com.google.android.material.progressindicator.LinearProgressIndicator;
+
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -38,7 +43,7 @@ public class WiFiHelper {
 
 
 
-    public void scanWifiNetworks(Consumer<String[][]> callback) {
+    public void scanWifiNetworks(FragmentActivity activity, LinearProgressIndicator linearProgressIndicator, Consumer<String[][]> callback) {
         new Thread(() -> {
             try {
                 // Check if wifiManager is null
@@ -121,6 +126,11 @@ public class WiFiHelper {
                             }
                             callback.accept(wifiLists);
                             Log.d("Info", "Trying to call callback function with the scanned results");
+
+                            activity.runOnUiThread(() -> {
+                                linearProgressIndicator.setVisibility(View.GONE);
+                            });
+
                         } catch (Exception e) {
                             Log.e("Exception", "Error in BroadcastReceiver: " + e.getMessage(), e);
                             LogHelper.sendLog(
@@ -129,6 +139,9 @@ public class WiFiHelper {
                                 "BroadcastReceiver exception: " + e.getMessage(),
                                 Constants.LOGGING_BEARER_TOKEN
                             );
+                            activity.runOnUiThread(() -> {
+                                linearProgressIndicator.setVisibility(View.GONE);
+                            });
                         }
                     }
                 }, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
@@ -149,6 +162,9 @@ public class WiFiHelper {
                             "Wi-Fi scan could not be started",
                             Constants.LOGGING_BEARER_TOKEN
                     );
+                    activity.runOnUiThread(() -> {
+                        linearProgressIndicator.setVisibility(View.GONE);
+                    });
                 }
             } catch (Exception e) {
                 Log.e("Exception", "Unexpected error in scanWifiNetworks: " + e.getMessage(), e);
@@ -158,6 +174,9 @@ public class WiFiHelper {
                     "scanWifiNetworks exception: " + e.getMessage(),
                     Constants.LOGGING_BEARER_TOKEN
                 );
+                activity.runOnUiThread(() -> {
+                    linearProgressIndicator.setVisibility(View.GONE);
+                });
             }
         })
         .start();

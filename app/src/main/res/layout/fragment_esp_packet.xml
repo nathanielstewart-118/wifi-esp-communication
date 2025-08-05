@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:gravity="center"
     android:layout_width="match_parent"
@@ -9,42 +10,79 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:weightSum="3"
-        android:orientation="horizontal">
-        <AutoCompleteTextView
-            android:id="@+id/sensor_setting_id_autocomplete"
+        android:baselineAligned="false"
+        android:orientation="horizontal"
+        android:weightSum="5">
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:layout_weight="2" >
+            <com.google.android.material.materialswitch.MaterialSwitch
+                android:id="@+id/esp_crc_switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/crc_upper"
+                android:checked="true"
+                android:gravity="center"
+                app:thumbTint="@color/switch_thumb_color"
+                app:trackTint="@color/switch_track_color"
+                android:textSize="16sp"
+                style="@style/Widget.Material3.CompoundButton.MaterialSwitch" />
+            <Spinner
+                android:id="@+id/esp_crc_spinner"
+                android:layout_gravity="center_vertical"
+                android:backgroundTint="@color/bs_info"
+                android:layout_marginHorizontal="12dp"
+                android:prompt="@string/select_commands"
+                android:spinnerMode="dropdown"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                 />
+
+
+        </LinearLayout>
+        <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:hint="@string/enter_sensor_setting_title"
-            android:layout_gravity="center_vertical"
-            android:focusable="true"
-            android:backgroundTint="@color/bs_info"
-            android:focusableInTouchMode="true"
-            android:completionThreshold="2"
-            android:inputType="text" />
-        <com.google.android.material.button.MaterialButton
-            style="@style/RoundedMaterialButton"
-            android:backgroundTint="@color/bs_success"
-            android:id="@+id/sensor_save_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/basic_button_text_color"
-            android:layout_margin="16dp"
-            android:text="@string/save_btn"/>
-        <com.google.android.material.button.MaterialButton
-            style="@style/RoundedMaterialButton"
-            android:backgroundTint="@color/bs_primary"
-            android:id="@+id/sensor_load_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/basic_button_text_color"
-            android:layout_margin="16dp"
-            android:text="@string/load_btn"/>
+            android:gravity="center"
+            android:weightSum="3"
+            android:layout_weight="3"
+            android:orientation="horizontal">
+            <AutoCompleteTextView
+                android:id="@+id/sensor_setting_id_autocomplete"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="@string/enter_esp_packet_setting_title"
+                android:layout_gravity="center_vertical"
+                android:focusable="true"
+                android:backgroundTint="@color/bs_info"
+                android:focusableInTouchMode="true"
+                android:completionThreshold="2"
+                android:inputType="text"
+                tools:ignore="NestedWeights" />
+            <com.google.android.material.button.MaterialButton
+                style="@style/RoundedMaterialButton"
+                android:backgroundTint="@color/bs_success"
+                android:id="@+id/sensor_save_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/basic_button_text_color"
+                android:layout_margin="16dp"
+                android:text="@string/save_btn"/>
+            <com.google.android.material.button.MaterialButton
+                style="@style/RoundedMaterialButton"
+                android:backgroundTint="@color/bs_primary"
+                android:id="@+id/sensor_load_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/basic_button_text_color"
+                android:layout_margin="16dp"
+                android:text="@string/load_btn"/>
 
+        </LinearLayout>
     </LinearLayout>
-
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -55,19 +93,12 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="50dp"
-                android:padding="16dp"
-                android:orientation="horizontal">
-
-                <TableLayout
-                    android:layout_width="0dp"
+            <TableLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="9"
                     android:id="@+id/wifi_list_tb"
                     android:stretchColumns="*"
+                    android:padding="16dp"
                     android:gravity="center"
                     android:background="@drawable/table_border">
 
@@ -106,7 +137,7 @@
                             android:padding="8dp"
                             android:textStyle="bold"/>
                         <TextView
-                            android:text="Actions"
+                            android:text="@string/actions"
                             android:gravity="center"
                             android:textColor="@android:color/white"
                             android:padding="8dp"
@@ -120,8 +151,10 @@
                             android:id="@+id/variable_name_input"
                             android:layout_gravity="center_vertical"
                             android:layout_width="match_parent"
+                            android:autofillHints=""
                             android:backgroundTint="@color/bs_info"
                             android:layout_height="wrap_content"
+                            android:inputType=""
                             android:padding="8dp" />
                         <Spinner
                             android:id="@+id/data_type_spinner"
@@ -133,6 +166,7 @@
                         <EditText
                             android:id="@+id/number_of_channels_input"
                             android:layout_gravity="center_vertical"
+                            android:autofillHints=""
                             android:backgroundTint="@color/bs_info"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -173,7 +207,6 @@
 
                     </TableRow>
                 </TableLayout>
-            </LinearLayout>
 
             <TableLayout
                 android:layout_width="match_parent"
@@ -233,7 +266,7 @@
                         android:textStyle="bold"/>
 
                     <TextView
-                        android:text="Actions"
+                        android:text="@string/actions"
                         android:gravity="center"
                         android:textColor="@android:color/white"
                         android:padding="8dp"
@@ -246,7 +279,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_span="7"
-                        android:text="⚠️ There is ESP packet settings now."
+                        android:text="@string/there_is_esp_packet_settings_now"
                         android:textColor="@android:color/black"
                         android:gravity="center"
                         android:padding="16dp"
@@ -265,19 +298,19 @@
                 <TableRow
                     android:background="@color/bs_primary">
                     <TextView
-                        android:text="Variable Name/\nData Type"
+                        android:text="@string/variable_name_ndata_type"
                         android:textColor="@color/white"
                         android:padding="6dp"
                         android:textStyle="bold"
                         android:gravity="center"/>
                     <TextView
-                        android:text="Channel\nOrder"
+                        android:text="@string/channel_norder"
                         android:textColor="@color/white"
                         android:padding="6dp"
                         android:textStyle="bold"
                         android:gravity="center"/>
                     <TextView
-                        android:text="Setting Thresholds"
+                        android:text="@string/setting_thresholds"
                         android:textColor="@color/white"
                         android:layout_span="3"
                         android:padding="6dp"
@@ -285,13 +318,13 @@
                         android:layout_gravity="center"
                         android:gravity="center"/>
                     <TextView
-                        android:text="Threshold\nEnable"
+                        android:text="@string/threshold_nenable"
                         android:textColor="@color/white"
                         android:padding="6dp"
                         android:textStyle="bold"
                         android:gravity="center"/>
                     <TextView
-                        android:text="Outlier Settings"
+                        android:text="@string/outlier_settings"
                         android:textColor="@color/white"
                         android:padding="6dp"
                         android:layout_gravity="center"
@@ -299,7 +332,7 @@
                         android:textStyle="bold"
                         android:gravity="center"/>
                     <TextView
-                        android:text="Outliers\nEnable"
+                        android:text="@string/outliers_nenable"
                         android:textColor="@color/white"
                         android:padding="6dp"
                         android:textStyle="bold"
@@ -316,19 +349,19 @@
                         android:textStyle="bold"
                         android:gravity="center"/>
                     <TextView
-                        android:text="Initial"
+                        android:text="@string/initial"
                         android:textColor="@color/white"
                         android:padding="6dp"
                         android:textStyle="bold"
                         android:gravity="center"/>
                     <TextView
-                        android:text="Lower"
+                        android:text="@string/lower"
                         android:textColor="@color/white"
                         android:padding="6dp"
                         android:textStyle="bold"
                         android:gravity="center"/>
                     <TextView
-                        android:text="Upper"
+                        android:text="@string/upper"
                         android:textColor="@color/white"
                         android:padding="6dp"
                         android:textStyle="bold"
@@ -340,13 +373,13 @@
                         android:textStyle="bold"
                         android:gravity="center"/>
                     <TextView
-                        android:text="Outlier"
+                        android:text="@string/outlier"
                         android:textColor="@color/white"
                         android:padding="6dp"
                         android:textStyle="bold"
                         android:gravity="center"/>
                     <TextView
-                        android:text="Compare"
+                        android:text="@string/compare"
                         android:textColor="@color/white"
                         android:padding="6dp"
                         android:textStyle="bold"
@@ -364,7 +397,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_span="9"
-                        android:text="⚠️ There is no threshold data now."
+                        android:text="@string/there_is_no_threshold_data_now"
                         android:textColor="@android:color/black"
                         android:gravity="center"
                         android:padding="16dp"

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:gravity="center"
     android:layout_width="match_parent"
@@ -8,6 +9,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:baselineAligned="false"
         android:gravity="center"
         android:weightSum="3"
         android:layout_margin="30dp"
@@ -16,21 +18,22 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="2"
-            android:weightSum="3"
+            android:weightSum="7"
             android:gravity="end"
             >
             <AutoCompleteTextView
                 android:id="@+id/command_id_autocomplete"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:hint="Enter Command Setting Title"
+                android:layout_weight="3"
+                android:hint="@string/enter_command_setting_title"
                 android:backgroundTint="@color/bs_info"
                 android:layout_gravity="center_vertical"
                 android:focusable="true"
                 android:focusableInTouchMode="true"
                 android:completionThreshold="2"
-                android:inputType="text" />
+                android:inputType="text"
+                tools:ignore="NestedWeights" />
             <com.google.android.material.button.MaterialButton
                 style="@style/RoundedMaterialButton"
                 android:backgroundTint="@color/bs_success"
@@ -38,7 +41,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@color/basic_button_text_color"
-                android:layout_margin="16dp"
+                android:layout_margin="8dp"
                 android:text="@string/save_btn"/>
 
             <com.google.android.material.button.MaterialButton
@@ -48,7 +51,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@color/basic_button_text_color"
-                android:layout_margin="16dp"
+                android:layout_margin="8dp"
                 android:text="@string/load_btn"/>
         </LinearLayout>
         <LinearLayout
@@ -74,12 +77,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginVertical="18dp"
-            android:orientation="horizontal">
-
             <TableLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -112,7 +109,7 @@
                         android:textStyle="bold"/>
 
                     <TextView
-                        android:text="Add"
+                        android:text="@string/add_btn"
                         android:textColor="@android:color/white"
                         android:gravity="center"
                         />
@@ -126,14 +123,16 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
+                        android:autofillHints=""
                         android:backgroundTint="@color/bs_info"
                         android:hint="@string/enter_ox_numbers"
+                        android:inputType="text"
                         android:padding="8dp" />
                     <EditText
                         android:id="@+id/command_time1_float_input"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="@string/enter_the_number"
+                        android:autofillHints="" android:hint="@string/enter_the_number"
                         android:backgroundTint="@color/bs_info"
                         android:inputType="numberDecimal"
                         android:layout_gravity="center_vertical"
@@ -143,6 +142,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
+                        android:autofillHints=""
                         android:backgroundTint="@color/bs_info"
                         android:inputType="numberDecimal"
                         android:hint="@string/enter_the_number"
@@ -163,14 +163,6 @@
                 <!-- Add more rows as needed -->
 
             </TableLayout>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginVertical="20dp"
-            android:orientation="horizontal">
 
             <TableLayout
                 android:layout_width="match_parent"
@@ -212,7 +204,7 @@
                         android:textStyle="bold"/>
 
                     <TextView
-                        android:text="Actions"
+                        android:text="@string/actions"
                         android:textColor="@android:color/white"
                         android:gravity="center"
                         android:padding="8dp"
@@ -223,7 +215,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_span="6"
-                        android:text="⚠️ There is no commands now."
+                        android:text="@string/there_is_no_commands_now"
                         android:textColor="@android:color/black"
                         android:gravity="center"
                         android:padding="16dp"
@@ -233,7 +225,6 @@
                 </TableRow>
 
             </TableLayout>
-        </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"

@@ -28,6 +28,7 @@ import android.widget.Toast;
 import android.widget.FrameLayout;
 
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.prtech.spiapp.MainActivity;
 import com.prtech.spiapp.R;
 import com.prtech.spiapp.utils.Constants;
@@ -55,6 +56,7 @@ public class WiFiSetting extends Fragment {
     private static final int WIFI_PERMISSION_REQUEST_CODE = 100;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1001;
     private Consumer<List<ScanResult>> pendingCallback;
+    private LinearProgressIndicator progress;
 
     private String[][] wifiList = {
     };
@@ -64,46 +66,6 @@ public class WiFiSetting extends Fragment {
 
     public WiFiSetting() {
 
-    }
-
-    public void displayWiFiList(TableLayout tableLayout, String[][] data) {
-        tableLayout.removeViews(1, tableLayout.getChildCount() - 1);
-        for (int i = 0; i <data.length; i++) {
-            TableRow tableRow = new TableRow(requireContext());
-            tableRow.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.table_border));
-            tableRow.setBackgroundResource(R.drawable.row_selector);
-            tableRow.setTag(i + 1);
-            for (int j = 0; j <data[i].length; j++) {
-                TextView textView = new TextView(requireContext());
-                textView.setText(data[i][j]);
-                textView.setPadding(16, 16, 16, 16);
-                tableRow.addView(textView);
-            }
-            // Click Listener to change background permanently
-            tableRow.setOnClickListener(v -> {
-                selectedRowIndex = (int) v.getTag();  // Save selected row index
-                if(selectedRowIndex == 0) return;
-                updateRowBackgrounds(tableLayout, data.length);  // Refresh backgrounds
-                LogHelper.sendLog(
-                        Constants.LOGGING_BASE_URL,
-                        Constants.LOGGING_REQUEST_METHOD,
-                        "User selected wifi: " + data[selectedRowIndex - 1][0],
-                        Constants.LOGGING_BEARER_TOKEN
-                );
-            });
-            tableLayout.addView(tableRow);
-        }
-    }
-
-    private void updateRowBackgrounds(TableLayout tableLayout, int rowCount) {
-        for (int i = 1; i <= rowCount; i++) {
-            TableRow row = (TableRow) tableLayout.getChildAt(i);
-            if (i == selectedRowIndex) {
-                row.setBackgroundColor(getResources().getColor(R.color.tr_active));
-            } else {
-                row.setBackgroundColor(getResources().getColor(R.color.tr_light));
-            }
-        }
     }
 
     @Override
@@ -134,14 +96,17 @@ public class WiFiSetting extends Fragment {
         });
 
         LogHelper.sendLog(
-            Constants.LOGGING_BASE_URL,
-            Constants.LOGGING_REQUEST_METHOD,
-            "The current machine's Android SDK version is : " + Build.VERSION.SDK_INT,
-            Constants.LOGGING_BEARER_TOKEN
+                Constants.LOGGING_BASE_URL,
+                Constants.LOGGING_REQUEST_METHOD,
+                "The current machine's Android SDK version is : " + Build.VERSION.SDK_INT,
+                Constants.LOGGING_BEARER_TOKEN
         );
         if (!hasLocationPermission()) {
             requestLocationPermission();
         }
+
+        progress = view.findViewById(R.id.wifi_scan_progress);
+
         return view;
         //return inflater.inflate(R.layout.fragment_wifi, container, false);
     }
@@ -151,9 +116,9 @@ public class WiFiSetting extends Fragment {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
         if (requestCode == WIFI_PERMISSION_REQUEST_CODE &&
-            grantResults.length > 0 &&
-            grantResults[0] == PackageManager.PERMISSION_GRANTED &&
-            clickSearch) {
+                grantResults.length > 0 &&
+                grantResults[0] == PackageManager.PERMISSION_GRANTED &&
+                clickSearch) {
             handleClickSearch();
         } else {
             Log.d("Info", "Permission requested but not granted");
@@ -164,6 +129,53 @@ public class WiFiSetting extends Fragment {
                     Constants.LOGGING_BEARER_TOKEN);
         }
     }
+
+
+    public void displayWiFiList(TableLayout tableLayout, String[][] data) {
+        tableLayout.removeViews(1, tableLayout.getChildCount() - 1);
+        for (int i = 0; i <data.length; i++) {
+            TableRow tableRow = new TableRow(requireContext());
+            tableRow.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.table_border));
+            tableRow.setBackgroundResource(R.drawable.row_selector);
+            tableRow.setTag(i + 1);
+            for (int j = 0; j <data[i].length; j++) {
+                TextView textView = new TextView(requireContext());
+                textView.setText(data[i][j]);
+                textView.setPadding(16, 16, 16, 16);
+                if (j == 1) {
+                    int signalLevel = Integer.parseInt(data[i][j]);
+                    textView.setText(String.format("%d/4", signalLevel));
+                    textView.setTextColor(getSignalColor(signalLevel));
+                }
+                tableRow.addView(textView);
+            }
+            // Click Listener to change background permanently
+            tableRow.setOnClickListener(v -> {
+                selectedRowIndex = (int) v.getTag();  // Save selected row index
+                if(selectedRowIndex == 0) return;
+                updateRowBackgrounds(tableLayout, data.length);  // Refresh backgrounds
+                LogHelper.sendLog(
+                        Constants.LOGGING_BASE_URL,
+                        Constants.LOGGING_REQUEST_METHOD,
+                        "User selected wifi: " + data[selectedRowIndex - 1][0],
+                        Constants.LOGGING_BEARER_TOKEN
+                );
+            });
+            tableLayout.addView(tableRow);
+        }
+    }
+
+    private void updateRowBackgrounds(TableLayout tableLayout, int rowCount) {
+        for (int i = 1; i <= rowCount; i++) {
+            TableRow row = (TableRow) tableLayout.getChildAt(i);
+            if (i == selectedRowIndex) {
+                row.setBackgroundColor(getResources().getColor(R.color.tr_active));
+            } else {
+                row.setBackgroundColor(getResources().getColor(R.color.tr_light));
+            }
+        }
+    }
+
 
     private boolean hasLocationPermission() {
         return ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
@@ -289,7 +301,11 @@ public class WiFiSetting extends Fragment {
             requestLocationPermission();
             return;
         }
-        wifiHelper.scanWifiNetworks(scanResults -> {
+
+        progress.setVisibility(View.VISIBLE);
+        searchBtn.setEnabled(false);
+        wifiHelper.scanWifiNetworks(requireActivity(), progress, scanResults -> {
+            searchBtn.setEnabled(true);
             wifiList = scanResults;
             StringBuilder result = new StringBuilder();
 
@@ -332,4 +348,13 @@ public class WiFiSetting extends Fragment {
 
     }
 
+    private int getSignalColor(int level) {
+        switch (level) {
+            case 4: return ContextCompat.getColor(requireContext(), R.color.signal_excellent);
+            case 3: return ContextCompat.getColor(requireContext(), R.color.signal_good);
+            case 2: return ContextCompat.getColor(requireContext(), R.color.signal_fair);
+            case 1: return ContextCompat.getColor(requireContext(), R.color.signal_weak);
+            default: return ContextCompat.getColor(requireContext(), R.color.signal_weak);
+        }
+    }
 }

@@ -10,8 +10,6 @@ import androidx.sqlite.db.SupportSQLiteDatabase;
 
 import com.prtech.spiapp.db.dao.CommandDao;
 import com.prtech.spiapp.db.dao.ESPPacketDao;
-import com.prtech.spiapp.db.dao.ESPRXRTDao;
-import com.prtech.spiapp.db.dao.ESPTXDao;
 import com.prtech.spiapp.db.dao.ExperimentDao;
 import com.prtech.spiapp.db.dao.MonitoringDao;
 import com.prtech.spiapp.db.dao.VisualizationDao;
@@ -23,15 +21,13 @@ import com.prtech.spiapp.db.entity.Monitoring;
 import com.prtech.spiapp.db.entity.ESPPacket;
 import com.prtech.spiapp.db.entity.Visualization;
 
-@Database(entities = {ESPPacket.class, Command.class, ESPTX.class, ESPRXRT.class, Experiment.class, Visualization.class, Monitoring.class}, version = 27)
+@Database(entities = {ESPPacket.class, Command.class, Experiment.class, Visualization.class, Monitoring.class}, version = 29)
 public abstract class AppDatabase extends RoomDatabase {
 
     private static AppDatabase instance;
 
     public abstract ESPPacketDao espPacketDao();
     public abstract CommandDao commandDao();
-    public abstract ESPTXDao espTXDao();
-    public abstract ESPRXRTDao espRXRTDao();
     public abstract ExperimentDao experimentDao();
     public abstract VisualizationDao visualizationDao();
     public abstract MonitoringDao monitoringDao();

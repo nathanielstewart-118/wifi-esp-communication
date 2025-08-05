@@ -4,6 +4,7 @@ import static com.prtech.spiapp.utils.CommonUtils.getNumberOfBytesFromDataTypeSt
 import static com.prtech.spiapp.utils.CommonUtils.string2Float;
 import static com.prtech.spiapp.utils.CommonUtils.string2Int;
 import static com.prtech.spiapp.utils.UIUtils.initAutoCompleteWithSuggestionList;
+import static com.prtech.spiapp.utils.UIUtils.initSpinnerWithSuggestionList;
 import static com.prtech.spiapp.utils.UIUtils.setSpinnerWithContent;
 import static com.prtech.spiapp.utils.UIUtils.setupOperationalButtons;
 
@@ -21,10 +22,12 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -35,6 +38,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.materialswitch.MaterialSwitch;
 import com.prtech.spiapp.R;
 import com.prtech.spiapp.db.AppDatabase;
 import com.prtech.spiapp.db.entity.ESPPacket;
@@ -66,6 +70,9 @@ public class ESPPacketSetting extends Fragment {
     private Long delegatedId = (long) -1;
     private int currentTableRowIndex = -1;
     private List<String> allTitles;
+    private Spinner crcSpinner;
+    private MaterialSwitch crcSwitch;
+
     public ESPPacketSetting() {
 
     }
@@ -114,6 +121,29 @@ public class ESPPacketSetting extends Fragment {
         ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, options);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         dataTypeSpinner.setAdapter(adapter);
+
+
+        crcSpinner = view.findViewById(R.id.esp_crc_spinner);
+        initSpinnerWithSuggestionList(crcSpinner, List.of("8 Bytes", "16 Bytes", "24 Bytes", "32 Bytes"), requireContext(), android.R.layout.simple_spinner_item);
+        crcSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+        crcSwitch = view.findViewById(R.id.esp_crc_switch);
+        crcSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                crcSpinner.setVisibility(isChecked ? View.VISIBLE : View.INVISIBLE);
+            }
+        });
 
         return view;
     }
@@ -201,8 +231,11 @@ public class ESPPacketSetting extends Fragment {
         List<ESPPacket> results = new ArrayList<>();
         try {
             int rowsCnt = espPacketListTable.getChildCount();
+            int crcIndex = crcSpinner.getSelectedItemPosition();
+            int crcBytes = getCRCBytesFromIndex(crcIndex);
             for (int i = 1; i < rowsCnt; i++) {
                 ESPPacket result = getSensorActuatorFromTableRow(i, sensorSetTitle);
+                result.setCrc(crcBytes);
                 if(allTitles.contains(sensorSetTitle) && currentESPPackets.get(i - 1).getId() != null) result.setId(currentESPPackets.get(i - 1).getId());
                 if (result == null) continue;
                 results.add(result);
@@ -616,6 +649,24 @@ public class ESPPacketSetting extends Fragment {
             thresholdListTable.addView(tableRow);
         }
     }
-
+    public int getCRCBytesFromIndex(int index) {
+        int result  = -1;
+        switch (index) {
+            case 0:
+                result = 8;
+                break;
+            case 1:
+                result = 16;
+                break;
+            case 2:
+                result = 24;
+            case 3:
+                result = 32;
+                break;
+            default:
+                break;
+        }
+        return result;
+    }
 }
 

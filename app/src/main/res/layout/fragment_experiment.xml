@@ -13,7 +13,7 @@
         android:orientation="vertical">
         <!-- Save & Load Buttons -->
         <LinearLayout
-            android:layout_width="500dp"
+            android:layout_width="700dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:orientation="horizontal"
@@ -23,8 +23,8 @@
                 android:id="@+id/id_autocomplete"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:hint="Enter Experiment Setting Title"
+                android:layout_weight="2"
+                android:hint="@string/enter_experiment_setting_title"
                 android:backgroundTint="@color/bs_info"
                 android:layout_gravity="center_vertical"
                 android:focusable="true"
@@ -125,6 +125,7 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:baselineAligned="false"
             android:orientation="horizontal"
             android:layout_gravity="center_horizontal"
             android:weightSum="12"
@@ -149,14 +150,14 @@
                     android:textColor="@color/white"
                     android:textStyle="bold"
                     android:gravity="center"
-                    android:text="Items" />
+                    android:text="@string/items" />
                 <TextView
                     android:layout_width="50dp"
                     android:layout_height="wrap_content"
                     android:textColor="@color/white"
                     android:gravity="center"
                     android:textStyle="bold"
-                    android:text="Edit" />
+                    android:text="@string/edit" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -164,7 +165,7 @@
                     android:textColor="@color/white"
                     android:gravity="center"
                     android:textStyle="bold"
-                    android:text="Values" />
+                    android:text="@string/values" />
             </TableRow>
             <TableRow
                 android:background="@drawable/table_border"
@@ -174,11 +175,11 @@
                     android:textSize="12sp"
                     android:textStyle="bold"
                     android:gravity="center"
-                    android:text="Command Selection" />
+                    android:text="@string/command_selection" />
 
                 <EditText
                     android:id="@+id/experiment_commands_select"
-                    android:layout_width="50dp"
+                    android:layout_width="30dp"
                     android:layout_height="wrap_content"
                     android:divider="@android:color/darker_gray"
                     android:focusable="false"
@@ -201,13 +202,14 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
-                    android:text="N Trials"
+                    android:text="@string/n_trials"
                     android:textSize="12sp"
                     android:gravity="center"
                     android:padding="4dp" />
                 <EditText
                     android:id="@+id/experiment_n_trials_text"
                     android:layout_width="50dp"
+                    android:autofillHints=""
                     android:backgroundTint="@color/bs_info"
                     android:layout_height="40dp"
                     android:layout_gravity="center_vertical"
@@ -229,7 +231,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Command"
+                    android:text="@string/command_label"
                     android:gravity="center"
                     android:textSize="12sp"
                     android:paddingVertical="6dp" />
@@ -237,6 +239,7 @@
                     android:id="@+id/experiment_command_text"
                     android:layout_width="50dp"
                     android:layout_height="40dp"
+                    android:autofillHints=""
                     android:backgroundTint="@color/bs_info"
                     android:hint="@string/enter_command_time_in_0_1_degree_increments"
                     android:inputType="numberDecimal" />
@@ -265,6 +268,7 @@
                     android:id="@+id/experiment_rest_text"
                     android:layout_width="50dp"
                     android:layout_height="40dp"
+                    android:autofillHints=""
                     android:backgroundTint="@color/bs_info"
                     android:hint="@string/enter_rest_time_in_0_1_degree_increments"
                     android:inputType="numberDecimal" />
@@ -344,6 +348,7 @@
                     android:id="@+id/experiment_post_run_text"
                     android:layout_width="50dp"
                     android:layout_height="40dp"
+                    android:autofillHints=""
                     android:backgroundTint="@color/bs_info"
                     android:hint="@string/enter_time_in_0_1_degree_increments"
                     android:inputType="numberDecimal" />
@@ -404,7 +409,7 @@
                     android:textColor="@color/basic_button_text_color"
                     android:layout_margin="16dp"
                     android:visibility="invisible"
-                    android:text="Reload" />
+                    android:text="@string/reload" />
 
                 <com.google.android.material.button.MaterialButton
                     style="@style/RoundedMaterialButton"
@@ -415,7 +420,7 @@
                     android:textColor="@color/basic_button_text_color"
                     android:layout_margin="16dp"
                     android:visibility="invisible"
-                    android:text="Update" />
+                    android:text="@string/update" />
 
             </LinearLayout>
         </LinearLayout>

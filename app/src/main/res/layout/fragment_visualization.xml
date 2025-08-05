@@ -50,6 +50,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:baselineAligned="false"
             android:orientation="horizontal"
             android:weightSum="4"
             >
@@ -59,19 +60,19 @@
                 android:orientation="vertical"
                 android:layout_weight="1">
                 <TextView
-                    android:text="Sample Rate"
+                    android:text="@string/sample_rate"
                     android:layout_width="wrap_content"
                     android:textSize="18sp"
                     android:layout_marginTop="6dp"
                     android:layout_height="match_parent" />
                 <TextView
-                    android:text="Block Size"
+                    android:text="@string/block_size"
                     android:layout_width="wrap_content"
                     android:textSize="18sp"
                     android:layout_marginVertical="25dp"
                     android:layout_height="match_parent" />
                 <TextView
-                    android:text="Buffer Size"
+                    android:text="@string/buffer_size"
                     android:layout_width="wrap_content"
                     android:textSize="18sp"
                     android:layout_height="match_parent" />
@@ -83,19 +84,25 @@
                 android:layout_weight="1">
                 <EditText
                     android:id="@+id/visualization_sample_rate_text"
+                    android:autofillHints=""
                     android:backgroundTint="@color/bs_info"
                     android:layout_width="match_parent"
-                    android:hint="SPS Unit"
+                    android:hint="@string/sps_unit"
+                    android:inputType="number"
                     android:layout_height="wrap_content" />
                 <EditText
                     android:id="@+id/visualization_block_size_text"
                     android:layout_width="match_parent"
+                    android:autofillHints=""
                     android:backgroundTint="@color/bs_info"
-                    android:hint="Int unit"
+                    android:inputType="number"
+                    android:hint="@string/int_unit"
                     android:layout_height="wrap_content" />
                 <EditText
                     android:id="@+id/visualization_buffer_size_text"
-                    android:hint="Int unit"
+                    android:autofillHints=""
+                    android:hint="@string/int_unit"
+                    android:inputType="number"
                     android:backgroundTint="@color/bs_info"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
@@ -109,7 +116,7 @@
                 android:layout_weight="1">
                 <TextView
                     android:id="@+id/visualization_sample_rate_view"
-                    android:text="0"
+                    android:text="@string/_0"
                     android:gravity="center"
                     android:layout_width="match_parent"
                     android:layout_marginTop="6dp"
@@ -117,14 +124,14 @@
                     android:layout_height="match_parent" />
                 <TextView
                     android:id="@+id/visualization_block_size_view"
-                    android:text="0"
+                    android:text="@string/_0"
                     android:gravity="center"
                     android:layout_width="match_parent"
                     android:textSize="18sp"
                     android:layout_marginVertical="25dp"
                     android:layout_height="match_parent" />
                 <TextView
-                    android:text="0"
+                    android:text="@string/_0"
                     android:id="@+id/visualization_buffer_size_view"
                     android:gravity="center"
                     android:layout_width="match_parent"
@@ -138,20 +145,26 @@
                 android:layout_weight="1">
                 <EditText
                     android:layout_width="match_parent"
+                    android:autofillHints=""
                     android:visibility="invisible"
+                    android:inputType="number"
                     android:layout_height="wrap_content" />
                 <EditText
                     android:id="@+id/visualization_ms_block_size_text"
-                    android:hint="ms unit notation"
+                    android:autofillHints=""
+                    android:hint="@string/ms_unit_notation"
                     android:backgroundTint="@color/bs_info"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:inputType="number" />
                 <EditText
                     android:id="@+id/visualization_sec_buffer_size_text"
-                    android:hint="Sec unit notation"
+                    android:autofillHints=""
+                    android:hint="@string/sec_unit_notation"
                     android:backgroundTint="@color/bs_info"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:inputType="number" />
 
             </LinearLayout>
         </LinearLayout>
@@ -176,14 +189,12 @@
                 android:textColor="@color/basic_button_text_color"
                 android:layout_margin="16dp"
                 android:visibility="invisible"
-                android:text="Setup Complete"/>
+                android:text="@string/setup_complete"/>
 
         </LinearLayout>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-            <HorizontalScrollView
+
+        <HorizontalScrollView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:fillViewport="true">
@@ -199,7 +210,7 @@
                 >
                 <TableRow android:background="@color/bs_primary">
                     <TextView
-                        android:text="Order"
+                        android:text="@string/order"
                         android:textColor="@android:color/white"
                         android:padding="8dp"
                         android:gravity="center"
@@ -219,37 +230,37 @@
                         android:textStyle="bold"/>
 
                     <TextView
-                        android:text="NChannels"
+                        android:text="@string/nchannels"
                         android:textColor="@android:color/white"
                         android:gravity="center"
                         android:padding="8dp"
                         android:textStyle="bold"/>
                     <TextView
-                        android:text="Count Byte"
+                        android:text="@string/nbyte"
                         android:textColor="@android:color/white"
                         android:padding="8dp"
                         android:gravity="center"
                         android:textStyle="bold"/>
                     <TextView
-                        android:text="Visualization"
+                        android:text="@string/visualization_label"
                         android:textColor="@android:color/white"
                         android:padding="8dp"
                         android:gravity="center"
                         android:textStyle="bold"/>
                     <TextView
-                        android:text="Y-axis range"
+                        android:text="@string/y_axis_range"
                         android:textColor="@android:color/white"
                         android:padding="8dp"
                         android:gravity="center"
                         android:textStyle="bold"/>
                     <TextView
-                        android:text="Upper Limit"
+                        android:text="@string/upper_limit"
                         android:textColor="@android:color/white"
                         android:padding="8dp"
                         android:gravity="center"
                         android:textStyle="bold"/>
                     <TextView
-                        android:text="Lower Limit"
+                        android:text="@string/lower_limit"
                         android:textColor="@android:color/white"
                         android:padding="8dp"
                         android:gravity="center"
@@ -262,7 +273,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_span="10"
-                        android:text="⚠️ There is no visualization setting now."
+                        android:text="@string/there_is_no_visualization_setting_now"
                         android:textColor="@android:color/black"
                         android:gravity="center"
                         android:padding="16dp"
@@ -273,11 +284,11 @@
             </TableLayout>
             </ScrollView>
             </HorizontalScrollView>
-        </LinearLayout>
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:weightSum="6"
+            android:gravity="center"
             android:orientation="horizontal" >
             <TextView
                 android:layout_width="0dp"
@@ -285,14 +296,8 @@
                 android:layout_weight="1"
                 android:layout_gravity="center"
                 android:gravity="center"
-                android:text="Save Format" />
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_weight="2"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                >
-                <RadioGroup
+                android:text="@string/save_format" />
+            <RadioGroup
                 android:id="@+id/visualization_save_format_radio"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -304,31 +309,33 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="6dp"
-                    android:text="bin" />
+                    android:text="@string/bin" />
 
                 <RadioButton
                     android:id="@+id/visualization_save_format_h5_radio"
                     android:layout_width="wrap_content"
                     android:layout_marginHorizontal="6dp"
                     android:layout_height="wrap_content"
-                    android:text="h5" />
+                    android:text="@string/h5" />
 
                 <RadioButton
                     android:id="@+id/visualization_save_format_csv_radio"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:visibility="gone"
                     android:layout_marginHorizontal="6dp"
-                    android:text="CSV" />
+                    android:text="@string/csv" />
             </RadioGroup>
-            </LinearLayout>
             <EditText
                 android:id="@+id/visualization_save_path_text"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="2"
                 android:layout_gravity="center"
+                android:autofillHints=""
                 android:backgroundTint="@color/bs_info"
-                android:hint="Set save path and name" />
+                android:hint="@string/set_save_path_and_name"
+                android:inputType="text" />
         </LinearLayout>
     </LinearLayout>
 

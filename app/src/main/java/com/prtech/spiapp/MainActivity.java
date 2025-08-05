@@ -1,8 +1,11 @@
 package com.prtech.spiapp; // Replace with your package name
 
+import static com.prtech.spiapp.utils.UIUtils.initSpinnerWithSuggestionList;
+
 import androidx.fragment.app.Fragment;
 
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -21,6 +24,7 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.prtech.spiapp.adapters.CustomSpinnerAdapter;
 import com.prtech.spiapp.db.viewmodel.TCPUDPReceiveViewModel;
 import com.prtech.spiapp.settings.CommandSetting;
 import com.prtech.spiapp.settings.ExperimentSetting;
@@ -131,10 +135,18 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
         });
-        String[] lagnuages = new String[Constants.LANGUAGES.length + 1];
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getApplicationContext(), R.array.my_array_items, R.layout.white_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        languageSpinner.setAdapter((adapter));
+        initSpinnerWithSuggestionList(languageSpinner, Arrays.asList(Constants.LANGUAGES), getApplicationContext(), R.layout.white_spinner_item);
+        CustomSpinnerAdapter adapter = new CustomSpinnerAdapter(
+                this,
+                Arrays.asList(Constants.LANGUAGES),
+                Color.WHITE,        // selected view text color
+                Color.TRANSPARENT,       // selected view background
+                Color.BLACK,        // dropdown text color
+                Color.WHITE,        // dropdown background
+                80
+        );
+
+        languageSpinner.setAdapter(adapter);
         SharedPreferences prefs = getSharedPreferences("settings", MODE_PRIVATE);
         String currentLang = prefs.getString("lang", "en"); // default to "en"
         languageSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {

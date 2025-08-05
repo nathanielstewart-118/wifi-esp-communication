@@ -400,7 +400,10 @@ public class PlayBack extends Fragment {
                 sleep[0] = 0L;
             }
             currentTime[0] = next.getCreatedAt();
-
+            if (sleep[0] > 2000) {
+                handler.post(playbackRunnable);
+                return;
+            }
             updateDataIfNeeded(next, () -> {
                 updateViews(fromStringToByteArray(next.getData()), offset[0]);
                 handler.postDelayed(playbackRunnable, sleep[0]);
@@ -682,9 +685,8 @@ public class PlayBack extends Fragment {
         int cnt = values.size();
         for (int i = 0; i < cnt; i ++) {
             TextView valueView = new TextView(context);
-            Integer value = (int) values.get(i);
-            if (value != null) {
-                valueView.setText(String.valueOf(value));
+            if(values.get(i) != null) {
+                valueView.setText(String.valueOf(values.get(i)));
             }
             tableRow.addView(valueView);
         }

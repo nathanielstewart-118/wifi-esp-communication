@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/scrollView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -43,6 +44,7 @@
                         android:backgroundTint="@color/bs_success"
                         android:id="@+id/playback_loading_btn"
                         android:layout_width="wrap_content"
+                        android:visibility="gone"
                         android:layout_height="wrap_content"
                         android:textColor="@color/basic_button_text_color"
                         android:layout_margin="16dp"
@@ -147,6 +149,7 @@
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/playback_next_command_btn"
                         android:text="@string/next_ncommand"
+                        android:visibility="gone"
                         style="@style/RoundedMaterialButton"
                         android:backgroundTint="@color/bs_primary"
                         android:layout_width="wrap_content"
@@ -157,6 +160,7 @@
                         android:id="@+id/playback_previous_command_btn"
                         android:text="@string/previous_ncommand"
                         style="@style/RoundedMaterialButton"
+                        android:visibility="gone"
                         android:backgroundTint="@color/bs_primary"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -164,18 +168,33 @@
                         android:layout_margin="6dp"/>
 
                 </LinearLayout>
-                <TextView
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:orientation="vertical"
                     android:gravity="center"
-                    android:layout_marginVertical="30dp"
-                    android:text="@string/log" />
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:text="@string/log_message" />
-
+                    >
+                    <com.google.android.material.materialswitch.MaterialSwitch
+                        android:id="@+id/playback_log_switch"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=" Log "
+                        android:checked="true"
+                        android:gravity="center"
+                        app:thumbTint="@color/switch_thumb_color"
+                        app:trackTint="@color/switch_track_color"
+                        android:textSize="16sp"
+                        style="@style/Widget.Material3.CompoundButton.MaterialSwitch" />
+                    <com.google.android.material.button.MaterialButton
+                        style="@style/RoundedMaterialButton"
+                        android:backgroundTint="@color/bs_info"
+                        android:id="@+id/monitoring_log_message_btn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/basic_button_text_color"
+                        android:layout_margin="16dp"
+                        android:text="@string/log_message"/>
+                </LinearLayout>
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>

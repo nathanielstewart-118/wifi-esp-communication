@@ -3,6 +3,9 @@ package com.prtech.spiapp.utils;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Random;
 
 public class CommonUtils {
@@ -68,5 +71,15 @@ public class CommonUtils {
                 break;
             }
         }
+    }
+
+    public static String long2DateTimeString(Long milliSeconds) {
+
+        DateTimeFormatter formatter = DateTimeFormatter
+                .ofPattern("yyyy.MM.dd HH:mm:ss")
+                .withZone(ZoneId.systemDefault());
+
+        String formattedDate = formatter.format(Instant.ofEpochMilli(milliSeconds));
+        return formattedDate;
     }
 }

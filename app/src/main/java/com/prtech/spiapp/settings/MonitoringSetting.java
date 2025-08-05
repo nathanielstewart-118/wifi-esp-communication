@@ -1,11 +1,14 @@
 package com.prtech.spiapp.settings;
 
+import static com.prtech.spiapp.utils.CommonUtils.long2DateTimeString;
 import static com.prtech.spiapp.utils.Constants.COLORS;
 import static com.prtech.spiapp.utils.UIUtils.createHeaderTextView;
 import static com.prtech.spiapp.utils.UIUtils.initSpinnerWithSuggestionList;
 import static com.prtech.spiapp.utils.UIUtils.uncheckOtherToggles;
 import static com.prtech.spiapp.utils.communications.PacketParser.encodeCommand;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.ViewCompat;
@@ -140,7 +143,8 @@ public class MonitoringSetting extends Fragment {
     private Long totalRecordsCnt = 0L;
     private int tableRowsCnt = 10;
     private Map<Long, List<Pair<Integer, Double>>> currentStatistics = new HashMap<>();
-
+    private TableLayout logTable;
+    private List<String[]> logs = new ArrayList<>();
     public MonitoringSetting() {
 
     }
@@ -200,6 +204,7 @@ public class MonitoringSetting extends Fragment {
             );
             Log.d("Monitoring Info", "New Data arrived from TCP : " + Arrays.toString(data));
             Toast.makeText(requireContext(), "Data arrived", Toast.LENGTH_SHORT).show();
+            logs.add(new String[]{"Data arrived from ESP", long2DateTimeString(System.currentTimeMillis())});
             if(bRunning) {
                 updateViews(data, curTime);
                 totalRecordsCnt ++;
@@ -225,111 +230,17 @@ public class MonitoringSetting extends Fragment {
 
         visualizationViewModel = new ViewModelProvider(requireActivity()).get(VisualizationViewModel.class);
 
-        // Test data
-        /*
-        visualizationViewModel.getActivatedVisualization(result -> {
-            if (result == null) {
-                currentVisualization = new Visualization("", "", 0, 0, 0, new ArrayList<>(), 0, "", 0, System.currentTimeMillis());
-                rangeDTOs = new ArrayList<>();
-                Toast.makeText(requireContext(), "There is no completed Visualization setting.", Toast.LENGTH_SHORT).show();
-            }
-            else {
-                currentVisualization = result;
-                displayAccordion(currentVisualization.getRanges());
-//                ByteBuffer buffer = ByteBuffer.allocate(4 * Constants.MAX_VARIABLE_NUMBER_IN_PACKET);
-                /*
-                visualizationViewModel.getCorrespondingSAs
-                (currentVisualization.getId(), results -> {
-                    rangeDTOs = results;
-                    executorService.execute(() -> {
-                        while(bDrawing) {
-                            ByteBuffer buffer = ByteBuffer.allocate(4 * Constants.MAX_VARIABLE_NUMBER_IN_PACKET);
-                            for (RangeDTO sa: results) {
-                                int nChannels = sa.getNumberOfChannels();
-                                double low = (double) sa.getLowerLimit();
-                                double high = (double) sa.getUpperLimit();
-                                for (int i = 0; i < nChannels; i ++) {
-                                    switch (sa.getDataType().toLowerCase()) {
-                                        case "uint8": {
-                                            int value = (int) randomBetween(low, high);
-                                            buffer.put((byte) (value & 0xFF));
-                                            break;
-                                        }
+        logMsgBtn = view.findViewById(R.id.monitoring_log_message_btn);
+        logMsgBtn.setOnClickListener(v -> handleClickLogMsgBtn());
 
-                                        case "int8": {
-                                            byte value = (byte) randomBetween(low, high);
-                                            buffer.put(value);
-                                            break;
-                                        }
-
-                                        case "uint16": {
-                                            int value = (int) randomBetween(low, high);
-                                            buffer.putShort((short) (value & 0xFFFF));
-                                            break;
-                                        }
-
-                                        case "int16": {
-                                            short value = (short) randomBetween(low, high);
-                                            buffer.putShort(value);
-                                            break;
-                                        }
-
-                                        case "uint24":
-
-                                        case "int24": {
-                                            int value = (int) randomBetween(low, high);
-                                            buffer.put(new byte[] {
-                                                    (byte) ((value >> 16) & 0xFF),
-                                                    (byte) ((value >> 8) & 0xFF),
-                                                    (byte) (value & 0xFF)
-                                            });
-                                            break;
-                                        }
-
-                                        case "uint32": {
-                                            long value = (long) randomBetween(low, high);
-                                            buffer = ByteBuffer.allocate(4);
-                                            buffer.putInt((int) (value & 0xFFFFFFFFL));
-                                            break;
-                                        }
-
-                                        case "int32": {
-                                            int value = (int) randomBetween(low, high);
-                                            buffer.putInt(value);
-                                            break;
-                                        }
-
-                                        case "float": {
-                                            float value = (float) randomBetween(low, high);
-                                            buffer.putFloat(value);
-                                            break;
-                                        }
-
-                                        case "double": {
-                                            double value = randomBetween(low, high);
-                                            buffer.putDouble(value);
-                                            break;
-                                        }
-                                        default:
-                                            throw new IllegalArgumentException("Unsupported type: " + sa.getDataType());
-                                    }
-                                }
-                            }
-                            try {
-                                Thread.sleep(500);
-                            } catch (InterruptedException e) {
-                                throw new RuntimeException(e);
-                            }
-
-                            updateViews(buffer.array(), buffer.array().length);
-                        }
-
-                    });
-
-                });
+        logSwitch = view.findViewById(R.id.monitoring_log_switch);
+        logSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                handleLogSwitchCheckedChange(isChecked);
             }
         });
-        */
+
         experimentToggleButtons.add(view.findViewById(R.id.monitoring_experiment_set1_btn));
         experimentToggleButtons.add(view.findViewById(R.id.monitoring_experiment_set2_btn));
         experimentToggleButtons.add(view.findViewById(R.id.monitoring_experiment_set3_btn));
@@ -362,6 +273,14 @@ public class MonitoringSetting extends Fragment {
     }
 
     @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        LayoutInflater inflater = getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.log_table_layout, null);
+        logTable = dialogView.findViewById(R.id.log_table);
+    }
+
+    @Override
     public void onStop() {
         bDrawing = false;
         super.onStop();
@@ -385,7 +304,7 @@ public class MonitoringSetting extends Fragment {
         int nChannels = result.getNumberOfChannels();
         List<Pair<Integer, Double>> statics = new ArrayList<>();
         for (int i = 0; i < nChannels; i ++) {
-            Pair pair = new Pair<>(0, 0);
+            Pair pair = new Pair<>(0, 0D);
             statics.add(pair);
         }
         currentStatistics.put(espId, statics);
@@ -451,65 +370,24 @@ public class MonitoringSetting extends Fragment {
         contentLayout.setPadding(24, 24, 24, 24);
         contentLayout.setLayoutParams(new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
-                600
+                500 + 100 * (result.getNumberOfChannels() + 1) + 100
         ));
-
-
-        ScrollView scrollView = new ScrollView(requireContext());
-        scrollView.setLayoutParams(new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                500 // or set a fixed height to allow scrolling inside
-        ));
-        scrollView.setFillViewport(true);
-        scrollView.setVerticalScrollBarEnabled(true);
-
-        LinearLayout scrollInnerLayout = new LinearLayout(requireContext());
-        scrollInnerLayout.setLayoutParams(new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-        ));
-        scrollInnerLayout.setOrientation(LinearLayout.VERTICAL);
-
-        //        ArrayList<Entry> entries = new ArrayList<>();
-//        for (int i = 0; i <= 100; i += 10) {
-//            entries.add(new Entry(i, i * 2)); // Example: All values = 0 (like your image)
-//        }
-//
-//        // Create dataset
-//        LineDataSet dataSet = new LineDataSet(entries, "Channel 1");
-//        dataSet.setDrawCircles(true);
-//        dataSet.setCircleRadius(5f);
-//        dataSet.setCircleColor(Color.RED);
-//        dataSet.setColor(Color.TRANSPARENT);
-//        LineData lineData = new LineData(dataSet);
-//        scatterChart.setData(lineData);
-
-//        scatterChart.invalidate(); // refresh chart
 
         // Content TextView
         if(visualizationRange.getVisualizationType() == 0) {
             ScatterChart scatterChart = displayChart(visualizationRange, requireContext());
             chartsMap.put(visualizationRange.getEspPacketId(), scatterChart);
             currentWindowStartMap.put(visualizationRange.getEspPacketId(), 0F);
-            LinearLayout chartLayout = new LinearLayout(requireContext());
-            chartLayout.setLayoutParams(new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT
-            ));
-            chartLayout.addView(scatterChart);
-//            contentLayout.addView(chartLayout);
-            scrollInnerLayout.addView(chartLayout);
+            contentLayout.addView(scatterChart);
         }
         else if(visualizationRange.getVisualizationType() == 1) {
             TableLayout tableLayout = displayTable(visualizationRange, requireContext());
             tablesMap.put(visualizationRange.getEspPacketId(), tableLayout);
-//            contentLayout.addView(tableLayout);
-            scrollInnerLayout.addView(tableLayout);
+            contentLayout.addView(tableLayout);
         }
 
         LinearLayout channelTableLayout = displayChannelTable(result, requireContext());
-//        contentLayout.addView(channelTableLayout);
-        scrollInnerLayout.addView(channelTableLayout);
+        contentLayout.addView(channelTableLayout);
         contentLayout.setVisibility(View.VISIBLE);
         // Save reference for updates
         accordionContentMap.put(result.getId(), contentLayout);
@@ -523,17 +401,12 @@ public class MonitoringSetting extends Fragment {
         headerLayout.addView(header);
         headerLayout.addView(spaceView);
         headerLayout.addView(visualizationSpinner);
-
-        scrollView.addView(scrollInnerLayout);
-        contentLayout.addView(scrollView);
-
         accordionContainer.addView(headerLayout);
         accordionContainer.addView(contentLayout);
 
     }
 
     public void displayAccordion(List<Long> espIds) {
-
         accordionContainer.removeAllViews();
         accordionContentMap.clear();
         chartsMap.clear();
@@ -645,12 +518,15 @@ public class MonitoringSetting extends Fragment {
     }
 
     public void handleClickStartBtn() throws InterruptedException {
+        logs.add(new String[]{"User clicks on the start Button", long2DateTimeString(System.currentTimeMillis())});
         if(currentExperiments.isEmpty()) {
             Toast.makeText(requireContext(), "Please select an Experiment Set", Toast.LENGTH_SHORT).show();
             return;
         }
         bRunning = true;
+        monitoringViewModel.deleteExcept20mins();
         enableOrDisableButtons(experimentToggleButtons, false);
+
         executorService.execute(() -> {
 
             List<String> commands = currentExperiments.get(currentExperimentSetId).getCommands();
@@ -720,6 +596,7 @@ public class MonitoringSetting extends Fragment {
     }
 
     public void handleClickStopBtn() {
+        logs.add(new String[]{"User clicks on the Stop Button", long2DateTimeString(System.currentTimeMillis())});
         bRunning = false;
         enableOrDisableButtons(experimentToggleButtons, true);
     }
@@ -953,7 +830,7 @@ public class MonitoringSetting extends Fragment {
         ScatterChart scatterChart = new ScatterChart(requireContext());
         scatterChart.setLayoutParams(new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.MATCH_PARENT));
+                500));
 
         scatterChart.getDescription().setEnabled(false);
         scatterChart.getAxisRight().setEnabled(false);
@@ -1115,6 +992,7 @@ public class MonitoringSetting extends Fragment {
                     LinearLayout.LayoutParams.WRAP_CONTENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT
             ));
+            visibleCheckBox.setChecked(true);
             visibleCheckBox.setGravity(Gravity.CENTER);
             int finalI = i;
             visibleCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -1188,16 +1066,16 @@ public class MonitoringSetting extends Fragment {
         sliderParams.setMargins(16, 16, 16, 32);
         sliderParams.gravity = Gravity.CENTER;
         rangeSlider.setLayoutParams(sliderParams);
+        rangeSlider.setValueFrom(0);
+        rangeSlider.setValueTo(1000);
+        rangeSlider.setValues(0f, 1000f);
+        rangeSlider.setStepSize(10);
 
         rangeSlider.addOnChangeListener((slider, value, fromUser) -> {
             List<Float> values = slider.getValues();
             handleChangeESPRange(values, espPacket.getId());
         });
 
-        rangeSlider.setValueFrom(0);
-        rangeSlider.setValueTo(1000);
-        rangeSlider.setValues(0f, 1000f);
-        rangeSlider.setStepSize(10);
         rangeLayout.addView(rangeSlider);
         linearLayout.addView(tableLayout);
         linearLayout.addView(rangeLayout);
@@ -1213,13 +1091,12 @@ public class MonitoringSetting extends Fragment {
 
     }
 
-
     private void setVisibilityToChannel(Long espPacketId, int channelNo, boolean checked) {
         ScatterChart scatterChart = (ScatterChart) chartsMap.get(espPacketId);
         if (scatterChart == null) return;
         ScatterData scatterData = scatterChart.getData();
         if (scatterData == null || scatterData.getDataSetCount() == 0) return;
-        IScatterDataSet dataSet = scatterData.getDataSetByIndex(0); // or use getDataSetByLabel()
+        IScatterDataSet dataSet = scatterData.getDataSetByIndex(channelNo); // or use getDataSetByLabel()
 
         // hides the dataset
         dataSet.setVisible(checked); // hides the dataset
@@ -1238,16 +1115,15 @@ public class MonitoringSetting extends Fragment {
                 if (obj instanceof Integer) {
                     Integer value = (Integer) obj;
                     int newCount = pair.first + 1;
-                    Double newAvg = (pair.second * pair.first + value) / newCount;
+                    double currentTotal = pair.second.doubleValue() * pair.first.doubleValue();  // pair.second is already Double
+                    double newValue = value.doubleValue();          // Unbox Integer to double
+                    double newSum = currentTotal + newValue;
+                    double newAvg = newSum / newCount;
                     Pair<Integer, Double> newPair = new Pair<>(newCount, newAvg);
                     pairs.set(i, newPair);
                     LinearLayout linearLayout = (LinearLayout) accordionContentMap.get(espPacketId);
                     if(linearLayout == null) continue;
-                    ScrollView scrollView = (ScrollView) linearLayout.getChildAt(0);
-                    if (scrollView == null) continue;
-                    LinearLayout scrollInnerLayout = (LinearLayout) scrollView.getChildAt(0);
-                    if (scrollInnerLayout == null) continue;
-                    LinearLayout tableWrapperLayout = (LinearLayout) scrollInnerLayout.getChildAt(1);
+                    LinearLayout tableWrapperLayout = (LinearLayout) linearLayout.getChildAt(1);
                     if (tableWrapperLayout == null) continue;
                     TableLayout tableLayout = (TableLayout) tableWrapperLayout.getChildAt(0);
                     if(tableLayout == null) continue;
@@ -1256,12 +1132,15 @@ public class MonitoringSetting extends Fragment {
                     LinearLayout gainLayout = (LinearLayout) tableRow.getChildAt(3);
                     if (gainLayout == null) continue;
                     CheckBox gainCheckBox = (CheckBox) gainLayout.getChildAt(0);
+                    newAvg = Math.floor(newAvg * 100) / 100D;
                     gainCheckBox.setText(String.valueOf(newAvg));
                     LinearLayout offsetLayout = (LinearLayout) tableRow.getChildAt(4);
                     if( offsetLayout == null) continue;;
                     CheckBox offsetCheckBox = (CheckBox) offsetLayout.getChildAt(0);
                     if (offsetCheckBox == null) continue;
-                    offsetCheckBox.setText(String.valueOf(Math.abs(newAvg - value)));
+                    double offset = Math.abs(newAvg - value);
+                    offset = Math.floor(offset * 100) / 100D;
+                    offsetCheckBox.setText(String.valueOf(offset));
                 }
             } catch (Exception e) {
                 Log.w("Exception", "Content is " + e.toString());
@@ -1269,6 +1148,77 @@ public class MonitoringSetting extends Fragment {
         }
 
     }
+
+    private void handleClickLogMsgBtn() {
+        logs.add(new String[]{"User clicks on the Log Message Button", long2DateTimeString(System.currentTimeMillis())});
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        LayoutInflater inflater = getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.log_table_layout, null);
+        builder.setView(dialogView);
+
+        AlertDialog dialog = builder.create();
+
+        // Initialize table
+        TableLayout tableLayout = dialogView.findViewById(R.id.log_table);
+        populateTable(tableLayout);
+
+        // Close button
+        MaterialButton closeButton = dialogView.findViewById(R.id.log_table_dialog_btn);
+        closeButton.setOnClickListener(v -> dialog.dismiss());
+
+        dialog.show();
+    }
+
+    private void handleLogSwitchCheckedChange(boolean checked) {
+        logs.add(new String[]{"User clicked the log switch", long2DateTimeString(System.currentTimeMillis())});
+        logMsgBtn.setEnabled(checked);
+    }
+
+    private void populateTable(TableLayout tableLayout) {
+        // Clear existing views (except header if you have one)
+//        tableLayout.removeAllViews();
+
+        // Add header row
+        TableRow headerRow = new TableRow(requireContext());
+        headerRow.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.table_header));
+
+        String[] headers = {"Order", "Context", "DateTime"};
+        for (String header : headers) {
+            TextView textView = new TextView(requireContext());
+            textView.setText(header);
+            textView.setPadding(16, 16, 16, 16);
+            textView.setTextColor(Color.WHITE);
+            textView.setTextSize(16);
+            textView.setTypeface(null, Typeface.BOLD);
+            headerRow.addView(textView);
+        }
+        tableLayout.addView(headerRow);
+
+        // Add sample data rows
+
+
+        for (int i = 0; i < logs.size(); i++) {
+            TableRow row = new TableRow(requireContext());
+            if (i % 2 == 0) {
+                row.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.table_row_even));
+            } else {
+                row.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.table_row_odd));
+            }
+
+            TextView orderView = createHeaderTextView(String.valueOf(tableLayout.getChildCount()), requireContext());
+            orderView.setTextColor(Color.BLACK);
+            row.addView(orderView);
+            for (String cell : logs.get(i)) {
+                TextView textView = new TextView(requireContext());
+                textView.setText(cell);
+                textView.setPadding(16, 16, 16, 16);
+                textView.setTextSize(14);
+                row.addView(textView);
+            }
+            tableLayout.addView(row);
+        }
+    }
+
 }
 
 

@@ -175,6 +175,7 @@
                 android:layout_height="wrap_content"
                 android:textColor="@color/basic_button_text_color"
                 android:layout_margin="16dp"
+                android:visibility="invisible"
                 android:text="Setup Complete"/>
 
         </LinearLayout>

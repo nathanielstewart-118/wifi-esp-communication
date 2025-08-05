@@ -40,5 +40,10 @@ public interface MonitoringDao {
     @Query("SELECT * FROM monitorings LIMIT :size OFFSET :offset")
     List<Monitoring> getMonitoringsByOffset(Long offset, Integer size);
 
+    @Query("DELETE FROM monitorings WHERE created_at < :threshold")
+    void deleteOlderThan(long threshold);
+
+    @Query("SELECT MAX(created_at) FROM monitorings")
+    long getLatestTimestamp();
 
 }

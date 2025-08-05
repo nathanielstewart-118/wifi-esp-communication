@@ -93,4 +93,15 @@ public class MonitoringViewModel extends AndroidViewModel {
 
     }
 
+    public void deleteExcept20mins() {
+        executorService.execute(() -> {
+            long latestTimestamp = monitoringDao.getLatestTimestamp();
+
+            // If there are no records, do nothing
+            if (latestTimestamp == 0) return;
+            long threshold = latestTimestamp - (20 * 60 * 1000); // 20 mins in millis
+            monitoringDao.deleteOlderThan(threshold);
+        });
+    }
+
 }
